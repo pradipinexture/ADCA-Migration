@@ -3,8 +3,11 @@ package adc.dxp.rest.api.application;
 import adc.dxp.rest.api.application.resources.NewsResource;
 import adc.dxp.rest.api.application.resources.PromotionsResource;
 import adc.dxp.rest.api.application.resources.UserResource;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Portal;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +41,8 @@ public class AdcDxpRestApiApplication extends Application {
     private NewsResource _newsResource;
     @Reference
     private PromotionsResource _promotionResource;
+    @Reference
+    private ConfigurationProvider _configurationProvider;
 
     @Override
     public Set<Object> getSingletons() {
@@ -56,5 +61,14 @@ public class AdcDxpRestApiApplication extends Application {
 
     public UserLocalService getUserLocalService() {
         return this._userLocalService;
+    }
+
+    public volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
+
+    @Activate
+    protected void activate() {
+        try {
+            _dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
+        } catch (ConfigurationException e) {}
     }
 }

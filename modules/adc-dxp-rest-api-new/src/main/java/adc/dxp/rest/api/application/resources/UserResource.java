@@ -74,23 +74,12 @@ public class UserResource {
     AdcDxpRestApiApplication _app;
     @Reference
     private UserLocalService _userLocalService;
-    @Reference
-    private ConfigurationProvider _configurationProvider;
 
     @Reference
     private Portal _portal;
 
-    private volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
-
-    @Activate
-    protected void activate() {
-        try {
-            _dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
-        } catch (ConfigurationException e) {
-            _log.error("Error loading configuration", e);
-        }
-    }
-
+    @Reference
+    private AdcDxpRestApiApplication _adcDxpRestApiApplication;
 
     // This is causing a dependency issue - switching to use normal utility classes instead
     //@Reference(target = "(component.name=adc.dxp.rest.api.application.AdcDxpRestApiApplication)")
@@ -144,7 +133,7 @@ public class UserResource {
             @Context Sort[] sorts,
             @Context HttpServletRequest request) throws PortalException {
 
-        int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
+        int paginationSize = pageSize == null ? _adcDxpRestApiApplication._dxpRESTConfiguration.paginationSize() : pageSize;
         int paginationPage = pagination.getPage();
         _log.debug("Get all users");
 

@@ -12,6 +12,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import adc.dxp.rest.api.application.AdcDxpRestApiApplication;
 import adc.dxp.rest.api.application.data.News;
 import adc.dxp.rest.api.application.utils.RequestUtil;
 import adc.dxp.rest.api.application.utils.UserUtil;
@@ -93,23 +94,10 @@ public class NewsResource {
     private AssetCategoryLocalService _assetCategoryLocalService;
 
     @Reference
-    private ConfigurationProvider _configurationProvider;
+    private AdcDxpRestApiApplication _adcDxpRestApiApplication;
 
     @Reference
     private StructureResource _structureResource;
-
-
-    private volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
-
-    @Activate
-    protected void activate() {
-        try {
-            _dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
-        } catch (ConfigurationException e) {
-            _log.error("Error loading configuration", e);
-        }
-    }
-
 
     @GET
     @Path("/search")
@@ -125,7 +113,7 @@ public class NewsResource {
         System.out.println("Inside the Search Module");
 
         // Pagination setup
-        int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
+        int paginationSize = pageSize == null ? _adcDxpRestApiApplication._dxpRESTConfiguration.paginationSize() : pageSize;
         int paginationPage = pagination.getPage();
 
         // Get basic parameters
@@ -332,7 +320,7 @@ public class NewsResource {
         System.out.println("startDateParam: " + startDateParam);
         System.out.println("endDateParam: " + endDateParam);
 
-        int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
+        int paginationSize = pageSize == null ? _adcDxpRestApiApplication._dxpRESTConfiguration.paginationSize() : pageSize;
 
         int paginationPage = pagination.getPage();
         System.out.println("paginationSize: " + paginationSize);
