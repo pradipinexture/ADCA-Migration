@@ -17,6 +17,9 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
@@ -47,7 +50,7 @@ public class UserData implements Serializable {
 
 
 
-	public UserData(User user) {
+	public UserData(User user) throws UnsupportedEncodingException {
 
 		this.userId = user.getUserId();
 		this.firstName = user.getFirstName();
@@ -77,7 +80,7 @@ public class UserData implements Serializable {
 				setTokenId(WebServerServletTokenUtil.getToken(image.getImageId()));
 			}
 
-			setImgIdToken(HttpUtil.encodeURL(DigesterUtil.digest(user.getUuid())));
+			setImgIdToken(URLEncoder.encode(DigesterUtil.digest(user.getUuid()), StandardCharsets.UTF_8.name()));
 
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
