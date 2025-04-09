@@ -1,0 +1,5 @@
+dependencies{
+    compileOnly group: "com.liferay", name: "com.liferay.portal.search.web", version: "6.0.113"
+    compileOnly group: "com.liferay", name: "com.liferay.calendar.api", version: "x.x.x"
+    compileOnly group: "com.liferay", name: "com.liferay.journal.api", version: "x.x.x"
+}

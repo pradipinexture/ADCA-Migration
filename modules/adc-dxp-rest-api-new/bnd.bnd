@@ -1,0 +1,8 @@
+Bundle-Name: ADC DXP REST API NEW
+Bundle-SymbolicName: adc.dxp.rest.api.new
+Bundle-Version: 1.0.0
+Export-Package: \
+    adc.dxp.rest.api.application,\
+    adc.dxp.rest.api.application.resources
+
+Import-Package: *; version="0";resolution:=optional

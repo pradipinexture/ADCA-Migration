@@ -1,0 +1,7 @@
+Bundle-Name: adc-dxp-hook-search
+Bundle-SymbolicName: adc.dxp.hook.search
+Bundle-Version: 1.0.0
+Fragment-Host: com.liferay.portal.search.web;bundle-version="6.0.113"
+Portal-Bundle-Version: 7.4.13
+Import-Package: \
+  com.liferay.portal.search.web.internal.sort.configuration;resolution:=optional
