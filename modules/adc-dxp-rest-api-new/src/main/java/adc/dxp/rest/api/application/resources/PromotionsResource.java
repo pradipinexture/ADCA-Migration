@@ -17,7 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import adc.dxp.rest.api.application.AdcDxpRestApiApplication;
+import adc.dxp.rest.api.application.utils.PageUtils;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -90,10 +90,21 @@ public class PromotionsResource {
 	private AssetCategoryLocalService _assetCategoryLocalService;
 
 	@Reference
-	private StructureResource _structureResource;
+	private ConfigurationProvider _configurationProvider;
 
 	@Reference
-	private AdcDxpRestApiApplication _adcDxpRestApiApplication;
+	private StructureResource _structureResource;
+
+	private volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
+
+	@Activate
+	protected void activate() {
+		try {
+			_dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
+		} catch (ConfigurationException e) {
+			_log.error("Error loading configuration", e);
+		}
+	}
 
 	@GET
 	@Operation(
@@ -125,7 +136,7 @@ public class PromotionsResource {
 		System.out.println("Inside the Promotions Search Module");
 
 		// Pagination setup
-		int paginationSize = pageSize == null ? _adcDxpRestApiApplication._dxpRESTConfiguration.paginationSize() : pageSize;
+		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
 		int paginationPage = pagination.getPage();
 
 		// Get basic parameters
@@ -258,14 +269,7 @@ public class PromotionsResource {
 
 		System.out.println("Final promotion items: " + lastResults.size());
 
-		// Handle pagination
-		int start = (paginationPage - 1) * paginationSize;
-		int end = Math.min(start + paginationSize, lastResults.size());
-
-		List<Promotion> pageResults = start < lastResults.size() ?
-				lastResults.subList(start, end) : Collections.emptyList();
-
-		return Page.of(pageResults, pagination, lastResults.size());
+		return  PageUtils.createPage(lastResults, pagination, lastResults.size());
 	}
 
 	@GET

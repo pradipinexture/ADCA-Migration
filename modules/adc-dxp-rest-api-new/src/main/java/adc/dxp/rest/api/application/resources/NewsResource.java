@@ -12,15 +12,16 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import adc.dxp.rest.api.application.AdcDxpRestApiApplication;
 import adc.dxp.rest.api.application.data.News;
-import adc.dxp.rest.api.application.utils.RequestUtil;
-import adc.dxp.rest.api.application.utils.UserUtil;
+import adc.dxp.rest.api.application.utils.JournalArticleUtil;
+import adc.dxp.rest.api.application.utils.PageUtils;
+import adc.dxp.rest.api.application.utils.StructureUtil;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.*;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Validator;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -32,7 +33,6 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleService;
-import com.liferay.journal.util.comparator.ArticleDisplayDateComparator;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -94,10 +93,21 @@ public class NewsResource {
     private AssetCategoryLocalService _assetCategoryLocalService;
 
     @Reference
-    private AdcDxpRestApiApplication _adcDxpRestApiApplication;
+    private ConfigurationProvider _configurationProvider;
 
     @Reference
     private StructureResource _structureResource;
+
+    private volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
+
+    @Activate
+    protected void activate() {
+        try {
+            _dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
+        } catch (ConfigurationException e) {
+            _log.error("Error loading configuration", e);
+        }
+    }
 
     @GET
     @Path("/search")
@@ -113,7 +123,7 @@ public class NewsResource {
         System.out.println("Inside the Search Module");
 
         // Pagination setup
-        int paginationSize = pageSize == null ? _adcDxpRestApiApplication._dxpRESTConfiguration.paginationSize() : pageSize;
+        int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
         int paginationPage = pagination.getPage();
 
         // Get basic parameters
@@ -223,73 +233,7 @@ public class NewsResource {
         return Page.of(pageResults, pagination, lastResults.size());
     }
 
-    /**
-     * Search for JournalArticles using a combination of service methods
-     *
-     * @param companyId company ID
-     * @param groupId group ID
-     * @param structureKey structure key
-     * @param startDate start date
-     * @param endDate end date
-     * @param status workflow status
-     * @param keywords search keywords
-     * @param start start position
-     * @param end end position
-     * @param obc order by comparator
-     * @return list of journal articles
-     */
-    private List<JournalArticle> searchByDynamicQuery(long companyId, long groupId, String structureKey,
-                                                      Date startDate, Date endDate, int status, String keywords,
-                                                      int start, int end, OrderByComparator<JournalArticle> obc) {
-        try {
-            // First get articles by group and status
-            List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(
-                    groupId, status, start, end, obc);
 
-            // Filter results manually
-            List<JournalArticle> filteredArticles = new ArrayList<>();
-
-            for (JournalArticle article : allArticles) {
-                // Check company ID
-                if (article.getCompanyId() != companyId) {
-                    continue;
-                }
-
-                // Check structure key
-                if (structureKey != null && !structureKey.equals(article.getDDMStructureKey())) {
-                    continue;
-                }
-
-                // Check date range
-                if (startDate != null && article.getDisplayDate().before(startDate)) {
-                    continue;
-                }
-
-                if (endDate != null && article.getDisplayDate().after(endDate)) {
-                    continue;
-                }
-
-                // Check keywords
-                boolean keywordMatch = true;
-                if (keywords != null && !keywords.isEmpty()) {
-                    String title = article.getTitle().toLowerCase();
-                    String desc = article.getDescription().toLowerCase();
-                    String searchTerm = keywords.toLowerCase();
-
-                    keywordMatch = title.contains(searchTerm) || desc.contains(searchTerm);
-                }
-
-                if (keywordMatch) {
-                    filteredArticles.add(article);
-                }
-            }
-
-            return filteredArticles;
-        } catch (Exception e) {
-            _log.error("Error searching for journal articles", e);
-            return Collections.emptyList();
-        }
-    }
     @GET
     @Operation(
             description = "Retrieves the list of the News. Results can be paginated, filtered, searched, and sorted."
@@ -320,7 +264,7 @@ public class NewsResource {
         System.out.println("startDateParam: " + startDateParam);
         System.out.println("endDateParam: " + endDateParam);
 
-        int paginationSize = pageSize == null ? _adcDxpRestApiApplication._dxpRESTConfiguration.paginationSize() : pageSize;
+        int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
 
         int paginationPage = pagination.getPage();
         System.out.println("paginationSize: " + paginationSize);
@@ -338,13 +282,10 @@ public class NewsResource {
         System.out.println("categoryId: " + categoryId);
         Boolean achievement = achievementParam != null && !achievementParam.isEmpty() && !achievementParam.equalsIgnoreCase("null") ?
                 Boolean.valueOf(achievementParam) : null;
-        System.out.println("achievement: " + achievement);
-        String structureId = _structureResource.getStructure(groupId, Constants.STRUCTURE_NEWS_NAME_EN);
-        System.out.println("structureId: " + structureId);
-        // Date
+        DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_NEWS_NAME_EN);
+         // Date
         Date startDate = null;
         Date endDate = null;
-
         try {
             if (startDateParam != null && !startDateParam.isEmpty()) {
                 startDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateParam);
@@ -352,67 +293,14 @@ public class NewsResource {
             if (endDateParam != null && !endDateParam.isEmpty()) {
                 endDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateParam);
             }
-
         } catch (ParseException e) {
             _log.error("Error parsing date", e);
         }
 
-        System.out.println("startDate: "+ startDate);
-        System.out.println("endDate: "+ endDate);
+        List<Document> list = JournalArticleUtil.searchArticles(companyId,groupId,structure.getStructureKey(),search);
 
-        // Skip the complicated search API call and just use dynamic query results
-        List<Document> list = new ArrayList<>();
-
-        // Get articles using dynamic query which is more stable
-        List<JournalArticle> results = searchByDynamicQuery(companyId, groupId, structureId,
-                startDate, endDate, WorkflowConstants.STATUS_APPROVED, search,
-                QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-
-        for (JournalArticle article : results) {
-            System.out.println("JournalArticle: " + article);
-
-            // Process each article as needed
-            // This is a simplified approach that doesn't rely on the search API
-
-            try {
-                AssetEntry assetEntry = _assetEntryLocalService.getEntry(
-                        "com.liferay.journal.model.JournalArticle", article.getResourcePrimKey());
-
-                // Get categories for filtering
-                List<AssetCategory> categoryList = _assetCategoryLocalService.getCategories(
-                        "com.liferay.journal.model.JournalArticle", article.getResourcePrimKey());
-
-                boolean categoryMatch = categoryIdParam == null || categoryIdParam.equalsIgnoreCase("-1");
-
-                // Check if this article matches the requested category
-                if (!categoryMatch && !categoryList.isEmpty()) {
-                    for (AssetCategory category : categoryList) {
-                        if (Long.compare(category.getCategoryId(), categoryId) == 0) {
-                            categoryMatch = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (categoryMatch) {
-                    // We could create a Document here, but since we don't need to return them,
-                    // we'll skip that for now
-                }
-            } catch (Exception e) {
-                _log.error("Error processing article: " + article.getArticleId(), e);
-            }
-        }
-
-        // Calculate pagination
-        int start = (paginationPage - 1) * paginationSize;
-        int end = Math.min(start + paginationSize, list.size());
-
-        List<Document> pageResults = start < list.size() ?
-                list.subList(start, end) : Collections.emptyList();
-
-        return Page.of(pageResults, pagination, list.size());
+        return PageUtils.createPage(list,pagination,list.size());
     }
-
     /**
      * Returns news by id
      *
@@ -472,72 +360,4 @@ public class NewsResource {
 
         return newsDetail;
     }
-
-    /**
-     * Search for JournalArticles using DynamicQuery
-     *
-     * @param companyId company ID
-     * @param groupId group ID
-     * @param structureKey structure key
-     * @param startDate start date
-     * @param endDate end date
-     * @param status workflow status
-     * @param keywords search keywords
-     * @param start start position
-     * @param end end position
-     * @param obc order by comparator
-     * @return list of journal articles
-     */
-//    private List<JournalArticle> searchByDynamicQuery(long companyId, long groupId, String structureKey,
-//                                                      Date startDate, Date endDate, int status, String keywords,
-//                                                      int start, int end, OrderByComparator<JournalArticle> obc) {
-//        try {
-//            DynamicQuery dynamicQuery = _journalArticleLocalService.dynamicQuery();
-//
-//            System.out.println("Inside the Search");
-//
-//            // Add company ID criteria
-//            dynamicQuery.add(PropertyFactoryUtil.forName("companyId").eq(companyId));
-//
-//            // Add group ID criteria
-//            dynamicQuery.add(PropertyFactoryUtil.forName("groupId").eq(groupId));
-//
-//            // Add structure key criteria if provided
-//            if (structureKey != null && !structureKey.isEmpty()) {
-//                dynamicQuery.add(PropertyFactoryUtil.forName("DDMStructureKey").eq(structureKey));
-//            }
-//
-//            // Add status criteria
-//            dynamicQuery.add(PropertyFactoryUtil.forName("status").eq(status));
-//
-//            // Add date range criteria if provided
-////            if (startDate != null && endDate != null) {
-////                dynamicQuery.add(PropertyFactoryUtil.forName("displayDate").between(startDate, endDate));
-////            } else if (startDate != null) {
-////                dynamicQuery.add(PropertyFactoryUtil.forName("displayDate").ge(startDate));
-////            } else if (endDate != null) {
-////                dynamicQuery.add(PropertyFactoryUtil.forName("displayDate").le(endDate));
-////            }
-//
-//            // Add title/content search if keywords provided
-//            if (keywords != null && !keywords.isEmpty()) {
-//                // Search in title, description, and content
-//                dynamicQuery.add(
-//                        PropertyFactoryUtil.forName("title").like("%" + keywords + "%")
-//                );
-//            }
-//
-//            // Add ordering
-////            if (obc != null) {
-////                dynamicQuery.addOrder(OrderFactoryUtil.asc("displayDate"));
-////            } else {
-////                dynamicQuery.addOrder(OrderFactoryUtil.desc("displayDate"));
-////            }
-//
-//            return _journalArticleLocalService.dynamicQuery(dynamicQuery, start, end);
-//        } catch (Exception e) {
-//            _log.error("Error searching for journal articles using dynamic query", e);
-//            return Collections.emptyList();
-//        }
-//    }
 }

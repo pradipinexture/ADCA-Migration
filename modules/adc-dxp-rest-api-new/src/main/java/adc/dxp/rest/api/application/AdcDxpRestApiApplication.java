@@ -1,13 +1,8 @@
 package adc.dxp.rest.api.application;
 
-import adc.dxp.rest.api.application.resources.NewsResource;
-import adc.dxp.rest.api.application.resources.PromotionsResource;
-import adc.dxp.rest.api.application.resources.UserResource;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import adc.dxp.rest.api.application.resources.*;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Portal;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
@@ -37,19 +32,27 @@ public class AdcDxpRestApiApplication extends Application {
     private Portal _portal;
     @Reference
     private UserResource _userResource;
+
     @Reference
     private NewsResource _newsResource;
     @Reference
-    private PromotionsResource _promotionResource;
+    private PromotionsResource _promotionsResource;
     @Reference
-    private ConfigurationProvider _configurationProvider;
-
+    private MediaResource _mediaResource;
+    @Reference
+    private ContactResource _contactResource;
+    @Reference
+    private EventResource _eventResource;
     @Override
     public Set<Object> getSingletons() {
         Set<Object> singletons = new HashSet<>();
-        singletons.add(_userResource);
+       singletons.add(_userResource);
         singletons.add(_newsResource);
-        singletons.add(_promotionResource);
+        singletons.add(_promotionsResource);
+        singletons.add(_mediaResource);
+        singletons.add(_contactResource);
+        singletons.add(_mediaResource);
+        singletons.add(_eventResource);
         return singletons;
     }
 
@@ -61,14 +64,5 @@ public class AdcDxpRestApiApplication extends Application {
 
     public UserLocalService getUserLocalService() {
         return this._userLocalService;
-    }
-
-    public volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
-
-    @Activate
-    protected void activate() {
-        try {
-            _dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
-        } catch (ConfigurationException e) {}
     }
 }

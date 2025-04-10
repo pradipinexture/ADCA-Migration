@@ -18,7 +18,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import adc.dxp.rest.api.application.AdcDxpRestApiApplication;
+import adc.dxp.rest.api.application.utils.PageUtils;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -114,11 +114,21 @@ public class MediaResource {
 	private AnnouncementsFlagLocalService _announcementsFlagLocalService;
 
 	@Reference
-	private StructureResource _structureResource;
+	private ConfigurationProvider _configurationProvider;
 
 	@Reference
-	private AdcDxpRestApiApplication _adcDxpRestApiApplication;
+	private StructureResource _structureResource;
 
+	private volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
+
+	@Activate
+	protected void activate() {
+		try {
+			_dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
+		} catch (ConfigurationException e) {
+			_log.error("Error loading configuration", e);
+		}
+	}
 	/**
 	 * Returns all Galleries
 	 */
@@ -275,7 +285,7 @@ public class MediaResource {
 		}
 
 		// Handle pagination
-		int paginationSize = pageSize == null ? _adcDxpRestApiApplication._dxpRESTConfiguration.paginationSize() : pageSize;
+		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
 		int paginationPage = pagination.getPage();
 		int fromIndex = paginationPage != 1 ? ((paginationPage - 1) * paginationSize) : 0;
 		int toIndex = paginationPage != 1 ? paginationPage * paginationSize : paginationSize;

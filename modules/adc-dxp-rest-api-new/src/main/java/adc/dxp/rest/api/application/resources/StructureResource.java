@@ -61,31 +61,5 @@ public class StructureResource {
 		throw new PortalException("Structure not found: " + structureName);
 	}
 
-	/**
-	 * Static helper method for backward compatibility
-	 *
-	 * @param groupId the group ID
-	 * @param structureName the structure name
-	 * @return the structure key
-	 * @throws PortalException if structure is not found
-	 */
-	public static String getStructureStatic(long groupId, String structureName) throws PortalException {
-		Property structureIdProperty = PropertyFactoryUtil.forName("name");
 
-		DynamicQuery dynamicQuery = DDMStructureLocalServiceUtil.dynamicQuery();
-		Criterion criterion = structureIdProperty.like("%>" + structureName + "</Name>%");
-		dynamicQuery.add(criterion);
-
-		List<DDMStructure> structures = DDMStructureLocalServiceUtil.dynamicQuery(
-				dynamicQuery, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		if (!structures.isEmpty()) {
-			String structureKey = structures.get(0).getStructureKey();
-			LogFactoryUtil.getLog(StructureResource.class).debug("Found structureKey: " + structureKey);
-			return structureKey;
-		}
-
-		LogFactoryUtil.getLog(StructureResource.class).error("Structure not found: " + structureName);
-		throw new PortalException("Structure not found: " + structureName);
-	}
 }

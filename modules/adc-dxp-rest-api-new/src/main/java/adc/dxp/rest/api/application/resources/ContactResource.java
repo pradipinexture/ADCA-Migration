@@ -17,11 +17,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import adc.dxp.rest.api.application.AdcDxpRestApiConfiguration;
+import adc.dxp.rest.api.application.utils.JournalArticleUtil;
+import adc.dxp.rest.api.application.utils.PageUtils;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.util.comparator.ArticleDisplayDateComparator;
@@ -31,15 +35,17 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
-import adc.dxp.rest.api.application.AdcDxpRestApiApplication;
 import adc.dxp.rest.api.application.data.Category;
 import adc.dxp.rest.api.application.data.Contact;
 import adc.dxp.rest.api.application.data.comparator.JournalArticleTitleComparator;
@@ -50,16 +56,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 
-/**
- *
- * Endpoints  of the Contact Contacts
- *
- */
+@Component(
+		property = {
+				"osgi.jaxrs.application.select=(osgi.jaxrs.name=ADC.Services)",
+				"osgi.jaxrs.resource=true"
+		},
+		scope = ServiceScope.PROTOTYPE,
+		service = ContactResource.class
+)
 @Path("/contacts")
-public class ContactResource extends BasicResource {
-
+public class ContactResource {
 
 	/**
 	 * app instance
@@ -71,7 +82,18 @@ public class ContactResource extends BasicResource {
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
-	private AdcDxpRestApiApplication _app;
+	private Portal _portal;
+
+	private volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
+
+	@Activate
+	protected void activate() {
+		try {
+			_dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
+		} catch (ConfigurationException e) {
+			_log.error("Error loading configuration", e);
+		}
+	}
 
 	/**
 	 * logging instance
@@ -105,7 +127,7 @@ public class ContactResource extends BasicResource {
 			@Context Sort[] sorts,
 			@Context HttpServletRequest request) throws PortalException {
 
-		int paginationSize = pageSize == null ? _app._dxpRESTConfiguration.paginationSize() : pageSize;
+		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
 		int paginationPage = pagination.getPage();
 
 		long companyId = PortalUtil.getCompanyId(request);
@@ -116,7 +138,6 @@ public class ContactResource extends BasicResource {
 		String languageIdString = request.getHeader("languageId");
 
 		long categoryId = categoryIdParam != null && !categoryIdParam.isEmpty() ? Long.valueOf(categoryIdParam).longValue() : -1;
-
 		String structureId = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_CONTACT_NAME_EN).getStructureKey();
 
 		Date startDate = null;
@@ -144,10 +165,10 @@ public class ContactResource extends BasicResource {
 			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());
 		}
 
-		List<JournalArticle> results = null;
-//		List<JournalArticle> results = search(companyId, groupId, Collections.emptyList(), 0, search, null,
-//				structureId, null, startDate, endDate, 0, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, orderByComparator);
+		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_CONTACT_NAME_EN);
 
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search,structure.getStructureId(),
+				startDate, endDate, null);
 		List<Contact> lastResults = new ArrayList<>();
 
 		for (JournalArticle article: results) {
@@ -201,14 +222,7 @@ public class ContactResource extends BasicResource {
 				lastResults.sort((entity1, entity2) -> entity2.getCategory().getName().compareTo(entity1.getCategory().getName()));
 			}
 		}
-		// Using the Liferay Vulcan Page API directly instead of PageUtils
-		int start = (paginationPage - 1) * paginationSize;
-		int end = Math.min(start + paginationSize, lastResults.size());
-
-		List<Contact> pageResults = start < lastResults.size() ?
-				lastResults.subList(start, end) : Collections.emptyList();
-
-		return Page.of(pageResults, pagination, lastResults.size());
+		return PageUtils.createPage(lastResults,pagination,lastResults.size());
 	}
 
 	/**
