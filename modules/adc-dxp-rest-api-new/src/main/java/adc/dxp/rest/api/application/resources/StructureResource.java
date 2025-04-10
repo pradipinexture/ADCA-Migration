@@ -2,9 +2,11 @@ package adc.dxp.rest.api.application.resources;
 
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -12,44 +14,52 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 /**
- *
- * Utilities for the Structures
+ * Utilities for working with DDM Structures
  *
  * @author ana.cavadas
- *
  */
+@Component(service = StructureResource.class)
 public class StructureResource {
 
 	/**
-	 * logging instance
+	 * Logging instance
 	 */
-	private static Log _log = LogFactoryUtil.getLog(StructureResource.class);
+	private static final Log _log = LogFactoryUtil.getLog(StructureResource.class);
 
-	public static String getStructure(long groupId, String structureName) throws PortalException {
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
+	/**
+	 * Gets the structure key for a structure by name
+	 *
+	 * @param groupId the group ID
+	 * @param structureName the structure name
+	 * @return the structure key
+	 * @throws PortalException if structure is not found
+	 */
+	public String getStructure(long groupId, String structureName) throws PortalException {
 		Property structureIdProperty = PropertyFactoryUtil.forName("name");
 
-		DynamicQuery dynamicQuery = DDMStructureLocalServiceUtil.dynamicQuery();
+		DynamicQuery dynamicQuery = _ddmStructureLocalService.dynamicQuery();
 		Criterion criterion = structureIdProperty.like("%>" + structureName + "</Name>%");
 		dynamicQuery.add(criterion);
 
-		String structureKey  = null;
+		List<DDMStructure> structures = _ddmStructureLocalService.dynamicQuery(
+				dynamicQuery, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
-		List<DDMStructure> structures = DDMStructureLocalServiceUtil.dynamicQuery(dynamicQuery, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-		if(!structures.isEmpty()) {
-			structureKey = structures.get(0).getStructureKey();
-			_log.debug("structureKey" + structureKey);
-
+		if (!structures.isEmpty()) {
+			String structureKey = structures.get(0).getStructureKey();
+			_log.debug("Found structureKey: " + structureKey);
+			return structureKey;
 		}
 
-		if (structureKey == null) {
-			//TODO: improve this
-			throw new PortalException("Structure not found");
-		}
-
-		return structureKey;
+		_log.error("Structure not found: " + structureName);
+		throw new PortalException("Structure not found: " + structureName);
 	}
+
 
 }
