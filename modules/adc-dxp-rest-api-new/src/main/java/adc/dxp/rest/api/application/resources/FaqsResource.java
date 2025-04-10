@@ -210,7 +210,7 @@ public class FaqsResource extends BasicResource {
 		}
 		// TODO: ver se d� probs getName e getTitle
 		
-		if (article == null || !String.valueOf(article.getDDMStructureId()).equals(structureId)) {
+		if (article == null || !String.valueOf(article.getDDMStructureKey()).equals(structureId)) {
 			// TODO: improve this
 			_log.debug("Not Found");
 			throw new PortalException(javax.ws.rs.core.Response.Status.NOT_FOUND.toString());

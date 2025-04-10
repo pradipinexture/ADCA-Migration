@@ -268,9 +268,8 @@ public class ContactResource {
 			AssetCategory catego = AssetCategoryLocalServiceUtil.getCategory(firstCategory.get().getCategoryId());
 			entity.setCategory(new Category(catego.getTitle(languageIdString), catego.getCategoryId()));
 		}
-		long ddmStructureId = article.getDDMStructureId();
 
-		if (article == null || !String.valueOf(article.getDDMStructureId()).equals(structureId)) {
+		if (article == null || !String.valueOf(article.getDDMStructureKey()).equals(structureId)) {
 			_log.debug("Not Found");
 			throw new PortalException(javax.ws.rs.core.Response.Status.NOT_FOUND.toString());
 		}

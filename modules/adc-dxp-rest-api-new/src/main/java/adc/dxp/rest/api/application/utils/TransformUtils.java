@@ -1,8 +1,6 @@
 package adc.dxp.rest.api.application.utils;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,38 +8,37 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Node;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 import adc.dxp.rest.api.application.data.enumeration.ChangeTagType;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 
-/**
- * Utility class for transforming and extracting structured content
- */
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+
 public class TransformUtils {
 
 	/**
-	 * Logging instance
+	 * logging instance
 	 */
-	private static final Log _log = LogFactoryUtil.getLog(TransformUtils.class);
+	private static Log _log = LogFactoryUtil.getLog(TransformUtils.class);
 
-	/**
-	 * Extracts image URL from JSON content
-	 *
-	 * @param imageJson the JSON containing image data
-	 * @return the formatted image URL or null if extraction fails
-	 */
 	public static String getImageByContent(String imageJson) {
+
 		String imageJsonOut = StringEscapeUtils.unescapeJava(imageJson);
 
 		if (!StringUtils.isEmpty(imageJsonOut)) {
@@ -53,32 +50,27 @@ public class TransformUtils {
 				String uuid = obj.getUuid();
 				String fileName = obj.getName();
 
-				// Return the image URL using the proper pattern for Liferay 7.4
-				return String.format(Constants.IMAGE_URL_FOLDER, Long.valueOf(groupId), fileName, uuid);
+				//return String.format(Constants.IMAGE_URL, uuid, Long.valueOf(groupId));
+
+				return String.format(Constants.IMAGE_URL_FOLDER, Long.valueOf(groupId), fileName, uuid );
 
 			} catch (JsonMappingException e) {
-				_log.error("Error mapping JSON to object", e);
+				// TODO ana.cavadas
+				e.printStackTrace();
 			} catch (JsonProcessingException e) {
-				_log.error("Error processing JSON", e);
+				// TODO ana.cavadas
+				e.printStackTrace();
 			}
 		}
 
 		return null;
 	}
 
-	/**
-	 * Extracts dynamic elements from content and returns them as a map
-	 *
-	 * @param content the XML content
-	 * @return a map of dynamic attributes
-	 */
-	public static Map<String, DynamicAttribute> getDynamicElement(String content) {
-		if (content == null || content.trim().isEmpty()) {
-			return new HashMap<>();
-		}
 
+	public static Map<String, DynamicAttribute> getDynamicElement(String content) {
 		JAXBContext jaxbContext;
-		try {
+		try
+		{
 			jaxbContext = JAXBContext.newInstance(Root.class);
 
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -87,35 +79,24 @@ public class TransformUtils {
 
 			List<DynamicElement> dynamicElementList = root.getDynamicElementList();
 			Map<String, DynamicAttribute> attributeList = new HashMap<>();
-
 			for (DynamicElement de: dynamicElementList) {
-				attributeList.put(de.getName(), new DynamicAttribute(
-						de.getName(),
-						de.getDynamicContent() != null ? de.getDynamicContent().get__cdata() : null
-				));
+				attributeList.put(de.getName(), new DynamicAttribute(de.getName(),  de.getDynamicContent() != null ? de.getDynamicContent().get__cdata() : null));
+
 			}
 
 			return attributeList;
-		} catch (JAXBException e) {
-			_log.error("Error unmarshalling content", e);
 		}
-
-		return new HashMap<>();
+		catch (JAXBException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	/**
-	 * Extracts list of dynamic elements from content and returns them as a map
-	 *
-	 * @param content the XML content
-	 * @return a map of dynamic attribute lists
-	 */
 	public static Map<String, List<DynamicAttribute>> getListDynamicElement(String content) {
-		if (content == null || content.trim().isEmpty()) {
-			return new HashMap<>();
-		}
-
 		JAXBContext jaxbContext;
-		try {
+		try
+		{
 			jaxbContext = JAXBContext.newInstance(Root.class);
 
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -126,189 +107,185 @@ public class TransformUtils {
 
 			Map<String, List<DynamicAttribute>> attributeList = new HashMap<>();
 			for (DynamicElement de: dynamicElementList) {
-				if (de.getDynamicContent() == null) {
-					continue;
-				}
-
 				if (attributeList.containsKey(de.getName())) {
 					List<DynamicAttribute> list = new ArrayList<>(attributeList.get(de.getName()));
 					list.add(new DynamicAttribute(de.getName(), de.getDynamicContent().get__cdata()));
 					attributeList.put(de.getName(), list);
-				} else {
-					List<DynamicAttribute> list = new ArrayList<>();
-					list.add(new DynamicAttribute(de.getName(), de.getDynamicContent().get__cdata()));
+				}
+				else {
+
+					List<DynamicAttribute> list = Arrays.asList(new DynamicAttribute(de.getName(), de.getDynamicContent() != null ? de.getDynamicContent().get__cdata() : null));
 					attributeList.put(de.getName(), list);
 				}
+
+
 			}
 
 			return attributeList;
-		} catch (JAXBException e) {
-			_log.error("Error unmarshalling content", e);
 		}
-
-		return new HashMap<>();
+		catch (JAXBException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	/**
-	 * Extracts the name element from content
-	 *
-	 * @param content the XML content
-	 * @return the extracted name or null
-	 */
 	public static String getElement(String content) {
-		if (content == null || content.trim().isEmpty()) {
-			return null;
-		}
-
 		JAXBContext jaxbContext;
-		try {
+		try
+		{
 			jaxbContext = JAXBContext.newInstance(RootName.class);
 
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
 			RootName root = (RootName) jaxbUnmarshaller.unmarshal(new StringReader(content));
 
-			return root.getName();
-		} catch (JAXBException e) {
-			_log.error("Error unmarshalling content", e);
-		}
 
+
+			return root.getName();
+		}
+		catch (JAXBException e)
+		{
+			e.printStackTrace();
+		}
 		return null;
 	}
 
-	/**
-	 * Updates HTML tags with specified CSS classes
-	 *
-	 * @param content the HTML content
-	 * @param tags the tag types to update
-	 * @return the updated content
-	 */
 	public static String updateTags(String content, ChangeTagType... tags) {
+
 		if (content == null) {
 			return content;
 		}
 
-		String result = content;
+		// Remove all styles
+		//String result = content.replaceAll("(?<=\\bstyle=\\\")[^\\\"]*", "");
 
 		for (ChangeTagType ct : tags) {
-			result = result.replaceAll(
-					ct.getTag() + ".",
-					ct.getTag() + " class=\"" + Constants.STYLE_FOR.get(ct.toString()) + "\" "
-			);
+			content = content.replaceAll(ct.getTag() + ".",
+					ct.getTag().concat(" class=\"").concat(Constants.STYLE_FOR.get(ct.toString())).concat("\" "));
 		}
 
-		return result;
+		return content;
 	}
 
 	/**
-	 * Gets localized fields from a JournalArticle
 	 *
-	 * @param model the JournalArticle
-	 * @param languageId the language ID
-	 * @param fieldName the field name
-	 * @return list of field values
+	 * @param model
+	 * @param languageId
+	 * @param fieldName
+	 * @return
+	 * @author Daniel Dias
+	 */
+//	public static String getLocalizableField(JournalArticle model, String languageId, String fieldName) {
+//
+//		String value = "";
+//		try {
+//
+//			Document document = SAXReaderUtil.read(model.getContentByLocale(languageId));
+//
+//			Node node = document.selectSingleNode("/root/dynamic-element[@name='"+fieldName+"']/dynamic-content");
+//			value = node.getText();
+//
+//
+//		} catch (DocumentException e) {
+//			LOGGER.error(e.getMessage());
+//		}
+//
+//		return value;
+//
+//	}
+
+	/**
+	 *
+	 * @param model
+	 * @param languageId
+	 * @param fieldName
+	 * @return
+	 * @author Daniel Dias
 	 */
 	public static List<String> getLocalizableField(JournalArticle model, String languageId, String fieldName) {
-		List<String> result = new ArrayList<>();
 
-		if (model == null || languageId == null || fieldName == null) {
-			return result;
-		}
+		List<String> result= new ArrayList<String>();
 
 		try {
+
 			Document document = SAXReaderUtil.read(model.getContentByLocale(languageId));
-			List<Node> nodes = document.selectNodes("/root/dynamic-element[@name='" + fieldName + "']/dynamic-content");
+			List<Node> nodes = document.selectNodes("/root/dynamic-element[@name='"+fieldName+"']/dynamic-content");
 
 			for (Node node : nodes) {
 				result.add(node.getText());
 			}
+
+
 		} catch (DocumentException e) {
-			_log.error("Error parsing document content", e);
+			_log.error(e.getMessage());
 		}
 
 		return result;
+
 	}
 
 	/**
-	 * Gets localized fields as a map from a JournalArticle
 	 *
-	 * @param model the JournalArticle
-	 * @param languageId the language ID
-	 * @param fieldName the field name
-	 * @return list of field value maps
+	 * @param model
+	 * @param languageId
+	 * @param fieldName
+	 * @return
+	 * @author Daniel Dias
 	 */
-	public static List<Map<String, String>> getLocalizableFieldMap(JournalArticle model, String languageId, String fieldName) {
-		List<Map<String, String>> result = new ArrayList<>();
+	public static List<Map<String,String>> getLocalizableFieldMap(JournalArticle model, String languageId, String fieldName) {
 
-		if (model == null || languageId == null || fieldName == null) {
-			return result;
-		}
+		List<Map<String,String>> result= new ArrayList<Map<String,String>>();
 
 		try {
+
 			Document document = SAXReaderUtil.read(model.getContentByLocale(languageId));
-			List<Node> nodes = document.selectNodes("/root/dynamic-element[@name='" + fieldName + "']");
+			List<Node> nodes = document.selectNodes("/root/dynamic-element[@name='"+fieldName+"']");
 
 			for (Node node : nodes) {
-				Map<String, String> obj = new HashMap<>();
-				Node contentNode = node.selectSingleNode("./dynamic-content");
-				Node elementContentNode = node.selectSingleNode("./dynamic-element/dynamic-content");
-
-				if (contentNode != null && elementContentNode != null) {
-					obj.put(contentNode.getText(), elementContentNode.getText());
-					result.add(obj);
-				}
+				Map<String, String> obj = new HashMap<String,String>();
+				List<Node> fieldNodes = node.selectNodes("Number");
+				obj.put(node.selectSingleNode("./dynamic-content").getText(), node.selectSingleNode("./dynamic-element/dynamic-content").getText());
+				result.add(obj);
 			}
+
+
 		} catch (DocumentException e) {
-			_log.error("Error parsing document content", e);
+			_log.error(e.getMessage());
 		}
 
 		return result;
+
 	}
 
-	/**
-	 * Gets nested localized fields as a map from a JournalArticle
-	 *
-	 * @param model the JournalArticle
-	 * @param languageId the language ID
-	 * @param fieldNameParent the parent field name
-	 * @param fieldName the child field name
-	 * @return list of field value maps with lists
-	 */
-	public static List<Map<String, List<String>>> getLocalizableFieldMap(
-			JournalArticle model, String languageId, String fieldNameParent, String fieldName) {
+	public static List<Map<String,List<String>>> getLocalizableFieldMap(JournalArticle model, String languageId, String fieldNameParent, String fieldName) {
 
-		List<Map<String, List<String>>> result = new ArrayList<>();
-
-		if (model == null || languageId == null || fieldNameParent == null || fieldName == null) {
-			return result;
-		}
+		List<Map<String,List<String>>> result= new ArrayList<>();
 
 		try {
+
 			Document document = SAXReaderUtil.read(model.getContentByLocale(languageId));
-			List<Node> nodes = document.selectNodes("/root/dynamic-element[@name='" + fieldNameParent + "']");
+			List<Node> nodes = document.selectNodes("/root/dynamic-element[@name='"+fieldNameParent+"']");
 			Map<String, List<String>> obj = new HashMap<>();
-
 			for (Node node : nodes) {
-				List<Node> fieldNodes = node.selectNodes("./dynamic-element[@name='" + fieldName + "']/dynamic-content");
-				Node contentNode = node.selectSingleNode("./dynamic-content");
-
-				if (contentNode != null) {
-					String mapKey = contentNode.getText();
-					List<String> list = new ArrayList<>();
-
-					for (Node n : fieldNodes) {
-						list.add(n.getText());
-					}
-
-					obj.put(mapKey, list);
+				List<Node> fieldNodes = node.selectNodes("./dynamic-element[@name='" + fieldName+ "']/dynamic-content");
+				String mapKey = node.selectSingleNode("./dynamic-content").getText();
+				List<String> list = new ArrayList<>();
+				for (Node n: fieldNodes) {
+					list.add(n.getText());
 				}
+				obj.put(mapKey, list);
 			}
-
 			result.add(obj);
+
+
 		} catch (DocumentException e) {
-			_log.error("Error parsing document content", e);
+			_log.error(e.getMessage());
 		}
 
 		return result;
+
 	}
+
+
 }
