@@ -244,8 +244,7 @@ public class UserResource {
 
         List<UserVO> result = new ArrayList<>();
         for (User user : users) {
-            result.add(convertToUserVO(user));
-        }
+            result.add(new UserVO(user));        }
 
         return Page.of(result, pagination, totalCount);
     }

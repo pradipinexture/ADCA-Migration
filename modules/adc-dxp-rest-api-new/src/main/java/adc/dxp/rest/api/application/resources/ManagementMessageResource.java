@@ -196,15 +196,7 @@ public class ManagementMessageResource extends BasicResource {
 			}
 		}
 
-		List<DirectorMessage> finalResult = new ArrayList<>();
-
-		if ((idString == null || idString.isEmpty()) && pageSize > 1) {
-			finalResult = lastResults.subList(1, lastResults.size());
-		} else {
-			finalResult = lastResults;
-		}
-
-		return PageUtils.createPage(finalResult, pagination, finalResult.size());
+		return PageUtils.createPage(lastResults, pagination, lastResults.size());
 	}
 
 	/**

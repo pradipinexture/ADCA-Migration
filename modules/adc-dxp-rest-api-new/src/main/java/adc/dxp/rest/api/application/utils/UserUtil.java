@@ -6,6 +6,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,14 +22,14 @@ public class UserUtil {
      * @throws PortalException if unable to determine the current user
      */
     public static User getCurrentUser(HttpServletRequest request, AdcDxpRestApiApplication app) {
-        if (request == null || app == null) {
+        if (request == null) {// || app == null) {
             return null;
         }
 
-        UserLocalService userLocalService = app.getUserLocalService();
-        if (userLocalService == null) {
-            return null;
-        }
+//        UserLocalService userLocalService = app.getUserLocalService();
+//        if (userLocalService == null) {
+//            return null;
+//        }
 
         String userId = request.getRemoteUser();
         if (userId == null || userId.isEmpty()) {
@@ -35,7 +37,7 @@ public class UserUtil {
         }
 
         try {
-            return userLocalService.getUser(Long.valueOf(userId));
+            return UserLocalServiceUtil.getUser(Long.valueOf(userId));
         } catch (Exception e) {
             // Use proper logging instead of printStackTrace
             Log _log = LogFactoryUtil.getLog(UserUtil.class);

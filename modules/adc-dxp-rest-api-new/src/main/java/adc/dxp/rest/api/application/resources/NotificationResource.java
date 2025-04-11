@@ -101,7 +101,7 @@ public class NotificationResource extends BasicResource {
             @HeaderParam(Constants.HEADER_GROUP_ID) long groupId) throws PortalException {
 
         User currentUser = UserUtil.getCurrentUser(request, _app);
-        notification.getEntryId()
+        notification.getEntryId();
         JSONObject payload = JSONFactoryUtil.createJSONObject()
             .put("entryId", notification.getEntryId())
             .put("notificationMessage", notification.getNotificationMessage())

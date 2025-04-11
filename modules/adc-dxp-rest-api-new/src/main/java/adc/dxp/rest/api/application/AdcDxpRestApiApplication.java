@@ -43,16 +43,28 @@ public class AdcDxpRestApiApplication extends Application {
     private ContactResource _contactResource;
     @Reference
     private EventResource _eventResource;
+    @Reference
+    private KnowledgeResource _knowledgeResource;
+    @Reference
+    private FaqsResource _faqsResource;
+    @Reference
+    private ManagementMessageResource _managementMessageResource;
+    @Reference
+    private QuickLinksResource _quickLinksResource;
     @Override
     public Set<Object> getSingletons() {
         Set<Object> singletons = new HashSet<>();
-       singletons.add(_userResource);
+        singletons.add(_userResource);
         singletons.add(_newsResource);
         singletons.add(_promotionsResource);
         singletons.add(_mediaResource);
         singletons.add(_contactResource);
         singletons.add(_mediaResource);
         singletons.add(_eventResource);
+        singletons.add(_eventResource);
+        singletons.add(_knowledgeResource);
+        singletons.add(_managementMessageResource);
+        singletons.add(_quickLinksResource);
         return singletons;
     }
 

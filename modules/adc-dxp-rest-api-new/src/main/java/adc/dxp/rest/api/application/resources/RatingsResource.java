@@ -32,8 +32,12 @@ import org.osgi.service.component.annotations.Reference;
 
 @Path("/ratings")
 public class RatingsResource {
+
 	private static AdcDxpRestApiApplication _app;
 
+	public RatingsResource(AdcDxpRestApiApplication _app) {
+		RatingsResource._app = _app;
+	}
 	/**
 	 * logging instance
 	 */
