@@ -52,6 +52,9 @@ public class AdcDxpRestApiApplication extends Application {
     private QuickLinksResource _quickLinksResource;
     @Reference
     private NewspaperResource _newspaperResource;
+    @Reference
+    private AnnouncementsResource _announcementsResource;
+
     @Override
     public Set<Object> getSingletons() {
         Set<Object> singletons = new HashSet<>();
@@ -67,6 +70,7 @@ public class AdcDxpRestApiApplication extends Application {
         singletons.add(_managementMessageResource);
         singletons.add(_quickLinksResource);
         singletons.add(_newspaperResource);
+        singletons.add(_announcementsResource);
         return singletons;
     }
 
