@@ -32,7 +32,6 @@ public class AdcDxpRestApiApplication extends Application {
     private Portal _portal;
     @Reference
     private UserResource _userResource;
-
     @Reference
     private NewsResource _newsResource;
     @Reference
@@ -51,6 +50,8 @@ public class AdcDxpRestApiApplication extends Application {
     private ManagementMessageResource _managementMessageResource;
     @Reference
     private QuickLinksResource _quickLinksResource;
+    @Reference
+    private NewspaperResource _newspaperResource;
     @Override
     public Set<Object> getSingletons() {
         Set<Object> singletons = new HashSet<>();
@@ -65,6 +66,7 @@ public class AdcDxpRestApiApplication extends Application {
         singletons.add(_knowledgeResource);
         singletons.add(_managementMessageResource);
         singletons.add(_quickLinksResource);
+        singletons.add(_newspaperResource);
         return singletons;
     }
 
