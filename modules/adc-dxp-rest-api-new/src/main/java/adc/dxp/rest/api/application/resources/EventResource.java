@@ -2,14 +2,17 @@ package adc.dxp.rest.api.application.resources;
 
 import adc.dxp.rest.api.application.AdcDxpRestApiApplication;
 import adc.dxp.rest.api.application.AdcDxpRestApiConfiguration;
+import adc.dxp.rest.api.application.data.vo.CalendarBoobingUserVO;
 import adc.dxp.rest.api.application.data.vo.CalendarBookingVO;
+import adc.dxp.rest.api.application.data.vo.CalendarVO;
+import adc.dxp.rest.api.application.data.vo.UserVO;
 import adc.dxp.rest.api.application.utils.Constants;
 import adc.dxp.rest.api.application.utils.PageUtils;
 import adc.dxp.rest.api.application.utils.UserUtil;
 import com.liferay.calendar.model.CalendarBooking;
 import com.liferay.calendar.model.CalendarResource;
-import com.liferay.calendar.service.CalendarBookingLocalServiceUtil;
-import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
+import com.liferay.calendar.service.*;
+import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
@@ -37,11 +40,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -62,8 +67,25 @@ public class EventResource extends BasicResource {
     private static final Log _log = LogFactoryUtil.getLog(EventResource.class);
 
     AdcDxpRestApiApplication _app;
+
+
     @Reference
     private UserLocalService _userLocalService;
+
+    @Reference
+    private CalendarBookingService _calendarBookingService;
+
+    @Reference
+    private CalendarLocalService _calendarLocalService;
+
+    @Reference
+    private CalendarResourceLocalService _calendarResourceLocalService;
+
+    @Reference
+    private CalendarBookingLocalService _calendarBookingLocalService;
+
+
+
     @Reference
     private ConfigurationProvider _configurationProvider;
 
@@ -264,4 +286,304 @@ public class EventResource extends BasicResource {
 
         return new CalendarBookingVO(booking, languageId);
     }
+    @GET
+    @Path("/calendars")
+    @Operation(description = "Get all calendars.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Page<CalendarVO> getCalendars(
+            @Parameter(hidden = true) @QueryParam("isRestricted") @DefaultValue("true") boolean isRestricted,
+            @QueryParam("pageSize") Integer pageSize,
+            @Context Filter filter,
+            @Context Pagination pagination,
+            @Context HttpServletRequest request) throws PortalException {
+
+        _log.debug("Get all calendars");
+
+        List<CalendarVO> result = new ArrayList<>();
+        int paginationSize = pageSize == null ?
+                _dxpRESTConfiguration.paginationSize() : pageSize;
+
+        int paginationPage = pagination.getPage();
+
+        List<com.liferay.calendar.model.Calendar> calendars = _calendarLocalService.getCalendars(-1, -1);
+
+        String languageIdRequestRequest = request.getHeader("languageId");
+        String languageIdAcceptLanguage = request.getHeader("Accept-Language") != null &&
+                request.getHeader("Accept-Language").equalsIgnoreCase("ar-AE") ? "ar_AE" : "en_US";
+        String languageIdRequest = languageIdRequestRequest != null ? languageIdRequestRequest : languageIdAcceptLanguage;
+        String languageId = languageIdRequest != null ? languageIdRequest : "en";
+
+        for (com.liferay.calendar.model.Calendar calendar : calendars) {
+            result.add(new CalendarVO(calendar.getPrimaryKey(), calendar.getName(languageId)));
+//            if (!isRestricted || _dxpRESTConfiguration.calendars().indexOf(calendar.getCalendarId()) != -1) {
+//                if (isAllowed("com.liferay.calendar.model.Calendar",
+//                        calendar.getCalendarId(),
+//                        UserUtil.getCurrentUser(request,_app),
+//                        getCompanyId(request))) {
+//
+//                    result.add(new CalendarVO(calendar.getPrimaryKey(), calendar.getName(languageId)));
+//                }
+//            }
+        }
+
+        return Page.of(result, pagination, paginationPage);
+    }
+
+    @GET
+    @Path("/{id}")
+    @Operation(description = "Get a booking.")
+    @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
+    @Produces(MediaType.APPLICATION_JSON)
+    public CalendarBookingVO getCalendarBooking(
+            @Parameter(hidden = true) @PathParam("id") long id,
+            @Context HttpServletRequest request) throws PortalException {
+
+        _log.debug("Get booking by ids " + id);
+
+        User currentUser = UserUtil.getCurrentUser(request,_app);
+        CalendarBooking booking = _calendarBookingLocalService.fetchCalendarBooking(id);
+
+        if (!isAllowed("com.liferay.calendar.model.Calendar",
+                _calendarBookingLocalService.getCalendarBooking(booking.getParentCalendarBookingId()).getCalendarId(),
+                currentUser,
+                getCompanyId(request))) {
+            throw new ForbiddenException();
+        }
+
+        String languageIdRequestRequest = request.getHeader("languageId");
+        String languageIdAcceptLanguage = request.getHeader("Accept-Language") != null &&
+                request.getHeader("Accept-Language").equalsIgnoreCase("ar-AE") ? "ar_AE" : "en";
+        String languageIdRequest = languageIdRequestRequest != null ? languageIdRequestRequest : languageIdAcceptLanguage;
+        String languageId = languageIdRequest != null ? languageIdRequest : "en";
+
+        CalendarBookingVO result = new CalendarBookingVO(booking, languageId);
+        result.setCalendarBoobingUserVO(new ArrayList<>());
+
+        DynamicQuery bookingsDQ = _calendarBookingLocalService.dynamicQuery();
+        Criterion idCriterion = RestrictionsFactoryUtil.ne("calendarBookingId", id);
+        bookingsDQ.add(idCriterion);
+
+        Criterion parentIdCriterion = RestrictionsFactoryUtil.eq("parentCalendarBookingId", id);
+        bookingsDQ.add(parentIdCriterion);
+
+        List<CalendarBooking> bookings = _calendarLocalService.dynamicQuery(bookingsDQ, -1, -1);
+
+        for (CalendarBooking b : bookings) {
+            CalendarResource calendarResource = _calendarResourceLocalService.fetchCalendarResource(b.getCalendarResourceId());
+            User user = _userLocalService.fetchUser(calendarResource.getUserId());
+
+            if (user == null) {
+                _log.warn("User is null");
+            } else {
+                UserVO userVo = new UserVO(user);
+                userVo.complementValues();
+                userVo.setContacts(null);
+
+                CalendarBoobingUserVO calendarBookingUser = new CalendarBoobingUserVO(userVo, b.getStatus());
+
+                if (currentUser.getUserId() == calendarBookingUser.getUser().getUserId()) {
+                    result.setCurrentUserStatus(calendarBookingUser.getStatus());
+                }
+
+                if (result.getCalendarBoobingUserVO().indexOf(calendarBookingUser) == -1) {
+                    result.getCalendarBoobingUserVO().add(calendarBookingUser);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @PATCH
+    @Path("/{id}/accept")
+    @Operation(description = "Subscribe in a calendar booking")
+    @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
+    @Produces(MediaType.APPLICATION_JSON)
+    public CalendarBookingVO addCalendarBooking(
+            @Parameter(hidden = true) @PathParam("id") long id,
+            @Context HttpServletRequest request) throws PortalException {
+
+        _log.debug("Accept calendar booking");
+
+        String languageId = getLanguageId(request);
+        User currentUser = UserUtil.getCurrentUser(request,_app);
+
+        CalendarBooking booking = setCalendarBookingStatus(id, 0, languageId, currentUser, getCompanyId(request));
+        CalendarBookingVO result = new CalendarBookingVO(booking, languageId);
+
+        return result;
+    }
+
+    @PATCH
+    @Path("/{id}/maybe")
+    @Operation(description = "Think about in a calendar booking")
+    @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
+    @Produces(MediaType.APPLICATION_JSON)
+    public CalendarBookingVO maybeCalendarBooking(
+            @Parameter(hidden = true) @PathParam("id") long id,
+            @Context HttpServletRequest request) throws PortalException {
+
+        _log.debug("Think about calendar booking");
+
+        String languageId = getLanguageId(request);
+        User currentUser = UserUtil.getCurrentUser(request,_app);
+
+        CalendarBooking booking = setCalendarBookingStatus(id, 9, languageId, currentUser, getCompanyId(request));
+        CalendarBookingVO result = new CalendarBookingVO(booking, languageId);
+
+        return result;
+    }
+
+    @PATCH
+    @Path("/{id}/decline")
+    @Operation(description = "Decline a calendar booking")
+    @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
+    @Produces(MediaType.APPLICATION_JSON)
+    public CalendarBookingVO declineCalendarBooking(
+            @Parameter(hidden = true) @PathParam("id") long id,
+            @Context HttpServletRequest request) throws PortalException {
+
+        _log.debug("Decline calendar booking");
+
+        String languageId = getLanguageId(request);
+        User currentUser = UserUtil.getCurrentUser(request,_app);
+
+        CalendarBooking booking = setCalendarBookingStatus(id, 4, languageId, currentUser, getCompanyId(request));
+        CalendarBookingVO result = new CalendarBookingVO(booking, languageId);
+
+        return result;
+    }
+
+    private CalendarBooking setCalendarBookingStatus(
+            long calendarBookingId,
+            int status,
+            String languageId,
+            User currentUser,
+            Long companyId) throws PortalException {
+
+        if (!isAllowed("com.liferay.calendar.model.Calendar",
+                _calendarBookingLocalService.getCalendarBooking(calendarBookingId).getCalendarId(),
+                currentUser,
+                companyId)) {
+            throw new ForbiddenException();
+        }
+
+        ServiceContext serviceContext = new ServiceContext();
+        List<CalendarBooking> bookings = getCalendarBookings(calendarBookingId, currentUser, serviceContext, true);
+
+        CalendarBooking result = null;
+
+        for (CalendarBooking booking : bookings) {
+            result = _calendarBookingLocalService.updateStatus(
+                    currentUser.getUserId(),
+                    booking.getCalendarBookingId(),
+                    status,
+                    serviceContext);
+        }
+
+        return result;
+    }
+
+    private List<CalendarBooking> getCalendarBookings(
+            Long calendarBookingId,
+            User currentUser,
+            ServiceContext serviceContext,
+            Boolean createIfMissing) throws PortalException {
+
+        DynamicQuery bookingsDQ = _calendarBookingLocalService.dynamicQuery();
+        Criterion idCriterion = RestrictionsFactoryUtil.ne("calendarBookingId", calendarBookingId);
+        bookingsDQ.add(idCriterion);
+
+        Criterion parentIdCriterion = RestrictionsFactoryUtil.eq("parentCalendarBookingId", calendarBookingId);
+        bookingsDQ.add(parentIdCriterion);
+
+        DynamicQuery resourceDQ = _calendarResourceLocalService.dynamicQuery();
+        Criterion userIdCriterion = RestrictionsFactoryUtil.eq("userId", currentUser.getUserId());
+        resourceDQ.add(userIdCriterion);
+
+        List<CalendarResource> calendarResources = _calendarResourceLocalService.dynamicQuery(resourceDQ);
+
+        List<Long> ids = new ArrayList<>();
+        for (CalendarResource resource : calendarResources) {
+            ids.add(resource.getCalendarResourceId());
+        }
+
+        Criterion calendarResourceCriterion = RestrictionsFactoryUtil.in("calendarResourceId", ids);
+        bookingsDQ.add(calendarResourceCriterion);
+
+        List<CalendarBooking> bookings = _calendarLocalService.dynamicQuery(bookingsDQ);
+
+        if (createIfMissing && bookings.isEmpty()) {
+            //addCalendar(calendarBookingId, calendarResources, currentUser, serviceContext);
+            bookings = _calendarLocalService.dynamicQuery(bookingsDQ);
+        }
+
+        return bookings;
+    }
+
+//    private void addCalendar(
+//            Long calendarBookingId,
+//            List<CalendarResource> calendarResources,
+//            User currentUser,
+//            ServiceContext serviceContext) throws PortalException {
+//
+//        if (calendarResources.isEmpty()) {
+//            return;
+//        }
+//
+//        CalendarBooking calendarBookingClone = _calendarBookingLocalService.fetchCalendarBooking(calendarBookingId);
+//
+//        List<com.liferay.calendar.model.Calendar> calendars = _calendarLocalService.getCalendarResourceCalendars(
+//                calendarResources.get(0).getGroupId(),
+//                calendarResources.get(0).getCalendarResourceId(),
+//                true);
+//
+//        if (calendars.isEmpty()) {
+//            return;
+//        }
+//
+//        calendarBookingClone.setCalendarResourceId(calendarResources.get(0).getCalendarResourceId());
+//        calendarBookingClone.setCalendarBookingId(0L);
+//        calendarBookingClone.setCalendarId(calendars.get(0).getCalendarId());
+//        calendarBookingClone.setUuid(null);
+//
+//        _calendarBookingLocalService.addCalendarBooking(
+//                currentUser.getUserId(),
+//                calendars.get(0).getCalendarId(),
+//                new long[0],
+//                calendarBookingId,
+//                calendarBookingClone.getTitleMap(),
+//                calendarBookingClone.getDescriptionMap(),
+//                calendarBookingClone.getLocation(),
+//                calendarBookingClone.getStartTime(),
+//                calendarBookingClone.getEndTime(),
+//                calendarBookingClone.getAllDay(),
+//                calendarBookingClone.getRecurrence(),
+//                calendarBookingClone.getFirstReminder(),
+//                calendarBookingClone.getFirstReminderType(),
+//                calendarBookingClone.getSecondReminder(),
+//                calendarBookingClone.getSecondReminderType(),
+//                serviceContext);
+//    }
+
+    @Override
+    public boolean isAllowed(String name, Long primaryKey, User currentUser, Long companyId) throws PortalException {
+        Boolean result = super.isAllowed(name, primaryKey, currentUser, companyId);
+
+        if (!result) {
+            result = !getCalendarBookings(primaryKey, currentUser, new ServiceContext(), false).isEmpty();
+        }
+
+        return result;
+    }
+
+    public String getLanguageId(HttpServletRequest request) {
+        String languageIdRequestRequest = request.getHeader("languageId");
+        String languageIdAcceptLanguage = request.getHeader("Accept-Language") != null &&
+                request.getHeader("Accept-Language").equalsIgnoreCase("ar-AE") ? "ar_AE" : "en_US";
+        String languageIdRequest = languageIdRequestRequest != null ? languageIdRequestRequest : languageIdAcceptLanguage;
+        return languageIdRequest != null ? languageIdRequest : "en";
+    }
+
+
 }
