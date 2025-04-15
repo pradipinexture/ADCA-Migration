@@ -1,0 +1,7 @@
+Bundle-Name: adc.dxp.language
+Bundle-SymbolicName: adc.dxp.language
+Bundle-Version: 1.0.0
+Export-Package: language.constants
+Provide-Capability:\
+	liferay.language.resources;\
+		resource.bundle.base.name="content.Language"

@@ -116,24 +116,23 @@ public class FaqsResource extends BasicResource {
 				Long.valueOf(categoryIdParam).longValue() : -1;
 		
 		String groupIdString = request.getHeader("groupId");
-		
 		long groupId = Long.valueOf(groupIdString).longValue();
 		String languageIdString = request.getHeader("languageId");
-		DDMStructure structureByNameEn = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_NEWS_NAME_EN);
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureByNameEn.getStructureId(), null, null, null);;
-		
+		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_FAQ_NAME_EN);
+
+		System.out.println("Structure Faqs ID: " + structure.getStructureId());
+		System.out.println("Structure Faqs : " + structure);
+
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, Long.parseLong("2432595"), null, null, null);;
 		List<Faqs> lastResults = new ArrayList<>();
 		
 		for (JournalArticle article: results) {
-			
 			Faqs faqs = new Faqs(article, 
 					languageIdString);
-			
 			if (lastResults.indexOf(faqs) != -1) {
 				continue;
 			}
-			
 			AssetEntry assetUtil = AssetEntryLocalServiceUtil.getEntry("com.liferay.journal.model.JournalArticle", article.getResourcePrimKey());
 			faqs.setEntryId(assetUtil.getEntryId());
 

@@ -104,7 +104,7 @@ public class Constants {
 	public static final String ACCEPT_LANGUAGE_EN = "en-US";
 	
 	//Contact
-	public static final String STRUCTURE_CONTACT_NAME_EN = "Contact";
+	public static final String STRUCTURE_CONTACT_NAME_EN = "Contact2";
 	public static final String VOCABULARY_CONTACT_NAME_EN = "Contact";
 	public static final String CONTACT_TYPE = "contact";
 	

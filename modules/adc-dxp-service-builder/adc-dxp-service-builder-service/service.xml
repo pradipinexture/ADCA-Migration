@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
+
+<service-builder dependency-injector="ds" package-path="adc.dxp.service.builder">
+	<namespace>FOO</namespace>
+	<entity name="EventResource" local-service="true" remote-service="false" json-enabled="false"></entity>
+
+	<entity name="ADCJournalArticleResource" local-service="true" remote-service="false" json-enabled="false"></entity>
+</service-builder>

@@ -17,6 +17,7 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -87,8 +88,13 @@ public class QuickLinksResource extends BasicResource {
 		long groupId = Long.parseLong(groupIdString);
 		long companyId = PortalUtil.getCompanyId(request);
 
+
 		long structureId = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN).getStructureId();
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, null, structureId, null, null, null);
+		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN);
+		System.out.println("Structure ID: " + structure.getStructureId());
+
+
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, null, structure.getStructureId(), null, null, null);
 
 		List<QuickLinks> lastResultsUpVoted = new ArrayList<>();
 		boolean defaultOrder = true;
@@ -140,6 +146,11 @@ public class QuickLinksResource extends BasicResource {
 
 		long structureId = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN).getStructureId();
 
+		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN);
+		System.out.println("Structure Quick Link: " + structure.getStructureId());
+		System.out.println("Structure Quick Link ID: " + structure);
+
+
 		Date startDate = null;
 		Date endDate = null;
 
@@ -161,7 +172,7 @@ public class QuickLinksResource extends BasicResource {
 			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());
 		}
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureId, startDate, endDate, orderByComparator);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureId(), startDate, endDate, orderByComparator);
 		List<QuickLinks> lastResults = new ArrayList<>();
 
 		for (JournalArticle article : results) {

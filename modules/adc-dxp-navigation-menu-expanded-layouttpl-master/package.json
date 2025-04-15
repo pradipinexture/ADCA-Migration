@@ -1,0 +1,27 @@
+{
+	"name": "adc-dxp-navigation-menu-expanded-layouttpl",
+	"version": "1.0.0-SNAPSHOT.0",
+	"main": "package.json",
+	"keywords": [
+		"liferay-theme"
+	],
+	"liferayLayoutTemplate": {
+		"version": "7.4"
+	},
+	"devDependencies": {
+		"gulp": "4.0.2",
+		"liferay-theme-tasks": "^11.0.0"
+	},
+	"scripts": {
+		"init": "gulp init",
+		"build": "gulp build",
+		"deploy": "gulp deploy",
+		"version-patch": "npm version patch -m \"[Release] New version  %s \" && npm run commit-develop",
+		"version-minor": "npm version minor -m \"[Release] New version  %s \" && npm run commit-develop",
+		"version-major": "npm version major -m \"[Release] New version  %s \" && npm run commit-develop",
+		"change-version": "npm --no-git-tag-version version prerelease --preid=SNAPSHOT",
+		"new-git": "git commit -am \"[Release] Prepare develop \"",
+		"commit-develop": "git push --follow-tags origin develop",
+		"prepare-release": "npm run change-version && npm run new-git && npm run commit-develop"
+	}
+}

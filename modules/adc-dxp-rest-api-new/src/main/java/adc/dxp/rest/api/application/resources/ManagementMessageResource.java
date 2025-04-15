@@ -116,6 +116,7 @@ public class ManagementMessageResource extends BasicResource {
 			@Context Sort[] sorts,
 			@Context HttpServletRequest request) throws PortalException {
 
+		System.out.println("Entering search API with idString: " + idString + ", search: " + search + ", categoryId: " + categoryIdParam);
 		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
 		int paginationPage = pagination.getPage();
 
@@ -153,11 +154,16 @@ public class ManagementMessageResource extends BasicResource {
 		_log.debug("endDate: "+ endDate);
 
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_MANAGEMENT_MESSAGE_NAME_EN);
+		System.out.println("Structure ID: " + structure.getStructureId());
+
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureId(), startDate, endDate, orderByComparator);
+		System.out.println("Search results size: " + (results != null ? results.size() : 0));
 
 		List<DirectorMessage> lastResults = new ArrayList<>();
 
 		for (JournalArticle article : results) {
+			System.out.println("Processing article with resourcePrimKey: " + article.getResourcePrimKey());
+
 			DirectorMessage tellaStory = new DirectorMessage(article, request.getHeader(Constants.HEADER_LANGUAGE_ID));
 
 			_log.debug("idString: "+ idString);
@@ -168,12 +174,14 @@ public class ManagementMessageResource extends BasicResource {
 			tellaStory.setEntryId(assetUtil.getEntryId());
 
 			List<AssetCategory> categoryList = AssetCategoryLocalServiceUtil.getCategories(JournalArticle.class.getName(), assetUtil.getClassPK());
+			System.out.println("Category list size for article: " + categoryList.size());
 
 			Optional<AssetCategory> firstCategory = categoryList.stream().findFirst();
 
 			if (firstCategory.isPresent()) {
 				AssetCategory catego = AssetCategoryLocalServiceUtil.getCategory(firstCategory.get().getCategoryId());
 				tellaStory.setCategory(new Category(catego.getTitle(languageIdString), catego.getCategoryId()));
+				System.out.println("Set category: " + catego.getTitle(languageIdString) + ", ID: " + catego.getCategoryId());
 			}
 
 			_log.debug("DisplayDate: " + tellaStory.getDisplayDate());
@@ -195,7 +203,7 @@ public class ManagementMessageResource extends BasicResource {
 				lastResults.sort((entity1, entity2) -> entity2.getCategory().getName().compareTo(entity1.getCategory().getName()));
 			}
 		}
-
+		System.out.println("Final results size: " + lastResults.size());
 		return PageUtils.createPage(lastResults, pagination, lastResults.size());
 	}
 

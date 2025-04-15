@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE layout-templates PUBLIC "-//Liferay//DTD Layout Templates 7.4.0//EN" "http://www.liferay.com/dtd/liferay-layout-templates_7_4_0.dtd">
+<layout-templates>
+	<custom>
+		<layout-template id="adc-dxp-layout-search" name="adc-dxp-layout-search">
+			<template-path>/adc_dxp_layout_search.ftl</template-path>
+			<thumbnail-path>/adc_dxp_layout_search.png</thumbnail-path>
+		</layout-template>
+	</custom>
+</layout-templates>

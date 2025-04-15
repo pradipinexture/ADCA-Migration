@@ -1,5 +1,6 @@
 package adc.dxp.rest.api.application.resources;
 
+import adc.dxp.rest.api.application.AdcDxpRestApiConfiguration;
 import adc.dxp.rest.api.application.data.Announcements;
 import adc.dxp.rest.api.application.data.Category;
 import adc.dxp.rest.api.application.utils.Constants;
@@ -23,14 +24,19 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import io.swagger.v3.oas.annotations.Operation;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
@@ -58,6 +64,21 @@ import java.util.Optional;
 public class AnnouncementsResource {
 
 	private static final Log _log = LogFactoryUtil.getLog(AnnouncementsResource.class);
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+	@Reference
+	private Portal _portal;
+
+	private volatile AdcDxpRestApiConfiguration _dxpRESTConfiguration;
+
+	@Activate
+	protected void activate() {
+		try {
+			_dxpRESTConfiguration = _configurationProvider.getCompanyConfiguration(AdcDxpRestApiConfiguration.class, 0);
+		} catch (ConfigurationException e) {
+			_log.error("Error loading configuration", e);
+		}
+	}
 
 	@GET
 	@Path("")

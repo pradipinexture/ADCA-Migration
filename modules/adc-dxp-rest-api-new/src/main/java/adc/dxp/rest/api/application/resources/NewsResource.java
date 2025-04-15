@@ -188,7 +188,6 @@ public class NewsResource {
                         groupId, article.getArticleId(), article.getVersion(), WorkflowConstants.STATUS_APPROVED)) {
 
                     News news = new News(article, request.getHeader(Constants.HEADER_LANGUAGE_ID));
-
                     // Check achievement filter
                     if (achievement == null || !achievement || achievement.compareTo(news.isAchievement()) == 0) {
 

@@ -59,7 +59,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Component(
 		property = {
 				"osgi.jaxrs.application.select=(osgi.jaxrs.name=ADC.Services)",
-				"osgi.jaxrs.resource=true"
+				"osgi.jaxrs.resource=true",
+				"auth.verifier.guest.allowed=true",
+				"auth.verifier.BasicAuthHeaderAuthVerifier.basic_auth=true"
 		},
 		scope = ServiceScope.PROTOTYPE,
 		service = KnowledgeResource.class
@@ -148,7 +150,13 @@ public class KnowledgeResource extends BasicResource {
 			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());	
 		}
 
-		DDMStructure structureByNameEn = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_NEWS_NAME_EN);
+		DDMStructure structureByNameEn = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_KNOWLEDGE_SHARING_NAME_EN);
+
+		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_KNOWLEDGE_SHARING_NAME_EN);
+
+		System.out.println("Structure Knowledge Sharing: " + structure.getStructureId());
+		System.out.println("Structure Knowledge Sharing: " + structure);
+
 
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureByNameEn.getStructureId(), startDate, endDate, orderByComparator);
 
