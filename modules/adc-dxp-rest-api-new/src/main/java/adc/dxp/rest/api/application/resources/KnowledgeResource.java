@@ -154,10 +154,6 @@ public class KnowledgeResource extends BasicResource {
 
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_KNOWLEDGE_SHARING_NAME_EN);
 
-		System.out.println("Structure Knowledge Sharing: " + structure.getStructureId());
-		System.out.println("Structure Knowledge Sharing: " + structure);
-
-
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureByNameEn.getStructureKey(), startDate, endDate, orderByComparator);
 
 		List<Knowledge> lastResults = new ArrayList<>();

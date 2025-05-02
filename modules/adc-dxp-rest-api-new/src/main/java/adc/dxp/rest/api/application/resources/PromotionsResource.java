@@ -134,7 +134,6 @@ public class PromotionsResource {
 			@Context HttpServletRequest request,
 			@HeaderParam(Constants.HEADER_GROUP_ID) long groupId) throws PortalException {
 
-		System.out.println("Inside the Promotions Search Module");
 
 		// Pagination setup
 		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
@@ -152,13 +151,11 @@ public class PromotionsResource {
 			groupId = Long.valueOf(groupIdString);
 		}
 
-		System.out.println("Group Id: " + groupId);
 		// Category filter
 		long categoryId = categoryIdParam != null && !categoryIdParam.isEmpty() && !categoryIdParam.equalsIgnoreCase("null") ?
 				Long.valueOf(categoryIdParam) : -1;
 
 		String structureId = _structureResource.getStructure(groupId, Constants.STRUCTURE_PROMOTIONS_EN);
-		System.out.println("Structure Id: " + structureId);
 
 		// Date parsing
 		Date startDate = null;
@@ -177,7 +174,6 @@ public class PromotionsResource {
 
 		// Get all articles for the group
 		List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(groupId);
-		System.out.println("Total articles in group: " + allArticles.size());
 
 		// Filter by approved status and structure ID
 		List<JournalArticle> filteredArticles = new ArrayList<>();
@@ -187,7 +183,6 @@ public class PromotionsResource {
 				filteredArticles.add(article);
 			}
 		}
-		System.out.println("Articles matching structure: " + filteredArticles.size());
 
 		// Filter by search term if provided
 		if (search != null && !search.isEmpty()) {
@@ -201,7 +196,6 @@ public class PromotionsResource {
 				}
 			}
 			filteredArticles = searchFilteredArticles;
-			System.out.println("Articles after search filter: " + filteredArticles.size());
 		}
 
 		// Sort results if needed
@@ -257,10 +251,6 @@ public class PromotionsResource {
 			}
 		}
 
-
-
-		System.out.println("Final promotion items: " + lastResults.size());
-		System.out.println("Final news items: " + lastResults.size());
 		// Handle pagination
 		int start = (paginationPage - 1) * paginationSize;
 		int end = Math.min(start + paginationSize, lastResults.size());

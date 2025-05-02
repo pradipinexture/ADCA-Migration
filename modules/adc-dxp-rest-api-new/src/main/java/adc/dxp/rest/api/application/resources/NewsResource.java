@@ -120,7 +120,6 @@ public class NewsResource {
             @Context Pagination pagination,
             @Context HttpServletRequest request) throws PortalException {
 
-        System.out.println("Inside the Search Module");
 
         // Pagination setup
         int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
@@ -135,7 +134,6 @@ public class NewsResource {
             throw new PortalException("Missing required header: groupId");
         }
 
-        System.out.println("Group Id: " + groupIdString);
         long groupId = Long.valueOf(groupIdString);
 
         // Category filter
@@ -143,7 +141,6 @@ public class NewsResource {
                 Long.valueOf(categoryIdParam) : -1;
 
         String structureId = _structureResource.getStructure(groupId, Constants.STRUCTURE_NEWS_NAME_EN);
-        System.out.println("Structure Id: " + structureId);
 
         // Achievement filter
         Boolean achievement = achievementParam != null && !achievementParam.isEmpty() && !achievementParam.equalsIgnoreCase("null") ?
@@ -151,7 +148,6 @@ public class NewsResource {
 
         // Get all articles for the group
         List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(groupId);
-        System.out.println("Total articles in group: " + allArticles.size());
 
         // Filter by approved status and structure ID
         List<JournalArticle> filteredArticles = new ArrayList<>();
@@ -161,8 +157,6 @@ public class NewsResource {
                 filteredArticles.add(article);
             }
         }
-        System.out.println("Articles matching structure: " + filteredArticles.size());
-
 
         // Filter by search term if provided
         if (search != null && !search.isEmpty()) {
@@ -176,7 +170,6 @@ public class NewsResource {
                 }
             }
             filteredArticles = searchFilteredArticles;
-            System.out.println("Articles after search filter: " + filteredArticles.size());
         }
 
         // Process results
@@ -221,7 +214,6 @@ public class NewsResource {
             }
         }
 
-        System.out.println("Final news items: " + lastResults.size());
 
         // Handle pagination
         int start = (paginationPage - 1) * paginationSize;
@@ -261,14 +253,9 @@ public class NewsResource {
             @Context Sort[] sorts,
             @Context HttpServletRequest request) throws PortalException {
 
-        System.out.println("startDateParam: " + startDateParam);
-        System.out.println("endDateParam: " + endDateParam);
-
         int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
 
         int paginationPage = pagination.getPage();
-        System.out.println("paginationSize: " + paginationSize);
-        System.out.println("paginationPage: " + paginationPage);
 
         long companyId = _portal.getCompanyId(request);
 
@@ -279,7 +266,7 @@ public class NewsResource {
 
         long categoryId = categoryIdParam != null && !categoryIdParam.isEmpty() && !categoryIdParam.equalsIgnoreCase("null") ?
                 Long.valueOf(categoryIdParam).longValue() : -1;
-        System.out.println("categoryId: " + categoryId);
+
         Boolean achievement = achievementParam != null && !achievementParam.isEmpty() && !achievementParam.equalsIgnoreCase("null") ?
                 Boolean.valueOf(achievementParam) : null;
         DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_NEWS_NAME_EN);
@@ -321,7 +308,6 @@ public class NewsResource {
             @Parameter(hidden = true) @QueryParam("id") String idString,
             @Context HttpServletRequest request
     ) throws PortalException {
-        System.out.println("Call get news");
         String groupIdString = request.getHeader("groupId");
         String languageIdString = request.getHeader("languageId");
 
@@ -335,9 +321,6 @@ public class NewsResource {
 
         AssetEntry assetUtil = _assetEntryLocalService.getEntry(
                 "com.liferay.journal.model.JournalArticle", article.getResourcePrimKey());
-        System.out.println("JournalArticle: " + article);
-
-        System.out.println("article.getResourcePrimKey(): " + article.getResourcePrimKey());
 
         List<AssetCategory> categoryList = _assetCategoryLocalService.getCategories(
                 "com.liferay.journal.model.JournalArticle", article.getResourcePrimKey());
@@ -346,15 +329,10 @@ public class NewsResource {
 
         if (firstCategory.isPresent()) {
             AssetCategory catego = _assetCategoryLocalService.getCategory(firstCategory.get().getCategoryId());
-            System.out.println("catego: " + catego);
-            System.out.println("languageIdString: " + languageIdString);
             newsDetail.setCategory(new Category(catego.getTitle(languageIdString), catego.getCategoryId()));
-            System.out.println("categoryName: " + catego.getName());
-            System.out.println("categoryName: " + catego.getTitle(languageIdString));
         }
 
         if (article == null || !article.getDDMStructureKey().equals(structureId)) {
-            System.out.println("Not Found");
             throw new PortalException(javax.ws.rs.core.Response.Status.NOT_FOUND.toString());
         }
 

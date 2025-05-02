@@ -21,10 +21,8 @@ public class DirectorMessage extends BaseContent {
 	public DirectorMessage(JournalArticle article, String languageId) {
 
 		super(article, Optional.of(languageId == null ? Constants.DEFAULT_VALUE_LANGUAGE : languageId), ContentType.ANNOUNCEMENT);
-		System.out.println("super(article, Optional.of(languageId == null ? Constants.DEFAULT_VALUE_LANGUAGE : languageId), ContentType.ANNOUNCEMENT);");
 
 		if (getAttributes().containsKey("Body")) {
-			System.out.println("if (getAttributes().containsKey(\"Body\")) {");
 			this.setBody(TransformUtils.updateTags(getAttributes().get("Body").getValue(), ChangeTagType.WEB_CONTENT_BODY_IMAGE));
 			
 		}

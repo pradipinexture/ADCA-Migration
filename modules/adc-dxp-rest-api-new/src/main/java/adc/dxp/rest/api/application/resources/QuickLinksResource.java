@@ -91,7 +91,6 @@ public class QuickLinksResource extends BasicResource {
 
 		long structureId = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN).getStructureId();
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN);
-		System.out.println("Structure ID: " + structure.getStructureId());
 
 
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, null, structure.getStructureKey(), null, null, null);
@@ -147,8 +146,6 @@ public class QuickLinksResource extends BasicResource {
 		long structureId = StructureUtil.getStructureByNameEn("Quick Link").getStructureId();
 
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN);
-		System.out.println("Structure Quick Link: " + structure.getStructureId());
-		System.out.println("Structure Quick Link ID: " + structure);
 
 		Date startDate = null;
 		Date endDate = null;

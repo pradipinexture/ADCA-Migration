@@ -110,7 +110,7 @@ public class BaseContent extends Content {
 		if (attributes != null) {
 			if (attributes.get(Constants.STRUNCTURE_FIELD_NAME_IMAGE) != null) {
 				String imageJson = attributes.get(Constants.STRUNCTURE_FIELD_NAME_IMAGE).getValue();
-				System.out.println(imageJson);
+
 				previewImage = TransformUtils.getImageByContent(imageJson);
 			}
 
@@ -152,13 +152,10 @@ public class BaseContent extends Content {
 
 		// Process content to extract attributes
 		String contentUnescape = StringEscapeUtils.unescapeJava(content);
-		System.out.println("contentUnescape" +contentUnescape);
 		attributes = TransformUtils.getDynamicElement(contentUnescape);
-		System.out.println("attributes" +attributes);
 		if (attributes != null) {
 			if (attributes.get(Constants.STRUNCTURE_FIELD_NAME_IMAGE) != null) {
 				String imageJson = attributes.get(Constants.STRUNCTURE_FIELD_NAME_IMAGE).getValue();
-				System.out.println("imageJson "+imageJson);
 				previewImage = TransformUtils.getImageByContent(imageJson);
 			}
 

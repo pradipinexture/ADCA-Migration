@@ -82,11 +82,10 @@ public class TransformUtils {
 			List<DynamicElement> dynamicElementList = root.getDynamicElementList();
 			Map<String, DynamicAttribute> attributeList = new HashMap<>();
 			for (DynamicElement de: dynamicElementList) {
-				System.out.println("Name "+de.getName());
+
 				if(de.getDynamicElementList() != null && de.getDynamicElementList().size() != 0) {
 					List<DynamicElement> dynamicElementNestedList = de.getDynamicElementList();
 					for (DynamicElement dynamicElementNested: dynamicElementNestedList) {
-						System.out.println("Name "+dynamicElementNested.getName());
 						attributeList.put(dynamicElementNested.getName(), new DynamicAttribute(dynamicElementNested.getName(),  dynamicElementNested.getDynamicContent() != null ? dynamicElementNested.getDynamicContent().get__cdata() : null));
 					}
 				} else {

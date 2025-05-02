@@ -127,20 +127,6 @@ public class JournalArticleUtil {
         Hits hits = indexer.search(searchContext);
         List<Document> documents = hits.toList();
 
-        // Print search result details
-        System.out.println("Total Hits: " + hits.getLength());
-        for (Document doc : documents) {
-            String title = doc.get("title_" + LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
-            String articleId = doc.get("articleId");
-            String resourcePrimKey = doc.get(Field.ENTRY_CLASS_PK);
-            String categories = doc.get(Field.ASSET_CATEGORY_IDS); // comma-separated
-
-            System.out.println("---------------------------------------------------");
-            System.out.println("Title: " + title);
-            System.out.println("Article ID: " + articleId);
-            System.out.println("Resource PK: " + resourcePrimKey);
-            System.out.println("Categories: " + categories);
-        }
         return documents;
     }
 

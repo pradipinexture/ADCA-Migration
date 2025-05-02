@@ -166,14 +166,12 @@ public class ContactResource {
 		}
 
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_CONTACT_NAME_EN);
-		System.out.println("Structure ID: " + structure.getStructureId());
 
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(),
 				startDate, endDate, null);
-		System.out.println("Search results size: " + (results != null ? results.size() : 0));
+
 		List<Contact> lastResults = new ArrayList<>();
 		for (JournalArticle article: results) {
-			System.out.println("Processing article with resourcePrimKey: " + article.getResourcePrimKey());
 
 			Contact contact = new Contact(article, request.getHeader(Constants.HEADER_LANGUAGE_ID));
 
@@ -181,7 +179,6 @@ public class ContactResource {
 			contact.setEntryId(assetUtil.getEntryId());
 
 			List<AssetCategory> categoryList = _assetCategoryLocalService.getCategories(JournalArticle.class.getName(), assetUtil.getClassPK());
-			System.out.println("Category list size for article: " + categoryList.size());
 
 			Optional<AssetCategory> firstCategory = categoryList.stream().findFirst();
 
