@@ -1,0 +1,5 @@
+Bundle-Name: adx-dxp-hook-messageboards
+Bundle-SymbolicName: adx.dxp.hook.messageboards
+Bundle-Version: 1.0.0
+Fragment-Host: com.liferay.message.boards.web;bundle-version="5.0.92"
+Portal-Bundle-Version: 7.4.13
