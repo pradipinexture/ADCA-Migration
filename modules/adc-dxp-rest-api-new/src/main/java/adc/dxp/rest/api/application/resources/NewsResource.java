@@ -163,6 +163,7 @@ public class NewsResource {
         }
         System.out.println("Articles matching structure: " + filteredArticles.size());
 
+
         // Filter by search term if provided
         if (search != null && !search.isEmpty()) {
             String searchLowerCase = search.toLowerCase();

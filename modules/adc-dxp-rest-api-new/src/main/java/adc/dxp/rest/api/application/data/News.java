@@ -32,7 +32,8 @@ public class News extends BaseContent {
 	
 	public News(JournalArticle article, String languageId) {
 		super(article, Optional.of(languageId == null ? Constants.DEFAULT_VALUE_LANGUAGE : languageId), ContentType.NEWS);
-		
+		System.out.println(getPreviewImage());
+
 		if (getAttributes() != null) {
 			
 			if (getAttributes().get(Constants.STRUCTURE_NEWS_FIELD_BODY) != null) {
@@ -108,10 +109,5 @@ public class News extends BaseContent {
 			return false;
 		return true;
 	}
-	
-	
-	
-	
-	
 	
 }

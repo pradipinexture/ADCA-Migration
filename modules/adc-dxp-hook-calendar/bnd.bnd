@@ -1,0 +1,5 @@
+Bundle-Name: adc-dxp-hook-calendar
+Bundle-SymbolicName: adc.dxp.hook.calendar
+Bundle-Version: 1.0.0
+Fragment-Host: com.liferay.calendar.web;bundle-version="5.0.77"
+Portal-Bundle-Version: 7.4.13

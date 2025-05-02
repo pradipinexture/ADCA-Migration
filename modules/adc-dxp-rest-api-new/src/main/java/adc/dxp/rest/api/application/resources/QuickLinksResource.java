@@ -94,7 +94,7 @@ public class QuickLinksResource extends BasicResource {
 		System.out.println("Structure ID: " + structure.getStructureId());
 
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, null, structure.getStructureId(), null, null, null);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, null, structure.getStructureKey(), null, null, null);
 
 		List<QuickLinks> lastResultsUpVoted = new ArrayList<>();
 		boolean defaultOrder = true;
@@ -144,12 +144,11 @@ public class QuickLinksResource extends BasicResource {
 		long companyId = PortalUtil.getCompanyId(request);
 		long categoryId = (categoryIdParam != null && !categoryIdParam.isEmpty() && !categoryIdParam.equalsIgnoreCase("null")) ? Long.parseLong(categoryIdParam) : -1;
 
-		long structureId = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN).getStructureId();
+		long structureId = StructureUtil.getStructureByNameEn("Quick Link").getStructureId();
 
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_QUICK_LINKS_EN);
 		System.out.println("Structure Quick Link: " + structure.getStructureId());
 		System.out.println("Structure Quick Link ID: " + structure);
-
 
 		Date startDate = null;
 		Date endDate = null;
@@ -172,7 +171,7 @@ public class QuickLinksResource extends BasicResource {
 			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());
 		}
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureId(), startDate, endDate, orderByComparator);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
 		List<QuickLinks> lastResults = new ArrayList<>();
 
 		for (JournalArticle article : results) {

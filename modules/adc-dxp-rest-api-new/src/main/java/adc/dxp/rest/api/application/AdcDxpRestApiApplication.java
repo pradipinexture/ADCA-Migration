@@ -18,13 +18,15 @@ import java.util.Set;
                 "osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.Vulcan)",
                 "osgi.jaxrs.name=ADC.Services",
                 "jaxrs.application=true",
-                "auth.verifier.guest.allowed=true",
-                "auth.verifier.BasicAuthHeaderAuthVerifier.basic_auth=true"
+                "auth.verifier.guest.allowed=false",
+                "auth.verifier.BasicAuthHeaderAuthVerifier.basic_auth=true",
+                "auth.verifier.BasicAuthHeaderAuthVerifier.hosts.allowed=*",
+                "auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=*"
         },
         service = Application.class,
         immediate = true,
         configurationPolicy = ConfigurationPolicy.OPTIONAL,
-        configurationPid = "adc.dxp.rest.api.application.AdcDxpRestApiConfiguration"
+        configurationPid = "adc.dxp.rest.api.application.AdcDx  pRestApiConfiguration"
 )
 public class AdcDxpRestApiApplication extends Application {
 

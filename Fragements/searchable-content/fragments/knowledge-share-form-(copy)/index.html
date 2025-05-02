@@ -1,0 +1,124 @@
+<div class="container wow fadeInUp" id="KS_form_container">
+
+
+  <div class="card-shadowed bg-white rounded ">
+
+
+    <div class="card-header">
+
+      <a type="button" class="btn" href="/group/portal/knowledge-sharing1"><i class="icon-arrow-left mr-1"></i>
+        [@liferay.language key='back' /]</a>
+    </div>
+
+    <form class="ks_form position-relative  p-4 mb-5 dir-ltr" id="ks_form">
+
+      <div class=" p-5 rounded-10 align-items-center justify-content-center loader-container d-none">
+        <div class="loader"></div>
+      </div>
+
+      <div class="row mb-3">
+
+        <div class="col-md-6">
+          <div class="d-flex align-items-center justify-content-between"><label for="categoriesSelect"
+              class="form-label">Category </label><label for="categoriesSelect" class="form-label">الفئة
+            </label></div>
+          <select class="form-control" id="categoriesSelect">
+
+          </select>
+        </div>
+
+        <div class="col-md-6">
+         
+            <div class="d-flex align-items-center justify-content-between"> <label for="poster-en"
+                class="form-label">Poster</label>
+              <label for="poster-en" class="form-label">صورة الغلاف</label>
+            </div>
+
+            <input type="file" class="form-control poster" id="poster-en" accept="image/*" />
+          
+        </div>
+
+        </div>
+      <div class="row"  id="title-inputs">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="title-en" class="form-label">Title<span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="title-en" placeholder="Enter the title in English"
+              autocomplete="off" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="title-ar" class="form-label dir-rtl">العنوان<span class="text-danger">*</span></label>
+            <input type="text" class="form-control ar-field" id="title-ar" placeholder="أدخل العنوان بالعربية"
+              autocomplete="off" />
+                           <a class="fillEmptyTitleInputBtn d-block">click to fill form the title fields</a>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row mt-3" id="description-inputs">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="description" class="form-label">Description<span class="text-danger">*</span></label>
+            <textarea class="form-control" id="description" rows="3" placeholder="Enter the description in English"></textarea>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="description-ar" class="form-label dir-rtl">الوصف<span class="text-danger">*</span> </label>
+            <textarea class="form-control  ar-field" id="description-ar" rows="3" placeholder="أدخل الوصف بالعربية"></textarea>
+             <a class="fillEmptyDescInputBtn d-block">click to fill form the title fields</a>
+          </div>
+        </div>
+      </div>
+
+     
+
+      <div class="text-right px-3 form-add-attachment-row">
+        <button type="button" class="btn btn-secondary-outline rounded-sm-btn mt-2 btn-add-attachment"><i
+            class="icon-plus"></i></button>
+      </div>
+
+
+      <div class="attachments-container border rounded px-3">
+        <div class="row attachment-row py-2 align-items-center" id="attachment-row-0">
+          <div class="col-md-6">
+
+            <label for="attachment-0" class="form-label">Attachment</label>
+            <input type="file" class="form-control attachment" id="attachment-0" />
+
+          </div>
+          <div class="col-md-5">
+
+            <label for="attachment-ar-0" class="form-label dir-rtl ">مرفق</label>
+            <input type="file" class="form-control attachment" id="attachment-ar-0" />
+
+          </div>
+          <div class="col-md-1 text-right">
+            <button type="button" class="btn rounded-sm-btn mt-2 btn-remove-attachment d-none"
+              data-row="attachment-row-0"><i class="icon-remove text-danger"></i></button>
+
+          </div>
+        </div>
+      </div>
+      
+      <h6 class="emptyInput_msg d-none text-danger mt-2">Required fields are empty.</h6>
+
+      <div class="d-flex justify-content-end mt-4 form-bottom-controls"> 
+        
+        <a class="clear-form-btn btn btn-cancel-outline mr-2" role="button">[@liferay.language key='clear' /]</a>
+        <button type="submit"
+          class="btn btn-secondary-outline text-right">
+           [#if locale == 'en_US']
+           Submit for approval
+           [#else] ارسل للموافقة
+          [/#if]
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>

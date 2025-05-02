@@ -1,0 +1,82 @@
+[#assign sdate='Start Date' eDate='End Date' allLabel='All' upcomingLabel='Upcoming Events'  doneLabel='Past Events'/]
+				 [#if locale != 'en_US']
+				 [#assign sdate='من تاريخ' eDate='إلى تاريخ' allLabel='جميع' upcomingLabel='الفعاليات القادمة' doneLabel='الفعاليات السابقة'/]
+				 [/#if]
+
+
+
+<div class="col advance-search events wow fadeInUp">
+	<div class="row justify-content-between bg-light rounded-10 p-3 mb-4 mx-auto card-shadowed overlap-container">
+		<div class="col-12 col-lg-3 d-md-flex align-items-center mb-2 mb-lg-0">
+			<h5 class="d-flex align-items-center m-0 justify-content-center">
+		 [@liferay.language key='results' /] <span class="badge badge-secondary ml-2" id="totalRes">0</span>
+			</h5>
+		</div>
+		<div class="col-12 col-lg-6 mb-2 mb-lg-0">
+			<div class="input-group">
+				<div class="input-group-prepend search-input-prepend">
+					<span class="input-group-text" id="addon-wrapping"><i class="icon-search"></i></span>
+				</div>
+				<input type="text" class="form-control search-input w-50" placeholder="[@liferay.language key='search' /]">
+				<div class="input-group-prepend search-input-append">
+					<a class="btn search-input" id="clearBtn"><i class="icon-undo"></i></a>
+					<a class="input-group-text" id="addon-wrapping" data-toggle="collapse" href="#collapseFilters" role="button" aria-expanded="false" aria-controls="collapseFilters"><i class="icon-filter"></i></a>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3 text-center text-lg-right mb-2 mb-lg-0">
+			<p class="card-text">
+				<a class="prev-btn btn btn-secondary-outline rounded-sm-btn mr-2"><i class="icon-arrow-left"></i></a>
+				<span id="pageNum">1/-</span>
+				<a class="next-btn btn btn-secondary-outline rounded-sm-btn ml-2"><i class="icon-arrow-right"></i></a>
+			</p>
+		</div>
+		<div class="advanced-search-section col mt-3 pt-3 border-top collapse"  id="collapseFilters">
+		
+		
+<div class="row">	
+ 
+  
+  <div class="col-md-4 events-filter">
+	<div class="btn-group btn-group-toggle filter--toggle" data-toggle="buttons" id="filter-toggles">
+		<label class="btn active mr-2">
+			<input type="radio" name="options" id="getAll" autocomplete="off" checked> ${allLabel}
+		</label>
+		<label class="btn mr-2" (click)="getUpComing()">
+			<input type="radio" name="options" id="getUpComing" autocomplete="off">${upcomingLabel}
+		</label>
+		<label class="btn mr-2" (click)="getPast()">
+			<input type="radio" name="options" id="getPast" autocomplete="off">${doneLabel}
+		</label>
+	 
+
+
+</div>
+  </div>
+
+       <div class="col-md-8">
+		
+			<div class="row">
+				<div class="col-md-4"> <select id="categoriesSelect"
+						class="form-control advanced-search-control border"> >
+					</select>
+				</div>
+        
+
+				<div class="col-md-4"><input type="text" placeholder="${sdate}" class="datepicker advanced-search-control form-control"
+						id="startDate" autocomplete="off"></div>
+
+				<div class="col-md-4"><input type="text" placeholder="${eDate}" class="datepicker advanced-search-control form-control"
+						id="endDate" autocomplete="off"></div>
+			</div>
+			</div>
+		</div>
+</div>
+
+
+	</div>
+
+	<div class="row mt-4" id="gallery-mixed-content">
+
+	</div>
+</div>

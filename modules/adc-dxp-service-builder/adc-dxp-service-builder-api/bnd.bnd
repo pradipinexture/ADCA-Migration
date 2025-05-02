@@ -1,7 +1,0 @@
-Bundle-Name: adc-dxp-service-builder-api
-Bundle-SymbolicName: adc.dxp.service.builder.api
-Bundle-Version: 1.0.0
-Export-Package:\
-	adc.dxp.service.builder.service
--check: EXPORTS
--includeresource: META-INF/service.xml=../adc-dxp-service-builder-service/service.xml

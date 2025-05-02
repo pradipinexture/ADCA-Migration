@@ -1,0 +1,30 @@
+.fragment_1095133 {
+}
+
+.page-item.active .page-link, .nav-underline .tab.active a.page-item .page-link, .page-item.show .page-link {
+    background-color: #2c6a9d;
+    border-color: #2c6a9d;
+    color: #FFF !important;
+ 
+}
+
+.pagination-items-per-page.active>a, .nav-underline .tab.active a.pagination-items-per-page>a, .pagination-items-per-page.active>button, .nav-underline .tab.active a.pagination-items-per-page>button, .pagination-items-per-page.show>a, .pagination-items-per-page.show>button {
+    background-color: #2c6a9d;
+    border-color: #2c6a9d;
+    color: #FFF !important;
+}
+
+.card-header button div {
+ 
+    font-family: "HelveticaNeue-Bold","HelveticaNeue-AR-Bold" !important;
+
+}
+
+.documents-section nav.management-bar.management-bar-light.navbar.navbar-expand-md {
+    box-shadow: none !important;
+    border-radius: 5px;
+}
+
+.documents-section .splitter.splitter-spaced{
+  display:none;
+}

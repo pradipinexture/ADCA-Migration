@@ -158,7 +158,7 @@ public class KnowledgeResource extends BasicResource {
 		System.out.println("Structure Knowledge Sharing: " + structure);
 
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureByNameEn.getStructureId(), startDate, endDate, orderByComparator);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureByNameEn.getStructureKey(), startDate, endDate, orderByComparator);
 
 		List<Knowledge> lastResults = new ArrayList<>();
 		

@@ -1,0 +1,38 @@
+.search-bar-container{
+  
+}
+
+.card.card_horiz_picture img{
+  display:none;
+}
+
+.lfr-search-container-wrapper .card_footer{
+  display:none;
+}
+
+.lfr-search-container-wrapper .card{
+   border:none;  
+
+}
+
+.lfr-search-container-wrapper .list-group-notification .list-group-item {
+ border-radius:10px;
+ margin-bottom:1rem;
+}
+
+.input-select-wrapper label{
+  display:none;
+}
+
+
+.page-link:active,.page-item.active .page-link, .nav-underline .tab.active a.page-item .page-link, .page-item.show .page-link {
+    background-color: #b9a58b;
+    color: #FFF !important;
+    border-color: #b9a58b;
+   
+}
+
+
+ a.page-item .page-link{
+  border:none;
+}

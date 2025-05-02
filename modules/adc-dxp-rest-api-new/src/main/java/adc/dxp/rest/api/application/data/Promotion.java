@@ -35,13 +35,18 @@ public class Promotion extends BaseContent {
 	private String link;
 	private String location;
 	private String locationLink;
+	private String body;
 	
 	public Promotion() {
 	}
 	
 	public Promotion(JournalArticle article, String languageId) {
 		super(article, Optional.of(languageId == null ? Constants.DEFAULT_VALUE_LANGUAGE : languageId), ContentType.PROMOTION);
-		
+
+		if (getAttributes().get(Constants.STRUCTURE_NEWS_FIELD_BODY) != null) {
+			body = TransformUtils.updateTags(getAttributes().get(Constants.STRUCTURE_NEWS_FIELD_BODY).getValue(), ChangeTagType.WEB_CONTENT_BODY_IMAGE);
+		}
+
 		if (getAttributes().get("CompanyDescription") != null) {
 			companyDescription = TransformUtils.updateTags(getAttributes().get("CompanyDescription").getValue(), ChangeTagType.WEB_CONTENT_BODY_IMAGE);
 		}
@@ -71,7 +76,6 @@ public class Promotion extends BaseContent {
 		if (getAttributes().get("Link") != null) {
 			link = getAttributes().get("Link").getValue();
 		}
-		
 		if (getAttributes().get("Location") != null) {
 			location = getAttributes().get("Location").getValue();
 		}
@@ -80,26 +84,26 @@ public class Promotion extends BaseContent {
 			locationLink = getAttributes().get("LocationLink").getValue();
 		}
 		
-		if (getAttributes().get("PreviewImage") != null) {
-			String imageJson = getAttributes().get("PreviewImage").getValue();
-			
-			String imageJsonOut = StringEscapeUtils.unescapeJava(imageJson);
-			
-			ObjectMapper mapper = new ObjectMapper();
-			try {
-				ImageJSON obj = mapper.readValue(imageJsonOut, ImageJSON.class);
-				String groupId = obj.getGroupId();
-				String uuid = obj.getUuid();
-				previewImage = "/c/document_library/get_file?uuid=" + uuid + "&groupId=" + groupId;
-				
-			} catch (JsonMappingException e) {
-				// TODO luis.correia
-				e.printStackTrace();
-			} catch (JsonProcessingException e) {
-				// TODO luis.correia
-				e.printStackTrace();
-			}
-		}
+//		if (getAttributes().get("PreviewImage") != null) {
+//			String imageJson = getAttributes().get("PreviewImage").getValue();
+//
+//			String imageJsonOut = StringEscapeUtils.unescapeJava(imageJson);
+//
+//			ObjectMapper mapper = new ObjectMapper();
+//			try {
+//				ImageJSON obj = mapper.readValue(imageJsonOut, ImageJSON.class);
+//				String groupId = obj.getGroupId();
+//				String uuid = obj.getUuid();
+//				previewImage = "/c/document_library/get_file?uuid=" + uuid + "&groupId=" + groupId;
+//
+//			} catch (JsonMappingException e) {
+//				// TODO luis.correia
+//				e.printStackTrace();
+//			} catch (JsonProcessingException e) {
+//				// TODO luis.correia
+//				e.printStackTrace();
+//			}
+//		}
 	
 	}	
 

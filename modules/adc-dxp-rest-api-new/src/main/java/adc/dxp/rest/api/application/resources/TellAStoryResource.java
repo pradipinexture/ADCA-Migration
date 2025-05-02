@@ -95,7 +95,7 @@ public class TellAStoryResource extends BasicResource {
 		String languageId = request.getHeader("languageId");
 		long categoryId = categoryIdParam != null && !categoryIdParam.isEmpty() ? Long.parseLong(categoryIdParam) : -1;
 
-		long structureId = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_TELL_A_STORY_NAME_EN).getStructureId();
+		String structureKey = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_TELL_A_STORY_NAME_EN).getStructureKey();
 
 		Date startDate = null, endDate = null;
 		try {
@@ -112,7 +112,7 @@ public class TellAStoryResource extends BasicResource {
 			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());
 		}
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureId, startDate, endDate, orderByComparator);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureKey, startDate, endDate, orderByComparator);
 		List<TellaStory> lastResults = new ArrayList<>();
 
 		for (JournalArticle article : results) {

@@ -1,0 +1,77 @@
+<div class="col advance-search knowledge-sharing wow fadeInUp">
+  <div class="row justify-content-between bg-light rounded-10 p-3 mb-4 mx-auto card-shadowed overlap-container">
+    <div class="col-12 col-md-3 d-md-flex align-items-center mb-2 mb-md-0">
+      <h5 class="d-flex align-items-center m-0 justify-content-center">
+        [@liferay.language key='results'/] <span class="badge badge-secondary ml-2" id="totalRes">0</span>
+      </h5>
+    </div>
+    <div class="col-12 col-md-6 mb-2 mb-md-0">
+      <div class="input-group">
+        <div class="input-group-prepend search-input-prepend">
+          <span class="input-group-text" id="addon-wrapping"><i class="icon-search"></i></span>
+        </div>
+        <input type="text" class="form-control search-input w-50">
+        <div class="input-group-prepend search-input-append">
+          <a class="btn search-input" id="clearBtn"><i class="icon-undo"></i></a>
+          <a class="input-group-text" id="addon-wrapping" data-toggle="collapse" href="#collapseFilters" role="button"
+            aria-expanded="false" aria-controls="collapseFilters"><i class="icon-filter"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 text-center text-md-right mb-2 mb-md-0">
+      <p class="card-text">
+        <a class="prev-btn btn btn-secondary-outline rounded-sm-btn mr-2"><i class="icon-arrow-left"></i></a>
+        <span id="pageNum">1/-</span>
+        <a class="next-btn btn btn-secondary-outline rounded-sm-btn ml-2"><i class="icon-arrow-right"></i></a>
+      </p>
+    </div>
+    <div class="advanced-search-section col mt-3 pt-3 border-top collapse" id="collapseFilters">
+      <div class="row justify-content-center">
+        <div class="col-md-6"> <select id="categoriesSelect" class="form-control advanced-search-control border"> 
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+
+
+  </div>
+
+
+ 
+
+  <div class="row mt-2">
+  
+
+    <div class="col-md-9">
+
+      <div class="d-flex justify-content-between mb-3 align-items-center">
+
+     <b>  <lfr-editable id="latestArticles" type="rich-text">Latest Articles</lfr-editable> </b>
+
+        <a class="btn btn-secondary-outline rounded-20 v-align-gap btn-sm" href="/group/portal/create-new-knowledge-article"><span>
+            <lfr-editable id="addArticle" type="text">Add New</lfr-editable>
+          </span> <i class="icon-plus"></i></a>
+      </div>
+
+      <div class="row" id="gallery-mixed-content">
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+
+   
+     <div class="contributors-heading"> <b> <lfr-editable id="colheading2" type="rich-text">Top 5 Contributors</lfr-editable></b></div>
+
+      <div class="row top-emps">
+        
+
+      </div>
+    </div>
+  
+   
+
+
+  </div>
+</div>

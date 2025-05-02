@@ -1,0 +1,22 @@
+.about-us-container{
+  
+    margin: auto;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 2px rgb(0 0 0 / 16%) !important;
+    border-top:1px solid #ddd;
+}
+
+.rounded-top-10{
+    border-radius:10px 10px 0 0;
+}
+
+.aboutus-img {
+    position: absolute;
+    top: -45px;
+    right: 0px;
+}
+
+[dir='rtl'] .aboutus-img{
+  left:0px;
+  right:unset;
+}

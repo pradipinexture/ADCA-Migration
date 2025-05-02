@@ -1,5 +1,6 @@
 package adc.dxp.rest.api.application.utils;
 
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.*;
@@ -9,11 +10,11 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -22,40 +23,79 @@ import java.util.List;
  */
 public class JournalArticleUtil {
     public static List<JournalArticle> searchJournalArticles(
-            long companyId, long groupId, String search, long structureId,
+            long companyId, long groupId, String search, String structureKey,
             Date startDate, Date endDate,
             OrderByComparator<JournalArticle> orderByComparator) {
 
-        DynamicQuery dq = JournalArticleLocalServiceUtil.dynamicQuery();
-
-        dq.add(RestrictionsFactoryUtil.eq("groupId", groupId));
-        dq.add(RestrictionsFactoryUtil.eq("companyId", companyId));
-        dq.add(RestrictionsFactoryUtil.eq("DDMStructureId", structureId));
-        dq.add(RestrictionsFactoryUtil.eq("status", WorkflowConstants.STATUS_APPROVED));
-
-        if (Validator.isNotNull(search)) {
-            dq.add(RestrictionsFactoryUtil.ilike("title", "%" + search + "%"));
-        }
-        if (startDate != null) {
-            dq.add(RestrictionsFactoryUtil.ge("displayDate", startDate));
-        }
-        if (endDate != null) {
-            dq.add(RestrictionsFactoryUtil.le("displayDate", endDate));
-        }
-        if (Validator.isNotNull(orderByComparator)) {
-            dq.addOrder((Order) orderByComparator);
-        } else {
-            dq.addOrder(OrderFactoryUtil.desc("displayDate"));
-        }
-
         try {
-            return JournalArticleLocalServiceUtil.dynamicQuery(dq);
+            // Create a basic dynamic query
+            DynamicQuery dq = JournalArticleLocalServiceUtil.dynamicQuery();
+
+            // Add group and company filters
+            dq.add(RestrictionsFactoryUtil.eq("groupId", groupId));
+            dq.add(RestrictionsFactoryUtil.eq("companyId", companyId));
+            dq.add(RestrictionsFactoryUtil.eq("status", WorkflowConstants.STATUS_APPROVED));
+
+            // Add date filters if specified
+            if (startDate != null) {
+                dq.add(RestrictionsFactoryUtil.ge("displayDate", startDate));
+            }
+            if (endDate != null) {
+                dq.add(RestrictionsFactoryUtil.le("displayDate", endDate));
+            }
+
+            // Execute query to get all matching articles
+            List<JournalArticle> allArticles = JournalArticleLocalServiceUtil.dynamicQuery(dq);
+
+            // Create a map to store only the latest version of each article
+            Map<String, JournalArticle> latestVersions = new HashMap<>();
+
+            // Process articles to find latest versions and apply remaining filters
+            for (JournalArticle article : allArticles) {
+                // Skip if doesn't match structure key
+                if (Validator.isNotNull(structureKey) &&
+                        !structureKey.equals(article.getDDMStructureKey())) {
+                    continue;
+                }
+
+                // Skip if doesn't match search term
+                if (Validator.isNotNull(search)) {
+                    String title = article.getTitle();
+                    if (title == null || !StringUtil.containsIgnoreCase(title, search)) {
+                        continue;
+                    }
+                }
+
+                // Keep only the latest version
+                String key = article.getArticleId();
+                if (!latestVersions.containsKey(key) ||
+                        article.getVersion() > latestVersions.get(key).getVersion()) {
+                    latestVersions.put(key, article);
+                }
+            }
+
+            // Convert map values to list
+            List<JournalArticle> results = new ArrayList<>(latestVersions.values());
+
+            // Sort results
+            if (orderByComparator != null) {
+                Collections.sort(results, orderByComparator);
+            } else {
+                // Default sort by display date descending
+                Collections.sort(results, new Comparator<JournalArticle>() {
+                    @Override
+                    public int compare(JournalArticle a1, JournalArticle a2) {
+                        return a2.getDisplayDate().compareTo(a1.getDisplayDate());
+                    }
+                });
+            }
+
+            return results;
         } catch (Exception e) {
             e.printStackTrace();
             return java.util.Collections.emptyList();
         }
     }
-
     public static List<Document> searchArticles(long companyId, long groupId, String structureKey, String searchKeyword) throws SearchException, ParseException {
         // Setup Search Context
         SearchContext searchContext = new SearchContext();

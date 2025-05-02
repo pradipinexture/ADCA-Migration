@@ -1,0 +1,12 @@
+.fragment_792002 {
+}
+[dir='rtl'] #wrapper .tweets-container {
+    background-image: linear-gradient(270deg, rgba(133, 163, 153, 0.2) 25%, rgba(242, 243, 244, 0.93) 50.96%, rgba(248, 245, 239, 0.93) 88.58%), url([resources:adc-lines-logo.png]) !important;
+}
+
+ #wrapper .tweets-container {
+
+   background-image:linear-gradient(90deg,rgba(133,163,153,0.2) 25%,rgba(242,243,244,0.93) 50.96%,rgba(248,245,239,0.93) 88.58%),url([resources:adc-lines-logo.png]) !important;
+   
+   
+ }

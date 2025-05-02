@@ -1,0 +1,133 @@
+<div class="wow fadeInUp mx-3 mb-5">
+
+    <ul
+        class="nav nav-tabs tabs-primary-outline card-shadowed rounded-top-10 mx-auto bg-light overflow-hidden border-0 overlap-container">
+
+        <li class="nav-item">
+            <a class="nav-link active btn py-3" href="#pg-tab" data-toggle="tab">
+
+                <span class="align-self-center font-b"> [#if locale == 'en_US']About Abu Dhabi Customs [#else] عن جمارك
+                    أبوظبي[/#if] </span>
+            </a>
+        </li>
+        <li class="nav-item ">
+            <a class="nav-link py-3   btn" href="#vg-tab" data-toggle="tab">
+
+                <span class="align-self-center font-b"> [#if locale == 'en_US'] Abu Dhabi Customs History [#else] تاريخ
+                    جمارك أبوظبي
+                    [/#if] </span>
+            </a>
+        </li>
+
+        <li class="nav-item ">
+            <a class="nav-link  btn py-3" href="#search-tab" data-toggle="tab">
+                <span class="align-self-center font-b">[#if locale == 'en_US']
+                    Our Centers [#else] مراكزنا [/#if] </span>
+            </a>
+        </li>
+
+    </ul>
+
+
+    <div class="tab-content">
+        <!--start of fist tab-->
+        <div class="tab-pane active" id="pg-tab">
+            <div class="pt-4">
+                <div class="text-justify bg-white rounded-10 card-shadowed p-4">
+                    <lfr-editable id="about-tab" type="rich-text"></lfr-editable>
+
+                </div>
+                <div class="col mt-4">
+                    <div class="row mt-5">
+                        <div class="col-lg-4 h-100 pl-lg-0 d-flex align-items-stretch mb-4">
+                            <div class="about-card p-3 h-100 w-100 card-shadowed bg-white rounded-10 position-relative">
+                                <img src="[resources:mission.png]" class="aboutus-img" height="100">
+                                <div class="row h-100">
+                                    <div class="col-12 h-100">
+
+                                        <lfr-editable id="mission-col" type="rich-text"></lfr-editable>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4  pr-lg-1 pl-lg-1  d-flex align-items-stretch mb-4">
+                            <div class="about-card p-3 w-100 card-shadowed bg-white rounded-10 position-relative">
+                                <img src="[resources:vision.png]" class="aboutus-img" height="100">
+                                <div class="row">
+                                    <div class="col-12 ">
+                                        <lfr-editable id="vision-col" type="rich-text"></lfr-editable>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4  pr-lg-0   d-flex align-items-stretch mb-4">
+                            <div class="about-card p-3  w-100 card-shadowed bg-white rounded-10 position-relative">
+                                <img src="[resources:values.png]" class="aboutus-img" height="100">
+                                <div class="row ">
+                                    <div class="col-12 ">
+                                        <lfr-editable id="values-col" type="rich-text"></lfr-editable>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+        <!--end of fist tab-->
+
+        <div class="tab-pane " id="vg-tab">
+            <lfr-editable id="history" type="html"></lfr-editable>
+        </div>
+
+        <div class="tab-pane " id="search-tab">
+
+            <div class="col advance-search contacts">
+                <div class="row justify-content-between bg-light  about-us-container mb-4 p-3 mx-auto card-shadowed">
+                    <div class="col-12 col-md-3 d-md-flex align-items-center mb-2 mb-md-0">
+                        <h5 class="d-flex align-items-center m-0 justify-content-center">
+                            [@liferay.language key="results" /] <span class="badge badge-secondary ml-2"
+                                id="totalRes">0</span>
+                        </h5>
+                    </div>
+                    <div class="col-12 col-md-6 mb-2 mb-md-0">
+                        <div class="input-group">
+                            <div class="input-group-prepend search-input-prepend">
+                                <span class="input-group-text" id="addon-wrapping"><i class="icon-search"></i></span>
+                            </div>
+                            <input type="text" class="form-control search-input w-50 no-filter"
+                                placeholder="[@liferay.language key='search' /] ">
+                            <div class="input-group-prepend search-input-append">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center text-md-right mb-2 mb-md-0">
+                        <p class="card-text">
+                            <a class="prev-btn btn btn-secondary-outline rounded-sm-btn mr-2"><i
+                                    class="icon-arrow-left"></i></a>
+                            <span id="pageNum">1/-</span>
+                            <a class="next-btn btn btn-secondary-outline rounded-sm-btn ml-2"><i
+                                    class="icon-arrow-right"></i></a>
+                        </p>
+                    </div>
+
+
+
+                </div>
+
+                <div class="row mt-4" id="contacts-section">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>

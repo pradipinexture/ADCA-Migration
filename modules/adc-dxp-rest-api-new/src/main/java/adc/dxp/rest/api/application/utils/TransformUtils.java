@@ -38,8 +38,13 @@ public class TransformUtils {
 	private static Log _log = LogFactoryUtil.getLog(TransformUtils.class);
 
 	public static String getImageByContent(String imageJson) {
+		//return "http://localhost:8080/documents/2412549/0/Etlaf%20(1).png/4251bf0a-5d16-4817-96a4-830ae2b35b37?imagePreview=1";
+//		String imageJsonOut = StringEscapeUtils.unescapeJava(imageJson);
+		String imageJsonOut = imageJson.replace("\\\"", "\"")
+				.replace("\\\\", "\\")
+				.replace("\\n", "\n")
+				.replace("\\t", "\t");
 
-		String imageJsonOut = StringEscapeUtils.unescapeJava(imageJson);
 
 		if (!StringUtils.isEmpty(imageJsonOut)) {
 			try {
@@ -72,18 +77,22 @@ public class TransformUtils {
 		try
 		{
 			jaxbContext = JAXBContext.newInstance(Root.class);
-
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
 			Root root = (Root) jaxbUnmarshaller.unmarshal(new StringReader(content));
-
 			List<DynamicElement> dynamicElementList = root.getDynamicElementList();
 			Map<String, DynamicAttribute> attributeList = new HashMap<>();
 			for (DynamicElement de: dynamicElementList) {
-				attributeList.put(de.getName(), new DynamicAttribute(de.getName(),  de.getDynamicContent() != null ? de.getDynamicContent().get__cdata() : null));
-
+				System.out.println("Name "+de.getName());
+				if(de.getDynamicElementList() != null && de.getDynamicElementList().size() != 0) {
+					List<DynamicElement> dynamicElementNestedList = de.getDynamicElementList();
+					for (DynamicElement dynamicElementNested: dynamicElementNestedList) {
+						System.out.println("Name "+dynamicElementNested.getName());
+						attributeList.put(dynamicElementNested.getName(), new DynamicAttribute(dynamicElementNested.getName(),  dynamicElementNested.getDynamicContent() != null ? dynamicElementNested.getDynamicContent().get__cdata() : null));
+					}
+				} else {
+					attributeList.put(de.getName(), new DynamicAttribute(de.getName(),  de.getDynamicContent() != null ? de.getDynamicContent().get__cdata() : null));
+				}
 			}
-
 			return attributeList;
 		}
 		catch (JAXBException e)
@@ -277,15 +286,9 @@ public class TransformUtils {
 				obj.put(mapKey, list);
 			}
 			result.add(obj);
-
-
 		} catch (DocumentException e) {
 			_log.error(e.getMessage());
 		}
-
 		return result;
-
 	}
-
-
 }

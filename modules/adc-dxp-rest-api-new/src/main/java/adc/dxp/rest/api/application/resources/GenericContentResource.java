@@ -159,7 +159,7 @@ public class GenericContentResource extends BasicResource {
 
 		DDMStructure structureByNameEn = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_NEWS_NAME_EN);
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureByNameEn.getStructureId(), startDate, endDate, orderByComparator);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structureByNameEn.getStructureKey(), startDate, endDate, orderByComparator);
 
 		List<GenericContent> lastResults = new ArrayList<>();
 		

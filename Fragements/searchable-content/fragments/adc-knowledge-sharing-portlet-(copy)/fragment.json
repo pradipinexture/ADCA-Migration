@@ -1,0 +1,8 @@
+{
+  "configurationPath": "configuration.json",
+  "jsPath": "index.js",
+  "htmlPath": "index.html",
+  "cssPath": "index.css",
+  "name": "adc-knowledge-sharing-portlet (Copy)",
+  "type": "section"
+}

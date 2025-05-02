@@ -1,0 +1,23 @@
+.fragment_792002 {
+}
+
+.innovation-card{
+  transition: all 0.5s;
+  border-radius:10px;
+  background:#fff;
+}
+.innovation-card:hover{
+  transform:scale(1.02);
+  
+}
+
+.recent-inno-img {
+    width: 65px;
+    height: 70px;
+    border-radius: 8px;
+}
+
+.innovation-card .recent-inno-img {
+    background: var(--beige-color);
+    padding: 0.5rem;
+}

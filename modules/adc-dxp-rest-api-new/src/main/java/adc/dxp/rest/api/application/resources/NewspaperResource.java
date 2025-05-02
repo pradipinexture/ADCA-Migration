@@ -139,7 +139,7 @@ public class NewspaperResource extends BasicResource {
 		_log.debug("startDate2: " + startDate);
 		_log.debug("endDate: " + endDate);
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureId(), startDate, endDate, orderByComparator);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
 
 		List<Newspaper> lastResults = new ArrayList<>();
 		for (JournalArticle article : results) {

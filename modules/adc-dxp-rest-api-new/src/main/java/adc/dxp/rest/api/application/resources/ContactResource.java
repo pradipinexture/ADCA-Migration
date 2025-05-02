@@ -168,7 +168,7 @@ public class ContactResource {
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_CONTACT_NAME_EN);
 		System.out.println("Structure ID: " + structure.getStructureId());
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureId(),
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(),
 				startDate, endDate, null);
 		System.out.println("Search results size: " + (results != null ? results.size() : 0));
 		List<Contact> lastResults = new ArrayList<>();
@@ -194,7 +194,6 @@ public class ContactResource {
 			long excludeCatID = -1;
 
 			List<AssetCategory> categories = AssetCategoryLocalServiceUtil.dynamicQuery(query, 0, 1); // we only want to first one
-
 			if (categories.size() > 0) {
 				AssetCategory cat = categories.get(0);
 				excludeCatID = cat.getPrimaryKey();

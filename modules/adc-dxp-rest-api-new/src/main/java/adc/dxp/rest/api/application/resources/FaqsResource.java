@@ -121,10 +121,8 @@ public class FaqsResource extends BasicResource {
 
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_FAQ_NAME_EN);
 
-		System.out.println("Structure Faqs ID: " + structure.getStructureId());
-		System.out.println("Structure Faqs : " + structure);
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, Long.parseLong("2432595"), null, null, null);;
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), null, null, null);;
 		List<Faqs> lastResults = new ArrayList<>();
 		
 		for (JournalArticle article: results) {

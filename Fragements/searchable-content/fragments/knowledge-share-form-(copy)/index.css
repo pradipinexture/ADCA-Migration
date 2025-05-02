@@ -1,0 +1,93 @@
+.fragment_1535073 {
+}
+
+#wrapper .ks_form .form-control:focus {
+    border: 1px solid #2d6a9d !important;
+}
+.fillEmptyInputBtn{
+  color: #000!important;
+  cursor:pointer;
+}
+.KS_form_container{
+  margin-top:-1rem;
+}
+
+.attachment-row:NOT(:last-child) {
+    border-bottom: 1px solid #ddd;
+}
+
+.attachment-row:hover{
+  background:#f3f1ed61;
+}
+
+.ks_form .form-control.is-invalid {
+    border-color: #dc3545 !important;
+  
+}
+
+.loader-container{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    background: #ffffffd1;
+}
+ .loader {
+    border: 10px solid #e2e4e6;
+    border-top: 10px solid #bba78d;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+}
+
+
+.btn-cancel-outline {
+    background: transparent;
+    padding: .5rem 1.5rem;
+    border: 2px solid #666;
+    color: #666 ;
+    transition: all .3s;
+}
+
+
+.btn-cancel-outline:hover {
+    color: #fff !important;
+    background-color: #666;
+}
+
+#wrapper .btn-secondary-outline {
+    background: #fff;
+   
+}
+
+.dir-rtl{
+  direction:rtl;
+  display:block;
+}
+
+
+
+.dir-ltr{
+  direction:ltr;
+  display:block;
+}
+
+.ar-field{
+  direction:rtl;
+}
+.form-add-attachment-row {
+margin-bottom: -20px;}
+
+[dir='rtl'] .form-bottom-controls{
+  direction:rtl;
+}
+
+[dir='rtl'] .form-add-attachment-row {
+    text-align: end !important;
+}
+
+.loader-container{
+  left:0;
+  top:0;
+}

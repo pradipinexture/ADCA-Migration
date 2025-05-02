@@ -1,6 +1,7 @@
 package adc.dxp.rest.api.application.utils;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,6 +27,16 @@ public class DynamicElement implements Serializable {
 	
 	@XmlElement(name = "dynamic-content")
 	private DynamicContent dynamicContent;
+
+	@XmlElement(name = "dynamic-element")
+	private List<DynamicElement> dynamicElementList;
+
+	public List<DynamicElement> getDynamicElementList() {
+		return dynamicElementList;
+	}
+	public void setDynamicElementList(List<DynamicElement> dynamicElementList) {
+		this.dynamicElementList = dynamicElementList;
+	}
 
 	@Override
 	public String toString() {

@@ -17,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import adc.dxp.rest.api.application.data.News;
 import adc.dxp.rest.api.application.utils.PageUtils;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
@@ -256,20 +257,18 @@ public class PromotionsResource {
 			}
 		}
 
-		// Order by category if needed
-		if (sorts != null && sorts.length > 0 && sorts[0].getFieldName().equalsIgnoreCase("category")) {
-			if (!sorts[0].isReverse()) {
-				// asc
-				lastResults.sort((promo1, promo2) -> promo1.getCategory().getName().compareTo(promo2.getCategory().getName()));
-			} else {
-				// desc
-				lastResults.sort((promo1, promo2) -> promo2.getCategory().getName().compareTo(promo1.getCategory().getName()));
-			}
-		}
+
 
 		System.out.println("Final promotion items: " + lastResults.size());
+		System.out.println("Final news items: " + lastResults.size());
+		// Handle pagination
+		int start = (paginationPage - 1) * paginationSize;
+		int end = Math.min(start + paginationSize, lastResults.size());
 
-		return  PageUtils.createPage(lastResults, pagination, lastResults.size());
+		List<Promotion> pageResults = start < lastResults.size() ?
+				lastResults.subList(start, end) : Collections.emptyList();
+
+		return Page.of(pageResults, pagination, lastResults.size());
 	}
 
 	@GET

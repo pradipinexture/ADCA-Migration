@@ -156,19 +156,19 @@ public class ManagementMessageResource extends BasicResource {
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_MANAGEMENT_MESSAGE_NAME_EN);
 		System.out.println("Structure ID: " + structure.getStructureId());
 
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureId(), startDate, endDate, orderByComparator);
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
 		System.out.println("Search results size: " + (results != null ? results.size() : 0));
 
 		List<DirectorMessage> lastResults = new ArrayList<>();
 
 		for (JournalArticle article : results) {
 			System.out.println("Processing article with resourcePrimKey: " + article.getResourcePrimKey());
-
+			System.out.println("Processing article with resourcePrimKey: " + request.getHeader(Constants.HEADER_LANGUAGE_ID));
 			DirectorMessage tellaStory = new DirectorMessage(article, request.getHeader(Constants.HEADER_LANGUAGE_ID));
-
-			_log.debug("idString: "+ idString);
-			_log.debug("tellaStory.getResourcePrimaryKey(): "+ tellaStory.getResourcePrimaryKey());
-			_log.debug("id: "+ id);
+			System.out.println(tellaStory);
+			//System.out.println("idString: "+ idString);
+			//System.out.println("tellaStory.getResourcePrimaryKey(): "+ tellaStory.getResourcePrimaryKey());
+			//System.out.println("id: "+ id);
 
 			AssetEntry assetUtil = AssetEntryLocalServiceUtil.getEntry("com.liferay.journal.model.JournalArticle", article.getResourcePrimKey());
 			tellaStory.setEntryId(assetUtil.getEntryId());

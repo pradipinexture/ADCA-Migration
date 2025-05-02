@@ -1,0 +1,196 @@
+<section class="media-center-section wow fadeInUp mt-4">
+	<!-- Media Center Content Start -->
+	<div class="mb-4">
+	<lfr-editable id="mediaCenter" type="rich-text">Media Center</lfr-editable>
+	</div>
+	<div class="row ">
+		<div class="col-lg-1 col-md-12 px-0">
+			<!-- Media Center Tabs Start -->
+			<div class="h-100">
+
+				<ul class="nav nav-tabs justify-content-around " id="v-pills-tab">
+
+
+					<li class="nav-item ">
+						<a class="nav-link nav-link v-tab-btn mx-auto btn active border-0" href="#news-tab" data-toggle="tab">
+							<img src="/o/ad-customs-theme/images/home/news.svg" class="img-fluid">
+						</a>
+					</li>
+
+					<li class="nav-item ">
+						<a class="nav-link nav-link v-tab-btn mx-auto btn  boder-0" href="#events-tab" data-toggle="tab">
+							<img src="/o/ad-customs-theme/images/home/events.svg" class="img-fluid">
+							</span>
+						</a>
+					</li>
+					<li class="nav-item ">
+						<a class="nav-link nav-link v-tab-btn mx-auto btn border-0" href="#media-tab" data-toggle="tab">
+							<img src="/o/ad-customs-theme/images/home/gallery.svg" class="img-fluid">
+						</a>
+					</li>
+
+					<li class="nav-item ">
+						<a class="nav-link nav-link v-tab-btn mx-auto btn border-0" href="#botcast-tab" data-toggle="tab">
+							<img src="/o/ad-customs-theme/images/home/announcements.svg" class="img-fluid">
+
+						</a>
+					</li>
+
+				</ul>
+			</div>
+			<!-- Media Center Tabs End -->
+		</div>
+		<div class="col-lg-11 col-md-12">
+			<div class="tab-content">
+				<!-- Media Center News Start -->
+
+
+				<div class="tab-pane fade show active" id="news-tab">
+					<div class="col-12">
+
+						<div class="row justify-content-between mb-4">
+							<div class="col-12 col-md-6 text-center text-md-left">
+								 
+									<lfr-editable id="latestNews" type="rich-text">Latest News</lfr-editable>
+							</div>
+
+							<div
+								class="col-12 col-md-6 text-md-right d-flex justify-content-center justify-content-md-end align-items-center">
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls news-prev-btn btn-secondary-outline p-0 mr-2">
+									<i class="icon-chevron-left"></i>
+								</button>
+
+								<a href="/group/portal/news" class="btn btn-secondary-outline rounded-20">
+						 
+									
+										<lfr-editable id="moreNs" type="rich-text">More News</lfr-editable>
+										
+								</a>
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls news-next-btn btn-secondary-outline p-0 ml-2">
+									<i class="icon-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+						<lfr-widget-asset-list id="NewsPortlet"></lfr-widget-asset-list>
+
+
+					</div>
+				</div>
+
+
+				<!-- Media Center News End -->
+
+				<!-- Media Center Events Start -->
+				<div class="tab-pane fade" id="events-tab">
+					<div class="col-12">
+
+						<div class="row justify-content-between mb-4">
+							<div class="col-12 col-md-6 text-center text-md-left">
+							<lfr-editable id="latestEvent" type="rich-text"></lfr-editable>
+							</div>
+
+							<div
+								class="col-12 col-md-6 text-md-right d-flex justify-content-center justify-content-md-end align-items-center">
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls event-prev-btn btn-secondary-outline p-0 mr-2">
+									<i class="icon-chevron-left"></i>
+								</button>
+
+								<a href="/group/portal/events" class="btn btn-secondary-outline rounded-20">
+									<lfr-editable id="moreEv" type="rich-text">More Events</lfr-editable>
+								</a>
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls event-next-btn btn-secondary-outline p-0 ml-2">
+									<i class="icon-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+					  <div class="events d-flex justify-content-center">
+					  <div class="owl-carousel events-carousel" id="latest-events">
+					    </div>
+					    </div>
+
+
+					</div>
+				</div>
+				<!-- Media Center Events Start -->
+
+				<!-- Media Center media Start -->
+				<div class="tab-pane fade" id="media-tab">
+					<div class="col-12">
+
+						<div class="row justify-content-between mb-4">
+							<div class="col-12 col-md-6 text-center text-md-left" style="
+">
+							  		<lfr-editable id="latestMedia" type="rich-text">Latest Media</lfr-editable>
+					 
+							</div>
+
+							<div
+								class="col-12 col-md-6 text-md-right d-flex justify-content-center justify-content-md-end align-items-center">
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls media-prev-btn btn-secondary-outline p-0 mr-2">
+									<i class="icon-chevron-left"></i>
+								</button>
+
+								<a href="/group/portal/media-gallery" class="btn btn-secondary-outline rounded-20">
+											<lfr-editable id="moreMe" type="rich-text">More Media</lfr-editable>
+								</a>
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls media-next-btn btn-secondary-outline p-0 ml-2">
+									<i class="icon-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+
+						<lfr-widget-asset-list id="mediaPortlet"></lfr-widget-asset-list>
+
+
+					</div>
+
+				</div>
+				<!-- Media Center media End -->
+
+
+				<!-- Media Center botcast Start -->
+				<div class="tab-pane fade" id="botcast-tab">
+					<div class="col-12">
+
+
+						<div class="row justify-content-between mb-4">
+							<div class="col-12 col-md-6 text-center text-md-left">
+				 
+									<lfr-editable id="latestBotcast" type="rich-text">Latest Botcast</lfr-editable>
+							</div>
+
+							<div
+								class="col-12 col-md-6 text-md-right d-flex justify-content-center justify-content-md-end align-items-center">
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls bot-prev-btn btn-secondary-outline p-0 mr-2">
+									<i class="icon-chevron-left"></i>
+								</button>
+
+								<a href="/group/portal/adc-botcast" class="btn btn-secondary-outline rounded-20">
+										<lfr-editable id="moreBc" type="rich-text">More BotCast</lfr-editable> 
+								</a>
+								<button type="button" role="presentation"
+									class=" custom-carousel-controls bot-next-btn btn-secondary-outline p-0 ml-2">
+									<i class="icon-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+
+						<lfr-widget-asset-list id="botCastPortlet"></lfr-widget-asset-list>
+
+
+					</div>
+				</div>
+				<!-- Media Center botcast End -->
+
+			</div>
+		</div>
+	</div>
+	<!-- Media Center Content End -->
+</section>

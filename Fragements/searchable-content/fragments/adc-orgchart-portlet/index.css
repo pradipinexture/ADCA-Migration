@@ -1,0 +1,47 @@
+#wrapper .sector--profile-img.general-director {
+    background: top/cover url('[resources:GM.png]');
+}
+
+
+.level-3 .more-details {
+  background:#7d7874;
+  color: #fff;
+  width: fit-content;
+  align-self: end;
+  padding: 0.25rem 1rem;
+  border-radius: 0.5rem;
+  visibility:hidden;
+  
+}
+
+.level-2 .more-details {
+  background: var(--primary-color);
+  color: #fff;
+  width: fit-content;
+  align-self: end;
+  padding: 0.25rem 1rem;
+  border-radius: 0.5rem;
+    visibility:hidden;
+
+}
+
+.level-2 .more-details:hover {
+  background:var(--primary-hover-color);
+}
+.level-3 .more-details:hover {
+  background:var(--secondary-color);
+}
+
+.loader {
+  border: 10px solid #eee;
+  border-top: 10px solid var(--secondary-color);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite;
+}
+
+.level-2 .more-details {
+    background: var(--primary-color) !important; 
+   
+}

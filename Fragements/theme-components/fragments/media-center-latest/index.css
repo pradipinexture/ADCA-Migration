@@ -1,0 +1,149 @@
+.media-center-tabs a.nav-link {
+    background: #fff;
+    border: 0;
+    height: 120px;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    color: #787979;
+    box-shadow: 1px 2px 5px #e4e4e4;
+    margin: auto;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.media-center-section{
+  min-height:685px;
+}
+
+#v-pills-tab .nav-link img{
+  width:50px;
+}
+.media-center-tabs
+{
+  width:140px;
+  margin:auto;
+  margin-top:1rem;
+}
+.media-center-tabs li{
+  width:100%;
+}
+
+
+ 
+ .draw-border.active::before, .draw-border.active::after {
+  border-color: #dcdcdc;
+  border-radius:5px;
+  transition: border-color 0s, width 0.25s, height 0.25s;
+  width: 100%;
+  height: 100%;
+}
+
+ .draw-border.active{
+  background:#ececec !important;
+}
+.media-center-tabs li.nav-item:not(:first-child){
+  
+  margin-top:1rem;
+  
+}
+
+.media-center-tabs img {
+    width: 41px;
+    margin-bottom: 0.5rem;
+}
+
+
+
+.draw-border {
+
+  color: #dcdcdc;
+  transition: color 0.25s 0.0833333333s;
+  position: relative;
+}
+.draw-border::before, .draw-border::after {
+  border: 0 solid transparent;
+  box-sizing: border-box;
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+  bottom: 0;
+  right: 0;
+}
+.draw-border::before {
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+}
+.draw-border::after {
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+.draw-border:hover {
+  color: #dcdcdc;
+}
+.draw-border:hover::before, .draw-border:hover::after {
+  border-color: #dcdcdc;
+  border-radius:5px;
+  transition: border-color 0s, width 0.25s, height 0.25s;
+  width: 100%;
+  height: 100%;
+}
+.draw-border:hover::before {
+  transition-delay: 0s, 0s, 0.25s;
+}
+.draw-border:hover::after {
+  transition-delay: 0s, 0.25s, 0s;
+}
+
+.tab-pane .controls-container{
+  display:none !important;
+}
+
+
+.media-center-section .tab-content{
+  min-height:500px;
+}
+
+
+.media-center-section .tab-content > .tab-pane {
+     visibility: hidden;
+     height: 0px;
+     overflow:hidden;
+     display:block;
+}
+.media-center-section .tab-content > .active {
+     visibility: visible;
+     height: auto;
+     overflow: visible;
+}
+
+.owl-carousel.owl-rtl {
+    direction: unset !important;
+}
+
+@media (min-width: 768px) { 
+  .v-tab-btn {
+    width: 70px;
+    height: 60px;
+  }
+}
+
+
+a.btn.btn-outline-light.rounded-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*[dir='rtl'] #wrapper .news-box::after, #wrapper .hover-box::after {*/
+/*    background: linear-gradient(181.8deg,rgba(217,217,217,0) 20%,rgba(45,106,157,0.86) 90.92%);*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    left: 0;*/
+/*    top: 0;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*}*/
