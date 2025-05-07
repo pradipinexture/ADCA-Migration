@@ -1,0 +1,11 @@
+.search-container {
+  margin-top: -6%;
+  position: relative;
+  z-index: 2;
+  width: 75%;
+}
+@media (max-width: 576px) {
+  .search-container {
+    width: 100%;
+  }
+}

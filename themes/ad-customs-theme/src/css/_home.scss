@@ -1,0 +1,206 @@
+.home-carousel-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+}
+
+.home-carousel {
+  .carousel-item {
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .carousel-indicators {
+    justify-content: end;
+    li {
+      border-top: none;
+      border-bottom: none;
+      opacity: 1;
+      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+      transition: all 0.3s ease;
+      background-color: #cfcaca;
+    }
+
+    .active {
+      opacity: 1;
+      background-color: $primary-color;
+    }
+  }
+  .carousel-control-prev-icon {
+    background-image: url(../images/home/carousel-control-prev.svg);
+    width: 2rem;
+  }
+  .carousel-control-next-icon {
+    background-image: url(../images/home/carousel-control-next.svg);
+    width: 2rem;
+  }
+
+  .carousel-controls-container{
+  background-color: #f9f9f9bd;
+  z-index: 5;
+  position: relative;
+  border-radius: 50px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    position: absolute;
+    top: auto;
+    bottom: -3%;
+    z-index: 1;
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    padding: 1rem;
+    color: #fff;
+    text-align: center;
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  .carousel-control-prev {
+    z-index: 16;
+    left: auto;
+    right: 19%;
+  }
+  .carousel-control-next {
+    right: 10.5%;
+  }
+}
+@media (max-width: 768px) {
+  .carousel-indicators {
+    justify-content: center !important;
+    bottom: -10% !important;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    display: none !important;
+  }
+}
+.applications-btn {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  border-radius: 10px;
+  padding: 1.5rem 2.5rem;
+  box-shadow: 0px 2px 11px rgba(154, 154, 154, 0.28) !important;
+
+  img {
+    margin-right: 1.5rem;
+    width: 40px !important;
+    transition: all 0.2s;
+ 
+  }
+  &:hover {
+    background-color: $primary-hover-color;
+    color: #fff;
+  }
+  &:hover img{
+  filter: invert(1);
+  }
+}
+
+#v-pills-tab .active {
+  background-color: $primary-color !important;
+  img {
+    filter: brightness(0) saturate(100%) invert(98%) sepia(0%) saturate(0%)
+      hue-rotate(30deg) brightness(103%) contrast(103%);
+  }
+  &:hover {
+    background-color: $primary-hover-color !important;
+  }
+}
+.v-tab-btn {
+  padding: 0.3rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafc !important;
+  box-shadow: 0px 2px 11px rgba(154, 154, 154, 0.28);
+  transition: all 0.2s;
+  width: 100px;
+  height: 90px;
+  border-radius: 10px !important;
+  margin-bottom: 1.3rem;
+  img {
+    transition: all 0.2s;
+  }
+  &:hover {
+    background-color: $primary-hover-color !important;
+    img {
+      filter: brightness(0) saturate(100%) invert(98%) sepia(0%) saturate(0%)
+        hue-rotate(30deg) brightness(103%) contrast(103%);
+    }
+  }
+}
+
+.tweets-container {
+  padding: 3rem;
+  background-image: linear-gradient(90deg, rgba(133,163,153, 0.2) 25%, rgba(242, 243, 244, 0.93) 50.96%, rgba(248, 245, 239, 0.93) 88.58%), url(../images/home/twitter-bg.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center right;
+  border-radius: 10px;
+
+  .tweet-card {
+    background: rgba(202, 181, 155, 0.08);
+    border: 1px solid rgba(161, 133, 97, 0.72);
+    box-shadow: 0px 2px 11px rgba(154, 154, 154, 0.28);
+    border-radius: 13px;
+  }
+  .owl-stage {
+    display: flex;
+    align-items: center;
+    height: 300px;
+  }
+  .owl-item {
+    padding: 0px 5px !important;
+  }
+  .owl-item:nth-child(even) {
+    margin-top: 2rem !important;
+  }
+  .twitter-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    padding: 1rem;
+    border-radius: 50%;
+    background-color: #d9d9d9;
+    margin-top: -40px;
+    margin-right: 1rem;
+  }
+}
+
+.secondary-bg-card {
+  background-color: $secondary-color;
+  padding: 0.3rem;
+  border-radius: 10px;
+  .inner-card {
+    border: 1px solid white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    h6 {
+      line-height: 25px;
+    }
+  }
+}
+@media (max-width: 576px) {
+  .tweets-container {
+    padding: 1rem;
+  }
+}
