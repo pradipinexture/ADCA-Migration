@@ -135,6 +135,21 @@ div#wrapper.loggedIn {
   margin-top: 120px !important;
 }
 
+.container-fluid-max-xl {
+  max-width: 100%;
+}
+
+.portlet-decorate .portlet-content{
+padding: 0;
+border: none;
+border-radius: 10px;
+background: transparent;
+}
+
+.breadcrumb-item .active{
+color: #fff;
+}
+
 /* SCSS imports */
 @import "custom-datepicker";
 @import "adcMain";
