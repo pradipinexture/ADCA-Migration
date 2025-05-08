@@ -23,7 +23,7 @@ $(document).ready(function () {
       url: `/o/adc-dxp-services/contacts?search=${searchText}&page=${pageNum}&pageSize=${pageSize}&categoryId=-1&sort=title:asc&excludeCategoryId=Main%20Building`,
       type: 'GET',
       headers: {
-                        'Authorization': 'Basic VmlzaGFsLlNoYWg6SW5leHR1cmUxMjMh', // Basic Auth,
+           'x-csrf-token': Liferay.authToken,
         "languageId": locale,
         "groupId": Liferay.ThemeDisplay.getSiteGroupId()
       },

@@ -15,7 +15,7 @@ $(document).ready(function () {
             url: `/o/adc-dxp-services/related/categoriesList?type=media`,
             type: 'GET',
             headers: {
-                'Authorization': 'Basic VmlzaGFsLlNoYWg6SW5leHR1cmUxMjMh', // Basic Auth from cURL
+                   'x-csrf-token': Liferay.authToken, // Basic Auth from cURL
                 "languageId": Liferay.ThemeDisplay.getLanguageId(),
                 'groupId': '2412549' // Hardcoded from cURL
             },
@@ -36,7 +36,7 @@ $(document).ready(function () {
             url: `/o/adc-dxp-services/medias/galleries?search=${searchText}&page=${pageNum}&pageSize=${pageSize}&categoryId=${categoryId}&startDate=${startDate}&endDate=${endDate}&sort=displayDate:desc`,
             type: 'GET',
             headers: {
-                'Authorization': 'Basic VmlzaGFsLlNoYWg6SW5leHR1cmUxMjMh', // Basic Auth from cURL
+                 'x-csrf-token': Liferay.authToken, // Basic Auth from cURL
                 "languageId": Liferay.ThemeDisplay.getLanguageId(),
                 'groupId': '2412549', // Hardcoded from cURL
                 'Cookie': `GUEST_LANGUAGE_ID=${Liferay.ThemeDisplay.getLanguageId()}; JSESSIONID=${document.cookie.match(/JSESSIONID=([^;]+)/)?.[1] || ''}`

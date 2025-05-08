@@ -24,7 +24,7 @@ $(document).ready(function () {
             url: `/o/adc-dxp-services/related/categoriesList?type=knowledge-sharing`,
             type: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + Liferay.authToken,
+                   'x-csrf-token': Liferay.authToken,
                 "languageId": Liferay.ThemeDisplay.getLanguageId(),
             },
             success: function (categories) {
@@ -75,7 +75,7 @@ $(document).ready(function () {
             url: `/o/headless-delivery/v1.0/content-structures/2430772/structured-contents?page=1&pageSize=100&sort=dateCreated:desc&fields=creator`,
             type: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + Liferay.authToken,
+                   'x-csrf-token': Liferay.authToken,
                 "Accept-Language": (Liferay.ThemeDisplay.getLanguageId()).replace('_', '-'),
                 'groupId': Liferay.ThemeDisplay.getSiteGroupId()
             },

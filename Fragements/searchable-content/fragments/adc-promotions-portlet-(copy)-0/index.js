@@ -18,7 +18,7 @@ $(document).ready(function () {
             type: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization': 'Basic VmlzaGFsLlNoYWg6SW5leHR1cmUxMjMh', // Basic Auth with Base64-encoded credentials
+                   'x-csrf-token': Liferay.authToken, // Basic Auth with Base64-encoded credentials
                 'Cookie': `GUEST_LANGUAGE_ID=${Liferay.ThemeDisplay.getLanguageId()}; JSESSIONID=${document.cookie.match(/JSESSIONID=([^;]+)/)?.[1] || ''}`
             },
             success: function (articles) {

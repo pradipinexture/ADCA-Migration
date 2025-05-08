@@ -12,7 +12,7 @@ $(document).ready(function () {
                 url: `/o/adc-dxp-services/ideas/all`,
                 type: 'GET',
                 headers: {
-                    'Authorization': 'Bearer ' + Liferay.authToken,
+                       'x-csrf-token': Liferay.authToken,
                     "languageId": Liferay.ThemeDisplay.getLanguageId(),
                     "groupId": Liferay.ThemeDisplay.getSiteGroupId()
                 },

@@ -27,7 +27,7 @@ $(document).ready(function () {
       url: `/o/adc-dxp-services/management-messages?search=${searchText}&page=${pageNum}&pageSize=${pageSize}&categoryId=-1&startDate=&endDate=&sort=displayDate:desc&id=null`,
       type: 'GET',
       headers: {
-         'Authorization': 'Basic VmlzaGFsLlNoYWg6SW5leHR1cmUxMjMh',
+           'x-csrf-token': Liferay.authToken,
         "languageId": Liferay.ThemeDisplay.getLanguageId(),
         'groupId': Liferay.ThemeDisplay.getSiteGroupId()
       },
@@ -82,7 +82,7 @@ $(document).ready(function () {
       mediaJson.push(`<div class="col-lg-4 col-md-6 col-sm-12 v-space">
       <a 
       href="/group/portal/director-message/detail?id=${article.articleId}"
-      class="card h-100 d-flex">
+      class="card h-100">
         <div class="card-image">
           <img src="/o/ad-customs-theme/images/news/news-item.svg" alt="">
         </div>
