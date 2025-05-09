@@ -1,0 +1,9 @@
+Bundle-Name: adc-dxp-override-default-calendar-js
+Bundle-SymbolicName: adx.dxp.hook.calendar.js
+Bundle-Version: 1.0.0
+
+Liferay-JS-Config: /META-INF/resources/js/config.js
+Web-ContextPath: /override-default-js
+
+Portal-Bundle-Version: 7.4.13
+
