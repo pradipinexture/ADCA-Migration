@@ -25,9 +25,9 @@ function getCategories() {
     url: `/o/adc-dxp-services/related/categoriesList?type=Announcement`,
     type: 'GET',
     headers: {
-      'Authorization': 'Basic VmlzaGFsLlNoYWg6SW5leHR1cmUxMjMh',
+      'Authorization': 'Bearer ' + Liferay.authToken,
       "languageId": Liferay.ThemeDisplay.getLanguageId(),
-      'groupId': '2412549'
+      'groupId': Liferay.ThemeDisplay.getSiteGroupId()
     },
     success: function (categories) {
       $('#categoriesSelect').append(`<option value=-1>-</option>`)
@@ -49,9 +49,9 @@ function getArticles() {
     url: `/o/adc-dxp-services/announcements/web-contents?search=${searchText}&page=${pageNum}&pageSize=${pageSize}&categoryId=${categoryId}&startDate=${startDate}&endDate=${endDate}&sort=displayDate:desc`,
     type: 'GET',
     headers: {
-       'Authorization': 'Basic VmlzaGFsLlNoYWg6SW5leHR1cmUxMjMh
+       Authorization: "Bearer " + Liferay.authToken,
       languageId: Liferay.ThemeDisplay.getLanguageId(),
-      groupId: '2412549',
+      groupId: Liferay.ThemeDisplay.getSiteGroupId(),
     },
     success: function (articles) {
       allArticles = articles;

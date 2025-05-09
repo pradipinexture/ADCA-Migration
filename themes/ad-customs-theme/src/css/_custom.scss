@@ -1,10 +1,166 @@
-/* These inject tags are used for dynamically creating imports for themelet styles, you can place them where ever you like in this file. */
-
-/* inject:imports */
-
 @import 'liferay-font-awesome/scss/font-awesome';
 @import 'liferay-font-awesome/scss/glyphicons';
 
-/* endinject */
+:root {
+  --primary-color: #3D4742;
+  --primary-hover-color: #5b6d67;
+  --secondary-color: #98938F;
+  --beige-color:#EAE5E0;
+}
 
-/* This file allows you to override default styles in one central location for easier upgrade and maintenance. */
+@font-face {
+  font-family: "Gotham-medium";
+  src: url(../font/Gotham/GothamMedium.ttf);
+}
+@font-face {
+  font-family: "bukra-regular";
+  src: url(../font/Bukra/bukraregular.ttf);
+}
+@font-face {
+  font-family: "bukra-Bold";
+  src: url(../font/Bukra/bukrabold.otf);
+}
+@font-face {
+  font-family: "HelveticaNeue-LT";
+  src: url(../font/helveticaneue/HelveticaNeueLt.ttf);
+}
+@font-face {
+  font-family: "HelveticaNeue-AR-LT";
+  src: url(../font/helveticaneue/HelveticaNeueLt_ar.ttf);
+}
+@font-face {
+  font-family: "HelveticaNeue-AR-Bold";
+  src: url(../font/helveticaneue/HelveticaNeuBold_ar.ttf);
+}
+@font-face {
+  font-family: "HelveticaNeue-Bold";
+  src: url(../font/helveticaneue/HelveticaNeuBold.ttf);
+}
+@font-face {
+  font-family: "HelveticaNeue-Thin";
+  src: url(../font/helveticaneue/HelveticaNeueThin.ttf);
+}
+@font-face {
+  font-family: "HelveticaNeue-Light";
+  src: url(../font/helveticaneue/HelveticaNeueLight.ttf);
+}
+
+[dir="ltr"] {
+  .hover-box::after,
+  .news-box::after {
+    background: linear-gradient(to bottom, rgba(217, 217, 217, 0) 20%, #3d4742);
+  }
+}
+
+.page-title:before {
+  content: "";
+  position: absolute;
+  bottom: -50%;
+  right: calc(50% - -5px);
+  width: 120px;
+  height: 29px;
+  background: #ffffff38;
+  transform: rotate(45deg) translate(calc(50% - 50px),-100px);
+}
+
+.page-title::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 30px;
+  width: 150px;
+  height: 29px;
+  background: #ffffff38;
+}
+
+[dir="rtl"] {
+  .page-title nav .breadcrumb .breadcrumb-item+.breadcrumb-item::before {
+    transform: scaleX(-1);
+  }
+
+  .discount-badge  .expired-badge {
+    right: unset;
+    left: 0;
+    border-radius: 10px 0px 10px 0;
+  }
+
+  .news-box::after,
+  .hover-box::after {
+    background: linear-gradient(to bottom, rgba(217, 217, 217, 0) 80%, #3d4742);
+  }
+
+  [class*="icon-chevron-"],
+  [class*="icon-arrow-"] {
+    transform: scaleX(-1);
+    display: inline-block;
+  }
+
+  .ngb-dp-arrow .ngb-dp-navigation-chevron {
+    transform: rotate(45deg);
+  }
+
+  .ngb-dp-arrow.right .ngb-dp-navigation-chevron {
+    transform: rotate(225deg) !important;
+  }
+}
+
+span.badge.badge-danger.panel-notifications-count {
+  position: absolute;
+  top: 0;
+}
+
+#navbarNav {
+  span.badge.badge-danger.panel-notifications-count {
+    position: absolute;
+    top: 5px;
+    margin-left: -15px;
+  }
+}
+
+#wrapper {
+  background: linear-gradient(158.76deg, #dad6d6 2.55%, rgba(0, 65, 102, 0.01) 23.57%, #8aa39917 45.57%, rgba(190, 186, 180, 0.270833) 70.99%, rgba(217, 217, 217, 0) 96.41%);
+}
+
+div#wrapper.viewerAccess {
+  margin-top: 0;
+}
+
+div#wrapper.loggedIn {
+  min-height: calc(100vh - 56px) !important;
+}
+
+#wrapper.viewerAccess .sidebar {
+  top: 66px !important;
+}
+
+.has-control-menu.has-edit-mode-menu #wrapper.loggedIn {
+  height: unset !important;
+  margin-top: 120px !important;
+}
+
+.container-fluid-max-xl {
+  max-width: 100%;
+}
+
+.portlet-decorate .portlet-content{
+padding: 0;
+border: none;
+border-radius: 10px;
+background: transparent;
+}
+
+.breadcrumb-item .active{
+color: #fff;
+}
+
+/* SCSS imports */
+@import "custom-datepicker";
+@import "adcMain";
+@import "home";
+@import "message";
+@import "news";
+@import "orgChart";
+@import "custom-tooltips";
+@import "media-center";
+@import "popups";
+

@@ -1,0 +1,93 @@
+.custom-tooltip {
+  position: relative;
+  transition: all 0.2s;
+}
+.custom-tooltip {
+  background-color:#98938F;
+  border-radius: 10px;
+  color: #fff;
+  display: none;
+  padding: 10px 15px;
+  position: absolute;
+  white-space: nowrap;
+  z-index: 20;
+  transition: all 0.2s;
+}
+.custom-tooltip.top {
+  content: "";
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, calc(-100% - 10px));
+  transition: all 0.2s;
+}
+
+.custom-tooltip.bottom {
+  content: "";
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, calc(100% + 10px));
+  transition: all 0.2s;
+}
+
+.custom-tooltip.right {
+  top: 0;
+  left: 80px;
+  // transform: translateX(calc(100% + 10px));
+  transition: all 0.2s;
+}
+
+.custom-tooltip.left {
+  top: 0;
+  left: 0;
+  transform: translateX(calc(-100% - 10px));
+  transition: all 0.2s;
+}
+.sidebar-btn:hover .custom-tooltip,
+.tweets-section-btn:hover .custom-tooltip {
+  display: block;
+  transition: all 0.2s;
+}
+.custom-tooltip::before {
+  background-color:#98938F;
+  content: " ";
+  display: none;
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  z-index: 20;
+  transition: all 0.2s;
+}
+
+.sidebar-btn:hover .custom-tooltip::before,
+.tweets-section-btn:hover .custom-tooltip::before {
+  display: block;
+  transition: all 0.2s;
+}
+
+.custom-tooltip.top::before {
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, calc(194% + 5px)) rotate(45deg);
+  transition: all 0.2s;
+}
+
+.custom-tooltip.bottom::before {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, calc(100% + 5px)) rotate(45deg);
+  transition: all 0.2s;
+}
+
+.custom-tooltip.right::before {
+  top: 50%;
+  left: 0;
+  transform: translate(calc(-5px), -50%) rotate(45deg);
+  transition: all 0.2s;
+}
+
+.custom-tooltip.left::before {
+  top: 50%;
+  left: 0;
+  transform: translate(calc(-100% - 5px), -50%) rotate(45deg);
+  transition: all 0.2s;
+}

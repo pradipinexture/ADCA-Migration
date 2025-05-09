@@ -1,5 +1,9 @@
 .fragment_1884408 {
 }
+.fadeInUp svg{
+    width: 30px;
+    height: 30px;
+}
 .fav-apps .fav-col{
-  min-width:33.33%;
+ min-width: 33.33%;
 }

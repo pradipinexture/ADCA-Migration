@@ -28,7 +28,7 @@ function getCategories() {
     url: `/o/adc-dxp-services/events/calendars?pageSize=999`,
     type: 'GET',
     headers: {
-      'Authorization': 'Bearer ' + Liferay.authToken,
+       'groupId': Liferay.ThemeDisplay.getSiteGroupId(),
       "languageId": Liferay.ThemeDisplay.getLanguageId(),
       'groupId': Liferay.ThemeDisplay.getSiteGroupId(),
     },
@@ -52,7 +52,7 @@ function getArticles() {
     url: `/o/adc-dxp-services/events?search=${searchText}&page=${pageNum}&pageSize=${pageSize}&calendarId=${categoryId}&startDate=${startDate}&endDate=${endDate}&sort=startTime:desc`,
     type: 'GET',
     headers: {
-      'Authorization': 'Bearer ' + Liferay.authToken,
+       'groupId': Liferay.ThemeDisplay.getSiteGroupId(),
       "languageId": Liferay.ThemeDisplay.getLanguageId(),
       'groupId': Liferay.ThemeDisplay.getSiteGroupId(),
     },

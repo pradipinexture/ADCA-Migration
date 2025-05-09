@@ -3,6 +3,7 @@
   "jsPath": "index.js",
   "htmlPath": "index.html",
   "cssPath": "index.css",
+  "icon": "code",
   "name": "adc-knowledge-sharing-portlet (Copy)",
   "type": "section"
 }

@@ -19,7 +19,7 @@ $(document).ready(function () {
           url: `/o/headless-delivery/v1.0/content-structures/2428177/structured-contents?page=${pageNum}&pageSize=${pageSize}&search=${searchText}&filter=(taxonomyCategoryIds/any(t:t eq ${categoryId}))`,
             type: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + Liferay.authToken,
+                   'x-csrf-token': Liferay.authToken,
                 "Accept-Language": Liferay?.ThemeDisplay?.getLanguageId()?.replace("_", "-"),
                 'groupId': Liferay.ThemeDisplay.getSiteGroupId()
             },

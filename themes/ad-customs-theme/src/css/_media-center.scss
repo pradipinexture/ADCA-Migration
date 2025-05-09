@@ -1,0 +1,49 @@
+.events-filter label {
+    border: 1px solid var(--secondary-color);
+    border-radius: 16px;
+    color: #5e5e5e;
+}
+
+small.filtered-counter {
+    background: var(--secondary-color);
+    border-radius: 20px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    color: #fff;
+}
+
+.events-filter label.active {
+    background-color:  #e2dbd5;
+    color: #000;
+}
+
+
+.calendar-container-text {
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.25rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    
+}
+
+.ngb-dp-weekday {
+    color: #2c6a9d;
+    font-size: 9px;
+}
+
+.ngb-dp-navigation-chevron {
+  
+    color: #2c6a9d;
+}
+
+.ngb-dp-day .bg-primary {
+    background: #bba78d !important;
+}
+
+.advanced-search-section .form-control {
+    border: 1px solid #e9e8e8 !important;
+    background-color: #f4f4f4 !important;
+    border-radius: 10px !important;
+}
