@@ -79,3 +79,14 @@
     background-color:#f7f7f7;
     padding:1rem;
 }
+ .input-group-prepend{
+   display: flex;
+}
+
+ .input-group-prepend .btn search-input{
+ border-radius: 0px;
+}
+
+.input-group-prepend .input-group-text{
+  border-radius: 0px;
+}
