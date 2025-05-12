@@ -17,9 +17,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import adc.dxp.rest.api.application.data.DirectorMessage;
 import adc.dxp.rest.api.application.data.News;
+import adc.dxp.rest.api.application.utils.JournalArticleUtil;
 import adc.dxp.rest.api.application.utils.PageUtils;
+import adc.dxp.rest.api.application.utils.StructureUtil;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.util.PortalUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -134,22 +139,15 @@ public class PromotionsResource {
 			@Context HttpServletRequest request,
 			@HeaderParam(Constants.HEADER_GROUP_ID) long groupId) throws PortalException {
 
-
 		// Pagination setup
 		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
 		int paginationPage = pagination.getPage();
 
 		// Get basic parameters
-		long companyId = _portal.getCompanyId(request);
+		long companyId = PortalUtil.getCompanyId(request);
+		String groupIdString = request.getHeader("groupId");
 		String languageIdString = request.getHeader("languageId");
 
-		if (groupId == 0) {
-			String groupIdString = request.getHeader("groupId");
-			if (groupIdString == null || groupIdString.isEmpty()) {
-				throw new PortalException("Missing required header: groupId");
-			}
-			groupId = Long.valueOf(groupIdString);
-		}
 
 		// Category filter
 		long categoryId = categoryIdParam != null && !categoryIdParam.isEmpty() && !categoryIdParam.equalsIgnoreCase("null") ?
@@ -172,53 +170,67 @@ public class PromotionsResource {
 			_log.error("Error parsing date", e);
 		}
 
+		OrderByComparator<JournalArticle> orderByComparator = null;
+
+		if (sorts != null && sorts[0].getFieldName().equalsIgnoreCase("displayDate")) {
+			orderByComparator = new ArticleDisplayDateComparator(!sorts[0].isReverse());
+		} else if (sorts != null && sorts[0].getFieldName().equalsIgnoreCase("title")) {
+			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());
+		}
+
+
 		// Get all articles for the group
 		List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(groupId);
+//
+//		// Filter by approved status and structure ID
+//		List<JournalArticle> filteredArticles = new ArrayList<>();
+//		for (JournalArticle article : allArticles) {
+//			if (article.getStatus() == WorkflowConstants.STATUS_APPROVED &&
+//					structureId.equals(article.getDDMStructureKey())) {
+//				filteredArticles.add(article);
+//			}
+//		}
+//
+//		// Filter by search term if provided
+//		if (search != null && !search.isEmpty()) {
+//			String searchLowerCase = search.toLowerCase();
+//			List<JournalArticle> searchFilteredArticles = new ArrayList<>();
+//			for (JournalArticle article : filteredArticles) {
+//				String title = article.getTitle(languageIdString).toLowerCase();
+//				String description = article.getDescription(languageIdString).toLowerCase();
+//				if (title.contains(searchLowerCase) || description.contains(searchLowerCase)) {
+//					searchFilteredArticles.add(article);
+//				}
+//			}
+//			filteredArticles = searchFilteredArticles;
+//		}
+//
+//		// Sort results if needed
+//		if (sorts != null && sorts.length > 0) {
+//			Sort sort = sorts[0];
+//			OrderByComparator<JournalArticle> orderByComparator = null;
+//
+//			if (sort.getFieldName().equalsIgnoreCase("displayDate")) {
+//				orderByComparator = new ArticleDisplayDateComparator(!sort.isReverse());
+//				Collections.sort(filteredArticles, orderByComparator);
+//			} else if (sort.getFieldName().equalsIgnoreCase("title")) {
+//				orderByComparator = new JournalArticleTitleComparator(!sort.isReverse());
+//				Collections.sort(filteredArticles, orderByComparator);
+//			}
+//		}
+//
+//		// Process results
 
-		// Filter by approved status and structure ID
-		List<JournalArticle> filteredArticles = new ArrayList<>();
-		for (JournalArticle article : allArticles) {
-			if (article.getStatus() == WorkflowConstants.STATUS_APPROVED &&
-					structureId.equals(article.getDDMStructureKey())) {
-				filteredArticles.add(article);
-			}
-		}
+		//	List<Promotion> lastResults = new ArrayList<>();
 
-		// Filter by search term if provided
-		if (search != null && !search.isEmpty()) {
-			String searchLowerCase = search.toLowerCase();
-			List<JournalArticle> searchFilteredArticles = new ArrayList<>();
-			for (JournalArticle article : filteredArticles) {
-				String title = article.getTitle(languageIdString).toLowerCase();
-				String description = article.getDescription(languageIdString).toLowerCase();
-				if (title.contains(searchLowerCase) || description.contains(searchLowerCase)) {
-					searchFilteredArticles.add(article);
-				}
-			}
-			filteredArticles = searchFilteredArticles;
-		}
+		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_PROMOTIONS_EN);
 
-		// Sort results if needed
-		if (sorts != null && sorts.length > 0) {
-			Sort sort = sorts[0];
-			OrderByComparator<JournalArticle> orderByComparator = null;
-
-			if (sort.getFieldName().equalsIgnoreCase("displayDate")) {
-				orderByComparator = new ArticleDisplayDateComparator(!sort.isReverse());
-				Collections.sort(filteredArticles, orderByComparator);
-			} else if (sort.getFieldName().equalsIgnoreCase("title")) {
-				orderByComparator = new JournalArticleTitleComparator(!sort.isReverse());
-				Collections.sort(filteredArticles, orderByComparator);
-			}
-		}
-
-		// Process results
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
 		List<Promotion> lastResults = new ArrayList<>();
 
-		for (JournalArticle article : filteredArticles) {
+		for (JournalArticle article : results) {
 			try {
 				Promotion promotion = new Promotion(article, request.getHeader(Constants.HEADER_LANGUAGE_ID));
-
 				if ((startDate != null && (startDate.after(promotion.getEndDate()) || promotion.getStartDate().after(startDate)))
 						|| (endDate != null && (endDate.before(promotion.getStartDate()) || promotion.getEndDate().before(endDate)))) {
 					continue;
@@ -250,7 +262,6 @@ public class PromotionsResource {
 				_log.error("Error processing article: " + article.getArticleId(), e);
 			}
 		}
-
 		// Handle pagination
 		int start = (paginationPage - 1) * paginationSize;
 		int end = Math.min(start + paginationSize, lastResults.size());

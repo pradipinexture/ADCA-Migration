@@ -60,7 +60,7 @@ public class Promotion extends BaseContent {
 				startDate = new SimpleDateFormat("yyyy-MM-dd").parse(getAttributes().get("StartDate").getValue());
 			} catch (ParseException e) {
 				// TODO luis.correia
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 		
@@ -69,7 +69,7 @@ public class Promotion extends BaseContent {
 				endDate = new SimpleDateFormat("yyyy-MM-dd").parse(getAttributes().get("EndDate").getValue());
 			} catch (ParseException e) {
 				// TODO luis.correia
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 		

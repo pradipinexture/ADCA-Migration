@@ -200,7 +200,6 @@ public class NewspaperResource extends BasicResource {
 			_log.debug("Not Found");
 			throw new PortalException(javax.ws.rs.core.Response.Status.NOT_FOUND.toString());
 		}
-
 		return newspaperDetail;
 	}
 }

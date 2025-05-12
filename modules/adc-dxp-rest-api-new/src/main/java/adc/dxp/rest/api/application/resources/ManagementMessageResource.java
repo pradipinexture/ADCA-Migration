@@ -155,7 +155,6 @@ public class ManagementMessageResource extends BasicResource {
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_MANAGEMENT_MESSAGE_NAME_EN);
 
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
-
 		List<DirectorMessage> lastResults = new ArrayList<>();
 
 		for (JournalArticle article : results) {
@@ -192,7 +191,14 @@ public class ManagementMessageResource extends BasicResource {
 				lastResults.sort((entity1, entity2) -> entity2.getCategory().getName().compareTo(entity1.getCategory().getName()));
 			}
 		}
-		return PageUtils.createPage(lastResults, pagination, lastResults.size());
+
+		int start = (paginationPage - 1) * paginationSize;
+		int end = Math.min(start + paginationSize, lastResults.size());
+		List<DirectorMessage> pageResults = start < lastResults.size() ?
+				lastResults.subList(start, end) : Collections.emptyList();
+
+		return Page.of(pageResults, pagination, lastResults.size());
+		//return PageUtils.createPage(lastResults, pagination, lastResults.size());
 	}
 
 	/**
