@@ -6,6 +6,13 @@
 --%>
 
 <%@ include file="/init.jsp" %>
+<%@ page import="com.liferay.calendar.model.*" %>
+<%@ page import="com.liferay.portal.kernel.model.*" %>
+
+<%@ page import="com.liferay.calendar.service.*" %>
+<%@ page import="com.liferay.portal.kernel.service.*" %>
+
+<%@ page import="java.util.*" %>
 
 <%
 	String activeView = ParamUtil.getString(request, "activeView", defaultView);
@@ -180,6 +187,31 @@
 
 		if (!CalendarServiceUtil.isManageableFromGroup(curCalendar.getCalendarId(), themeDisplay.getScopeGroupId())) {
 			manageableCalendarsIterator.remove();
+		}
+	}
+
+	//All of the portal organizations
+	List<Organization> portalOrganizations = OrganizationLocalServiceUtil.getOrganizations(themeDisplay.getCompanyId(), 0);
+	List<Group> orgGrp = GroupLocalServiceUtil.getOrganizationsGroups(portalOrganizations);//Organizations
+
+	ArrayList<ArrayList<Long>> cal_grp_ids = new ArrayList<ArrayList<Long>>();//list of [calendarId, groupId1, groupId2, ...]
+
+	if (manageableCalendars != null && orgGrp != null) {
+		for (Calendar mang_cal : manageableCalendars) {
+			Long usr_id = mang_cal.getUserId();
+			
+			if(!UserLocalServiceUtil.hasRoleUser(20101, usr_id)){//user who has no Administrator Role (in my case, only administrator is able to add calendars and resources)
+				Long cal_usr_id = mang_cal.getCalendarId();
+
+				ArrayList<Long> cal_grp = new ArrayList<Long>();//[calendarId, groupId1, groupId2, ...]
+				cal_grp.add(cal_usr_id);
+				for (Group ug : orgGrp) {
+					if (OrganizationLocalServiceUtil.hasUserOrganization(usr_id, ug.getClassPK())) {
+						cal_grp.add(ug.getGroupId());
+					}
+				}
+				cal_grp_ids.add(cal_grp);
+			}
 		}
 	}
 %>
@@ -417,7 +449,7 @@
 							<clay:col
 									size="12"
 							>
-								<div class="calendar-portlet-list-header toggler-header-collapsed" id="<portlet:namespace />checkAvailability">
+								<div hidden="true" class="calendar-portlet-list-header toggler-header-collapsed" id="<portlet:namespace />checkAvailability">
 									<span class="calendar-portlet-list-arrow"></span>
 
 									<span class="calendar-portlet-list-text"><liferay-ui:message key="resources-availability" /></span>
@@ -937,6 +969,35 @@
 		addToList(calendar);
 
 		inviteResourcesInput.val('');
+
+		if (calendar.classNameId == 10001) {
+		if (<%= cal_grp_ids != null %>) {
+		<%
+			for (int ind = 0; ind < cal_grp_ids.size(); ind ++) {
+				ArrayList <Long> tempRow = cal_grp_ids.get(ind);
+
+				if (tempRow.size() > 1) {
+					for (int inj = 1; inj < tempRow.size(); inj ++) {
+						Long tempOrgId = tempRow.get(inj);
+
+		%>
+		if (calendar.classPK == <%= tempOrgId %>) {
+		<%
+			Calendar mycalendar = CalendarServiceUtil.fetchCalendar(tempRow.get (0));
+			JSONObject calendarJSONObject = CalendarUtil.toCalendarJSONObject(themeDisplay, mycalendar);
+
+		%>
+		<portlet:namespace />calendarListPending.add(<%= calendarJSONObject%>);
+		}
+		<%
+					}
+				}
+			}
+		%>
+		}
+		} else {
+		<portlet:namespace />calendarListPending.add(calendar);
+		}
 		}
 		);
 
