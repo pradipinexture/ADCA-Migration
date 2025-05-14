@@ -2,10 +2,7 @@ package adc.dxp.rest.api.application.resources;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -18,7 +15,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import adc.dxp.rest.api.application.utils.PageUtils;
+import adc.dxp.rest.api.application.data.Promotion;
+import adc.dxp.rest.api.application.utils.*;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -62,8 +60,6 @@ import adc.dxp.rest.api.application.data.Category;
 import adc.dxp.rest.api.application.data.Media;
 import adc.dxp.rest.api.application.data.comparator.JournalArticleTitleComparator;
 import adc.dxp.rest.api.application.data.vo.GalleryVO;
-import adc.dxp.rest.api.application.utils.Constants;
-import adc.dxp.rest.api.application.utils.FileUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -157,6 +153,10 @@ public class MediaResource {
 
 		_log.debug("Call all galleries " + groupId);
 
+		// Pagination setup
+		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
+		int paginationPage = pagination.getPage();
+
 		// Get basic parameters
 		long companyId = _portal.getCompanyId(request);
 		String languageIdString = request.getHeader("languageId");
@@ -211,41 +211,45 @@ public class MediaResource {
 			}
 		}
 
-		// Get all articles for the group
-		List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(groupId);
-		_log.debug("Total articles in group: " + allArticles.size());
+//		// Get all articles for the group
+//		List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(groupId);
+//		_log.debug("Total articles in group: " + allArticles.size());
+//
+//		// Filter by approved status and structure ID
+//		List<JournalArticle> filteredArticles = new ArrayList<>();
+//		for (JournalArticle article : allArticles) {
+//			if (article.getStatus() == WorkflowConstants.STATUS_APPROVED &&
+//					structureId.equals(article.getDDMStructureKey())) {
+//				filteredArticles.add(article);
+//			}
+//		}
+//		_log.debug("Articles matching structure: " + filteredArticles.size());
+//
+//		// Filter by search term if provided
+//		if (search != null && !search.isEmpty()) {
+//			String searchLowerCase = search.toLowerCase();
+//			List<JournalArticle> searchFilteredArticles = new ArrayList<>();
+//			for (JournalArticle article : filteredArticles) {
+//				String title = article.getTitle(languageIdString).toLowerCase();
+//				String description = article.getDescription(languageIdString).toLowerCase();
+//				if (title.contains(searchLowerCase) || description.contains(searchLowerCase)) {
+//					searchFilteredArticles.add(article);
+//				}
+//			}
+//			filteredArticles = searchFilteredArticles;
+//		}
+//
+//		// Process results
+//		List<Media> lastResults = new ArrayList<>();
 
-		// Filter by approved status and structure ID
-		List<JournalArticle> filteredArticles = new ArrayList<>();
-		for (JournalArticle article : allArticles) {
-			if (article.getStatus() == WorkflowConstants.STATUS_APPROVED &&
-					structureId.equals(article.getDDMStructureKey())) {
-				filteredArticles.add(article);
-			}
-		}
-		_log.debug("Articles matching structure: " + filteredArticles.size());
+		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_MEDIA_NAME_EN);
 
-		// Filter by search term if provided
-		if (search != null && !search.isEmpty()) {
-			String searchLowerCase = search.toLowerCase();
-			List<JournalArticle> searchFilteredArticles = new ArrayList<>();
-			for (JournalArticle article : filteredArticles) {
-				String title = article.getTitle(languageIdString).toLowerCase();
-				String description = article.getDescription(languageIdString).toLowerCase();
-				if (title.contains(searchLowerCase) || description.contains(searchLowerCase)) {
-					searchFilteredArticles.add(article);
-				}
-			}
-			filteredArticles = searchFilteredArticles;
-		}
-
-		// Process results
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
 		List<Media> lastResults = new ArrayList<>();
 
-		for (JournalArticle article : filteredArticles) {
+		for (JournalArticle article : results) {
 			try {
 				Media media = new Media(article, request.getHeader(Constants.HEADER_LANGUAGE_ID));
-
 				// Get asset entry
 				AssetEntry assetUtil = _assetEntryLocalService.getEntry(
 						"com.liferay.journal.model.JournalArticle", article.getResourcePrimKey());
@@ -284,21 +288,31 @@ public class MediaResource {
 			}
 		}
 
+//		// Handle pagination
+//		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
+//		int paginationPage = pagination.getPage();
+//		int fromIndex = paginationPage != 1 ? ((paginationPage - 1) * paginationSize) : 0;
+//		int toIndex = paginationPage != 1 ? paginationPage * paginationSize : paginationSize;
+//
+//		if (toIndex > lastResults.size()) {
+//			toIndex = lastResults.size();
+//		}
+//
+//		if (fromIndex >= lastResults.size()) {
+//			return Page.of(new ArrayList<>(), pagination, lastResults.size());
+//		}
+
 		// Handle pagination
-		int paginationSize = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
-		int paginationPage = pagination.getPage();
-		int fromIndex = paginationPage != 1 ? ((paginationPage - 1) * paginationSize) : 0;
-		int toIndex = paginationPage != 1 ? paginationPage * paginationSize : paginationSize;
+		int start = (paginationPage - 1) * paginationSize;
+		int end = Math.min(start + paginationSize, lastResults.size());
 
-		if (toIndex > lastResults.size()) {
-			toIndex = lastResults.size();
-		}
+		List<Media> pageResults = start < lastResults.size() ?
+				lastResults.subList(start, end) : Collections.emptyList();
 
-		if (fromIndex >= lastResults.size()) {
-			return Page.of(new ArrayList<>(), pagination, lastResults.size());
-		}
+		return Page.of(pageResults, pagination, lastResults.size());
 
-		return Page.of(lastResults.subList(fromIndex, toIndex), pagination, lastResults.size());
+//		return Page.of(lastResults.subList(fromIndex, toIndex), pagination, lastResults.size());
+
 	}
 
 	/**
