@@ -1,23 +1,17 @@
-<%--
-/**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
- * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
- */
---%>
-
 <%@ include file="/init.jsp" %>
+<h4>Hello Inside the login</h4>
 
 <c:choose>
 	<c:when test="<%= themeDisplay.isSignedIn() %>">
 
 		<%
-		String signedInAs = HtmlUtil.escape(user.getFullName());
+			String signedInAs = HtmlUtil.escape(user.getFullName());
 
-		if (themeDisplay.isShowMyAccountIcon() && (themeDisplay.getURLMyAccount() != null)) {
-			String myAccountURL = String.valueOf(themeDisplay.getURLMyAccount());
+			if (themeDisplay.isShowMyAccountIcon() && (themeDisplay.getURLMyAccount() != null)) {
+				String myAccountURL = String.valueOf(themeDisplay.getURLMyAccount());
 
-			signedInAs = "<a class=\"signed-in\" href=\"" + HtmlUtil.escape(myAccountURL) + "\">" + signedInAs + "</a>";
-		}
+				signedInAs = "<a class=\"signed-in\" href=\"" + HtmlUtil.escape(myAccountURL) + "\">" + signedInAs + "</a>";
+			}
 		%>
 
 		<liferay-ui:message arguments="<%= signedInAs %>" key="you-are-signed-in-as-x" translateArguments="<%= false %>" />
@@ -25,32 +19,33 @@
 	<c:otherwise>
 
 		<%
-		String formName = "loginForm";
+			String formName = "loginForm";
 
-		if (windowState.equals(LiferayWindowState.EXCLUSIVE)) {
-			formName += "Modal";
-		}
+			if (windowState.equals(LiferayWindowState.EXCLUSIVE)) {
+				formName += "Modal";
+			}
 
-		String redirect = ParamUtil.getString(request, "redirect");
+			String redirect = ParamUtil.getString(request, "redirect");
 
-		String login = (String)SessionErrors.get(renderRequest, "login");
+			String login = (String)SessionErrors.get(renderRequest, "login");
 
-		if (Validator.isNull(login)) {
-			login = LoginUtil.getLogin(request, "login", company);
-		}
+			if (Validator.isNull(login)) {
+				login = LoginUtil.getLogin(request, "login", company);
+			}
 
-		String password = StringPool.BLANK;
-		boolean rememberMe = ParamUtil.getBoolean(request, "rememberMe");
+			String password = StringPool.BLANK;
+			boolean rememberMe = ParamUtil.getBoolean(request, "rememberMe");
 
-		if (Validator.isNull(authType)) {
-			authType = company.getAuthType();
-		}
+			if (Validator.isNull(authType)) {
+				authType = company.getAuthType();
+			}
 		%>
 
 		<div class="login-container">
-			<portlet:actionURL name="/login/login" secure="<%= PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS || request.isSecure() %>" var="loginURL">
+			<!--	<portlet:actionURL name="/login/login" secure="<%= PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS || request.isSecure() %>" var="loginURL">
 				<portlet:param name="mvcRenderCommandName" value="/login/login" />
 			</portlet:actionURL>
+ 			-->
 
 			<aui:form action="<%= loginURL %>" autocomplete='<%= PropsValues.COMPANY_SECURITY_LOGIN_FORM_AUTOCOMPLETE ? "on" : "off" %>' cssClass="sign-in-form" method="post" name="<%= formName %>" onSubmit="event.preventDefault();" validateOnBlur="<%= false %>">
 				<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
@@ -70,7 +65,7 @@
 					<c:when test='<%= SessionMessages.contains(request, "userAdded") %>'>
 
 						<%
-						String userEmailAddress = (String)SessionMessages.get(request, "userAdded");
+							String userEmailAddress = (String)SessionMessages.get(request, "userAdded");
 						%>
 
 						<div class="alert alert-success">
@@ -95,7 +90,7 @@
 					<c:when test='<%= SessionMessages.contains(request, "userPending") %>'>
 
 						<%
-						String userEmailAddress = (String)SessionMessages.get(request, "userPending");
+							String userEmailAddress = (String)SessionMessages.get(request, "userPending");
 						%>
 
 						<div class="alert alert-success">
@@ -121,7 +116,7 @@
 				<liferay-ui:error exception="<%= UserLockoutException.PasswordPolicyLockout.class %>">
 
 					<%
-					UserLockoutException.PasswordPolicyLockout ule = (UserLockoutException.PasswordPolicyLockout)errorException;
+						UserLockoutException.PasswordPolicyLockout ule = (UserLockoutException.PasswordPolicyLockout)errorException;
 					%>
 
 					<c:choose>
@@ -131,7 +126,7 @@
 						<c:otherwise>
 
 							<%
-							Format dateFormat = FastDateFormatFactoryUtil.getDateTime(FastDateFormatConstants.SHORT, FastDateFormatConstants.LONG, locale, TimeZone.getTimeZone(ule.user.getTimeZoneId()));
+								Format dateFormat = FastDateFormatFactoryUtil.getDateTime(FastDateFormatConstants.SHORT, FastDateFormatConstants.LONG, locale, TimeZone.getTimeZone(ule.user.getTimeZoneId()));
 							%>
 
 							<liferay-ui:message arguments="<%= dateFormat.format(ule.user.getUnlockDate()) %>" key="this-account-is-locked-until-x" translateArguments="<%= false %>" />
@@ -147,17 +142,17 @@
 				<aui:fieldset>
 
 					<%
-					String loginLabel = null;
+						String loginLabel = null;
 
-					if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
-						loginLabel = "email-address";
-					}
-					else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
-						loginLabel = "screen-name";
-					}
-					else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
-						loginLabel = "id";
-					}
+						if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
+							loginLabel = "email-address";
+						}
+						else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
+							loginLabel = "screen-name";
+						}
+						else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
+							loginLabel = "id";
+						}
 					%>
 
 					<aui:input cssClass="clearable" label="<%= loginLabel %>" name="login" required="<%= true %>" showRequiredLabel="<%= false %>" type="text" value="<%= login %>">
@@ -187,40 +182,38 @@
 			var form = document.getElementById('<portlet:namespace /><%= formName %>');
 
 			if (form) {
-				form.addEventListener('submit', (event) => {
-					<c:if test="<%= PropsValues.SESSION_ENABLE_PERSISTENT_COOKIES && PropsValues.SESSION_TEST_COOKIE_SUPPORT %>">
-						if (!navigator.cookieEnabled) {
-							document.getElementById(
-								'<portlet:namespace />cookieDisabled'
-							).style.display = '';
+			form.addEventListener('submit', (event) => {
+			<c:if test="<%= PropsValues.SESSION_ENABLE_PERSISTENT_COOKIES && PropsValues.SESSION_TEST_COOKIE_SUPPORT %>">
+				if (!navigator.cookieEnabled) {
+				document.getElementById(
+				'<portlet:namespace />cookieDisabled'
+				).style.display = '';
 
-							return;
-						}
-					</c:if>
-
-					<c:if test="<%= Validator.isNotNull(redirect) %>">
-						var redirect = form.querySelector('#<portlet:namespace />redirect');
-
-						if (redirect) {
-							var redirectVal = redirect.getAttribute('value');
-
-							redirect.setAttribute('value', redirectVal + window.location.hash);
-						}
-					</c:if>
-
-					submitForm(form);
-				});
-
-				var password = form.querySelector('#<portlet:namespace />password');
-
-				if (password) {
-					password.addEventListener('keypress', (event) => {
-						Liferay.Util.showCapsLock(
-							event,
-							'<portlet:namespace />passwordCapsLockSpan'
-						);
-					});
+				return;
 				}
+			</c:if>
+
+			<c:if test="<%= Validator.isNotNull(redirect) %>">
+				var redirect = form.querySelector('#<portlet:namespace />redirect');
+
+				if (redirect) {
+				var redirectVal = redirect.getAttribute('value');
+
+				redirect.setAttribute('value', redirectVal + window.location.hash);
+				}
+			</c:if>
+
+			submitForm(form);
+			});
+			var password = form.querySelector('#<portlet:namespace />password');
+			if (password) {
+			password.addEventListener('keypress', (event) => {
+			Liferay.Util.showCapsLock(
+			event,
+			'<portlet:namespace />passwordCapsLockSpan'
+			);
+			});
+			}
 			}
 		</aui:script>
 	</c:otherwise>
