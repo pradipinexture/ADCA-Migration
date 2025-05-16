@@ -7,7 +7,6 @@
 
 	<%@ include file="/init.jsp" %>
 
-	<h1>HelofsdfkjsdfhsdfgjdgsfhjsdgfahsdgjkhsdkjfhsjkDf,</h1>
 	<%
 	String activeView = ParamUtil.getString(request, "activeView", sessionClicksDefaultView);
 	long date = ParamUtil.getLong(request, "date", System.currentTimeMillis());

@@ -375,14 +375,6 @@
 									label="<%= true %>"
 							/>
 						</liferay-expando:custom-attributes-available>
-
-						<c:if test="<%= calendarBooking == null %>">
-							<aui:field-wrapper label="permissions">
-								<liferay-ui:input-permissions
-										modelName="<%= CalendarBooking.class.getName() %>"
-								/>
-							</aui:field-wrapper>
-						</c:if>
 					</liferay-ui:panel>
 
 					<liferay-ui:panel
@@ -485,28 +477,6 @@
 							title="reminders"
 					>
 						<div class="calendar-booking-reminders" id="<portlet:namespace />reminders"></div>
-					</liferay-ui:panel>
-
-					<liferay-ui:panel
-							collapsible="<%= true %>"
-							cssClass="panel-unstyled"
-							defaultState="closed"
-							extended="<%= false %>"
-							id="calendarBookingCategorizationPanel"
-							markupView="lexicon"
-							persistState="<%= true %>"
-							title="categorization"
-					>
-						<liferay-asset:asset-categories-selector
-								className="<%= CalendarBooking.class.getName() %>"
-								classPK="<%= calendarBookingId %>"
-								visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
-						/>
-
-						<liferay-asset:asset-tags-selector
-								className="<%= CalendarBooking.class.getName() %>"
-								classPK="<%= calendarBookingId %>"
-						/>
 					</liferay-ui:panel>
 
 					<liferay-ui:panel
