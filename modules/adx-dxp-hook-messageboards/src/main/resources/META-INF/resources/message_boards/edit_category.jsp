@@ -6,7 +6,7 @@
 --%>
 
 <%@ include file="/message_boards/init.jsp" %>
-
+<h1>Hello inside the </h1>
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
@@ -118,7 +118,7 @@ if (portletTitleBasedNavigation) {
 					<aui:input autocomplete="off" name="name" />
 
 					<aui:input name="description" />
-
+					<!--
 					<aui:select name="displayStyle">
 
 						<%
@@ -132,6 +132,7 @@ if (portletTitleBasedNavigation) {
 						%>
 
 					</aui:select>
+					-->
 				</aui:fieldset>
 
 				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="mailing-list">

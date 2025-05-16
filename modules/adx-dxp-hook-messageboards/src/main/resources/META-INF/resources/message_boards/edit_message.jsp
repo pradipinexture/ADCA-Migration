@@ -300,20 +300,7 @@ if (portletTitleBasedNavigation) {
 					</aui:fieldset>
 				</c:if>
 
-				<c:if test="<%= curParentMessage == null %>">
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="categorization">
-						<liferay-asset:asset-categories-selector
-							className="<%= MBMessage.class.getName() %>"
-							classPK="<%= (message != null) ? message.getMessageId() : 0 %>"
-							visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
-						/>
 
-						<liferay-asset:asset-tags-selector
-							className="<%= MBMessage.class.getName() %>"
-							classPK="<%= (message != null) ? message.getMessageId() : 0 %>"
-						/>
-					</aui:fieldset>
-				</c:if>
 
 				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="related-assets">
 					<liferay-asset:input-asset-links
@@ -322,80 +309,6 @@ if (portletTitleBasedNavigation) {
 					/>
 				</aui:fieldset>
 
-				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="more-settings">
-					<c:if test="<%= curParentMessage == null %>">
-
-						<%
-						MBCategory category = MBCategoryLocalServiceUtil.getCategory(categoryId);
-
-						boolean disabled = false;
-						boolean question = threadAsQuestionByDefault;
-
-						String displayStyle = category.getDisplayStyle();
-
-						if (message != null) {
-							if (thread.isQuestion() || message.isAnswer()) {
-								question = true;
-
-								if ((category != null) && Objects.equals(displayStyle, "question")) {
-									disabled = true;
-								}
-							}
-						}
-						else if ((category != null) && Objects.equals(displayStyle, "question")) {
-							disabled = true;
-							question = true;
-						}
-						%>
-
-						<aui:input disabled="<%= disabled %>" helpMessage="message-boards-message-question-help" label="mark-as-a-question" name="question" type="checkbox" value="<%= question %>" />
-					</c:if>
-
-					<c:if test="<%= (message == null) && themeDisplay.isSignedIn() && allowAnonymousPosting %>">
-						<aui:input helpMessage="message-boards-message-anonymous-help" name="anonymous" type="checkbox" />
-					</c:if>
-
-					<c:if test="<%= (message == null) && themeDisplay.isSignedIn() && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), MBThread.class.getName(), threadId) && !SubscriptionLocalServiceUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), MBCategory.class.getName(), categoryId) %>">
-						<aui:input helpMessage="message-boards-message-subscribe-me-help" label="subscribe-me" name="subscribe" type='<%= (mbGroupServiceSettings.isEmailMessageAddedEnabled() || mbGroupServiceSettings.isEmailMessageUpdatedEnabled()) ? "checkbox" : "hidden" %>' value="<%= subscribeByDefault %>" />
-					</c:if>
-
-					<c:if test="<%= (priorities.length > 0) && MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.UPDATE_THREAD_PRIORITY) %>">
-
-						<%
-						double threadPriority = BeanParamUtil.getDouble(message, request, "priority");
-						%>
-
-						<aui:select name="priority">
-							<aui:option value="" />
-
-							<%
-							for (int i = 0; i < priorities.length; i++) {
-								String[] priority = StringUtil.split(priorities[i], StringPool.PIPE);
-
-								try {
-									String priorityName = priority[0];
-
-									double priorityValue = GetterUtil.getDouble(priority[2]);
-							%>
-
-									<c:if test="<%= priorityValue > 0 %>">
-										<aui:option label="<%= HtmlUtil.escape(priorityName) %>" selected="<%= threadPriority == priorityValue %>" value="<%= priorityValue %>" />
-									</c:if>
-
-							<%
-								}
-								catch (Exception e) {
-								}
-							}
-							%>
-
-						</aui:select>
-					</c:if>
-
-					<c:if test="<%= PropsValues.MESSAGE_BOARDS_PINGBACK_ENABLED %>">
-						<aui:input helpMessage="to-allow-pingbacks,-please-also-ensure-the-entry's-guest-view-permission-is-enabled" label="allow-pingbacks" name="allowPingbacks" value="<%= allowPingbacks %>" />
-					</c:if>
-				</aui:fieldset>
 
 				<c:if test="<%= message == null %>">
 					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
