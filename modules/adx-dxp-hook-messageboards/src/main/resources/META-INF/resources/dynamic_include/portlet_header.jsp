@@ -15,10 +15,6 @@ MBCategory category = (MBCategory)request.getAttribute(WebKeys.MESSAGE_BOARDS_CA
 long categoryId = MBUtil.getCategoryId(request, category);
 %>
 
-<liferay-portlet:renderURL varImpl="searchURL">
-	<portlet:param name="mvcRenderCommandName" value="/message_boards/search" />
-</liferay-portlet:renderURL>
-
 <aui:form action="<%= searchURL %>" method="get" name="searchFm">
 	<liferay-portlet:renderURLParams varImpl="searchURL" />
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />

@@ -133,7 +133,6 @@ public class ContactResource {
 		long companyId = PortalUtil.getCompanyId(request);
 
 		String groupIdString = request.getHeader("groupId");
-
 		long groupId = Long.valueOf(groupIdString).longValue();
 		String languageIdString = request.getHeader("languageId");
 
@@ -164,9 +163,7 @@ public class ContactResource {
 		else if (sorts != null && sorts[0].getFieldName().equalsIgnoreCase("title")) {
 			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());
 		}
-
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_CONTACT_NAME_EN);
-
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(),
 				startDate, endDate, null);
 

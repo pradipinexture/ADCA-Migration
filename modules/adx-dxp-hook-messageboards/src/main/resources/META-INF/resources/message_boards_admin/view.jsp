@@ -6,7 +6,6 @@
 --%>
 
 <%@ include file="/message_boards/init.jsp" %>
-
 <%
 String navigation = "threads";
 
@@ -60,6 +59,7 @@ mbAdminListDisplayContext.populateResultsAndTotal(entriesSearchContainer);
 String entriesNavigation = ParamUtil.getString(request, "entriesNavigation", "all");
 %>
 
+<div class="filters">
 <clay:management-toolbar
 	actionDropdownItems="<%= mbEntriesManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	additionalProps="<%= mbEntriesManagementToolbarDisplayContext.getAdditionalProps() %>"
@@ -77,6 +77,7 @@ String entriesNavigation = ParamUtil.getString(request, "entriesNavigation", "al
 	sortingOrder="<%= mbEntriesManagementToolbarDisplayContext.getOrderByType() %>"
 	sortingURL="<%= String.valueOf(mbEntriesManagementToolbarDisplayContext.getSortingURL()) %>"
 />
+</div>
 
 <%@ include file="/message_boards_admin/view_entries.jspf" %>
 

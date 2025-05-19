@@ -6,6 +6,7 @@
 --%>
 
 <%@ include file="/message_boards/init.jsp" %>
+<h1>Insdie the message board</h1>
 
 <%
 String redirect = ParamUtil.getString(request, "redirect");
