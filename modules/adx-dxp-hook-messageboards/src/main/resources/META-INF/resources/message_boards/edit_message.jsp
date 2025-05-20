@@ -8,109 +8,109 @@
 <%@ include file="/message_boards/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
+	String redirect = ParamUtil.getString(request, "redirect");
 
-MBMessage message = (MBMessage)request.getAttribute(WebKeys.MESSAGE_BOARDS_MESSAGE);
+	MBMessage message = (MBMessage)request.getAttribute(WebKeys.MESSAGE_BOARDS_MESSAGE);
 
-long messageId = BeanParamUtil.getLong(message, request, "messageId");
+	long messageId = BeanParamUtil.getLong(message, request, "messageId");
 
-long categoryId = MBUtil.getCategoryId(request, message);
-long threadId = BeanParamUtil.getLong(message, request, "threadId");
-long parentMessageId = BeanParamUtil.getLong(message, request, "parentMessageId", MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID);
+	long categoryId = MBUtil.getCategoryId(request, message);
+	long threadId = BeanParamUtil.getLong(message, request, "threadId");
+	long parentMessageId = BeanParamUtil.getLong(message, request, "parentMessageId", MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID);
 
-String subject = BeanParamUtil.getString(message, request, "subject");
+	String subject = BeanParamUtil.getString(message, request, "subject");
 
-MBThread thread = null;
+	MBThread thread = null;
 
-MBMessage curParentMessage = null;
+	MBMessage curParentMessage = null;
 
-if (threadId > 0) {
-	thread = MBThreadLocalServiceUtil.getThread(threadId);
+	if (threadId > 0) {
+		thread = MBThreadLocalServiceUtil.getThread(threadId);
 
-	try {
-		curParentMessage = MBMessageServiceUtil.getMessage(parentMessageId);
+		try {
+			curParentMessage = MBMessageServiceUtil.getMessage(parentMessageId);
 
-		if (Validator.isNull(subject)) {
-			String curParentMessageSubject = curParentMessage.getSubject();
+			if (Validator.isNull(subject)) {
+				String curParentMessageSubject = curParentMessage.getSubject();
 
-			if (curParentMessageSubject.startsWith(MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE)) {
-				subject = curParentMessageSubject;
-			}
-			else {
-				subject = MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE + curParentMessageSubject;
+				if (curParentMessageSubject.startsWith(MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE)) {
+					subject = curParentMessageSubject;
+				}
+				else {
+					subject = MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE + curParentMessageSubject;
+				}
 			}
 		}
+		catch (Exception e) {
+		}
 	}
-	catch (Exception e) {
+
+	String body = BeanParamUtil.getString(message, request, "body");
+	boolean quote = ParamUtil.getBoolean(request, "quote");
+	boolean splitThread = ParamUtil.getBoolean(request, "splitThread");
+
+	List<FileEntry> existingAttachmentsFileEntries = new ArrayList<FileEntry>();
+
+	if (message != null) {
+		existingAttachmentsFileEntries = message.getAttachmentsFileEntries();
 	}
-}
 
-String body = BeanParamUtil.getString(message, request, "body");
-boolean quote = ParamUtil.getBoolean(request, "quote");
-boolean splitThread = ParamUtil.getBoolean(request, "splitThread");
+	boolean allowPingbacks = PropsValues.MESSAGE_BOARDS_PINGBACK_ENABLED && BeanParamUtil.getBoolean(message, request, "allowPingbacks", true);
 
-List<FileEntry> existingAttachmentsFileEntries = new ArrayList<FileEntry>();
-
-if (message != null) {
-	existingAttachmentsFileEntries = message.getAttachmentsFileEntries();
-}
-
-boolean allowPingbacks = PropsValues.MESSAGE_BOARDS_PINGBACK_ENABLED && BeanParamUtil.getBoolean(message, request, "allowPingbacks", true);
-
-if (Validator.isNull(redirect)) {
-	redirect = PortletURLBuilder.createRenderURL(
-		renderResponse
-	).setMVCRenderCommandName(
-		"/message_boards/view_message"
-	).setParameter(
-		"messageId", messageId
-	).buildString();
-}
-
-if (curParentMessage != null) {
-	MBBreadcrumbUtil.addPortletBreadcrumbEntries(curParentMessage, request, renderResponse);
-
-	if (!layout.isTypeControlPanel()) {
-		PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "reply"), currentURL);
+	if (Validator.isNull(redirect)) {
+		redirect = PortletURLBuilder.createRenderURL(
+				renderResponse
+		).setMVCRenderCommandName(
+				"/message_boards/view_message"
+		).setParameter(
+				"messageId", messageId
+		).buildString();
 	}
-}
-else if (message != null) {
-	MBBreadcrumbUtil.addPortletBreadcrumbEntries(message, request, renderResponse);
 
-	if (!layout.isTypeControlPanel()) {
-		PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
+	if (curParentMessage != null) {
+		MBBreadcrumbUtil.addPortletBreadcrumbEntries(curParentMessage, request, renderResponse);
+
+		if (!layout.isTypeControlPanel()) {
+			PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "reply"), currentURL);
+		}
 	}
-}
-else {
-	MBBreadcrumbUtil.addPortletBreadcrumbEntries(categoryId, request, renderResponse);
+	else if (message != null) {
+		MBBreadcrumbUtil.addPortletBreadcrumbEntries(message, request, renderResponse);
 
-	if (!layout.isTypeControlPanel()) {
-		PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-message"), currentURL);
+		if (!layout.isTypeControlPanel()) {
+			PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
+		}
 	}
-}
+	else {
+		MBBreadcrumbUtil.addPortletBreadcrumbEntries(categoryId, request, renderResponse);
 
-String headerTitle = LanguageUtil.get(request, "add-message");
+		if (!layout.isTypeControlPanel()) {
+			PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-message"), currentURL);
+		}
+	}
 
-if (message != null) {
-	headerTitle = LanguageUtil.format(request, "edit-x", HtmlUtil.escape(message.getSubject()), false);
-}
-else if (curParentMessage != null) {
-	headerTitle = LanguageUtil.format(request, "reply-to-x", HtmlUtil.escape(curParentMessage.getSubject()), false);
-}
+	String headerTitle = LanguageUtil.get(request, "add-message");
 
-boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation")) || Objects.equals(portletDisplay.getPortletResource(), PortletKeys.MY_WORKFLOW_TASK);
+	if (message != null) {
+		headerTitle = LanguageUtil.format(request, "edit-x", HtmlUtil.escape(message.getSubject()), false);
+	}
+	else if (curParentMessage != null) {
+		headerTitle = LanguageUtil.format(request, "reply-to-x", HtmlUtil.escape(curParentMessage.getSubject()), false);
+	}
 
-if (portletTitleBasedNavigation) {
-	portletDisplay.setShowBackIcon(true);
-	portletDisplay.setURLBack(redirect);
+	boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation")) || Objects.equals(portletDisplay.getPortletResource(), PortletKeys.MY_WORKFLOW_TASK);
 
-	renderResponse.setTitle(headerTitle);
-}
+	if (portletTitleBasedNavigation) {
+		portletDisplay.setShowBackIcon(true);
+		portletDisplay.setURLBack(redirect);
+
+		renderResponse.setTitle(headerTitle);
+	}
 %>
 
-<clay:container-fluid-1280
-	cssClass="container-form-lg"
-	id='<%= liferayPortletResponse.getNamespace() + "mbEditPageContainer" %>'
+<clay:container-fluid
+		cssClass="container-form-lg"
+		id='<%= liferayPortletResponse.getNamespace() + "mbEditPageContainer" %>'
 >
 	<c:if test="<%= !portletTitleBasedNavigation %>">
 		<h3><%= headerTitle %></h3>
@@ -133,7 +133,7 @@ if (portletTitleBasedNavigation) {
 		<liferay-ui:error exception="<%= AntivirusScannerException.class %>">
 
 			<%
-			AntivirusScannerException ase = (AntivirusScannerException)errorException;
+				AntivirusScannerException ase = (AntivirusScannerException)errorException;
 			%>
 
 			<liferay-ui:message key="<%= ase.getMessageKey() %>" />
@@ -149,7 +149,7 @@ if (portletTitleBasedNavigation) {
 		</liferay-ui:error>
 
 		<%
-		DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
+			DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 		%>
 
 		<liferay-ui:error exception="<%= FileExtensionException.class %>">
@@ -161,7 +161,7 @@ if (portletTitleBasedNavigation) {
 		<liferay-ui:error exception="<%= FileSizeException.class %>">
 
 			<%
-			FileSizeException fileSizeException = (FileSizeException)errorException;
+				FileSizeException fileSizeException = (FileSizeException)errorException;
 			%>
 
 			<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(fileSizeException.getMaxSize(), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
@@ -189,12 +189,12 @@ if (portletTitleBasedNavigation) {
 							</span>
 
 							<%
-							request.setAttribute("edit-message.jsp-showPermanentLink", Boolean.TRUE);
-							request.setAttribute("edit-message.jsp-showRecentPosts", Boolean.TRUE);
-							request.setAttribute("edit_message.jsp-category", null);
-							request.setAttribute("edit_message.jsp-editable", Boolean.FALSE);
-							request.setAttribute("edit_message.jsp-message", curParentMessage);
-							request.setAttribute("edit_message.jsp-thread", thread);
+								request.setAttribute("edit-message.jsp-showPermanentLink", Boolean.TRUE);
+								request.setAttribute("edit-message.jsp-showRecentPosts", Boolean.TRUE);
+								request.setAttribute("edit_message.jsp-category", null);
+								request.setAttribute("edit_message.jsp-editable", Boolean.FALSE);
+								request.setAttribute("edit_message.jsp-message", curParentMessage);
+								request.setAttribute("edit_message.jsp-thread", thread);
 							%>
 
 							<liferay-util:include page="/message_boards/view_thread_message.jsp" servletContext="<%= application %>" />
@@ -220,14 +220,14 @@ if (portletTitleBasedNavigation) {
 				</aui:fieldset>
 
 				<liferay-expando:custom-attributes-available
-					className="<%= MBMessage.class.getName() %>"
+						className="<%= MBMessage.class.getName() %>"
 				>
 					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="custom-fields">
 						<liferay-expando:custom-attribute-list
-							className="<%= MBMessage.class.getName() %>"
-							classPK="<%= messageId %>"
-							editable="<%= true %>"
-							label="<%= true %>"
+								className="<%= MBMessage.class.getName() %>"
+								classPK="<%= messageId %>"
+								editable="<%= true %>"
+								label="<%= true %>"
 						/>
 					</aui:fieldset>
 				</liferay-expando:custom-attributes-available>
@@ -238,35 +238,35 @@ if (portletTitleBasedNavigation) {
 
 						<div class="<%= (existingAttachmentsFileEntries.size() == 0) ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />fileAttachments">
 							<liferay-ui:search-container
-								emptyResultsMessage="this-message-does-not-have-file-attachments"
-								headerNames="file-name,size,action"
-								id="messageAttachments"
-								total="<%= existingAttachmentsFileEntries.size() %>"
+									emptyResultsMessage="this-message-does-not-have-file-attachments"
+									headerNames="file-name,size,action"
+									id="messageAttachments"
+									total="<%= existingAttachmentsFileEntries.size() %>"
 							>
 								<liferay-ui:search-container-results
-									results="<%= existingAttachmentsFileEntries %>"
+										results="<%= existingAttachmentsFileEntries %>"
 								/>
 
 								<liferay-ui:search-container-row
-									className="com.liferay.portal.kernel.repository.model.FileEntry"
-									escapedModel="<%= true %>"
-									keyProperty="fileEntryId"
-									modelVar="fileEntry"
+										className="com.liferay.portal.kernel.repository.model.FileEntry"
+										escapedModel="<%= true %>"
+										keyProperty="fileEntryId"
+										modelVar="fileEntry"
 								>
 									<liferay-ui:search-container-column-text
-										href='<%= PortletFileRepositoryUtil.getDownloadPortletFileEntryURL(themeDisplay, fileEntry, "status=" + WorkflowConstants.STATUS_APPROVED) %>'
-										name="file-name"
-										value="<%= fileEntry.getTitle() %>"
+											href='<%= PortletFileRepositoryUtil.getDownloadPortletFileEntryURL(themeDisplay, fileEntry, "status=" + WorkflowConstants.STATUS_APPROVED) %>'
+											name="file-name"
+											value="<%= fileEntry.getTitle() %>"
 									/>
 
 									<liferay-ui:search-container-column-text
-										name="size"
-										value="<%= LanguageUtil.formatStorageSize(fileEntry.getSize(), locale) %>"
+											name="size"
+											value="<%= LanguageUtil.formatStorageSize(fileEntry.getSize(), locale) %>"
 									/>
 
 									<liferay-ui:search-container-column-text
-										cssClass="entry-action"
-										name="action"
+											cssClass="entry-action"
+											name="action"
 									>
 										<liferay-portlet:actionURL name="/message_boards/edit_message_attachments" var="deleteURL">
 											<portlet:param name="<%= Constants.CMD %>" value="<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
@@ -276,15 +276,15 @@ if (portletTitleBasedNavigation) {
 										</liferay-portlet:actionURL>
 
 										<liferay-ui:icon-menu
-											direction="left-side"
-											icon="<%= StringPool.BLANK %>"
-											markupView="lexicon"
-											message="actions"
+												direction="left-side"
+												icon="<%= StringPool.BLANK %>"
+												markupView="lexicon"
+												message="actions"
 										>
 											<div class="delete-attachment" data-rowid="<%= fileEntry.getFileEntryId() %>" data-url="<%= deleteURL.toString() %>">
 												<liferay-ui:icon-delete
-													trash="<%= trashHelper.isTrashEnabled(scopeGroupId) %>"
-													url="javascript:void(0);"
+														trash="<%= trashHelper.isTrashEnabled(scopeGroupId) %>"
+														url="javascript:void(0);"
 												/>
 											</div>
 										</liferay-ui:icon-menu>
@@ -292,8 +292,8 @@ if (portletTitleBasedNavigation) {
 								</liferay-ui:search-container-row>
 
 								<liferay-ui:search-iterator
-									markupView="lexicon"
-									paginate="<%= false %>"
+										markupView="lexicon"
+										paginate="<%= false %>"
 								/>
 							</liferay-ui:search-container>
 						</div>
@@ -304,30 +304,30 @@ if (portletTitleBasedNavigation) {
 
 				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="related-assets">
 					<liferay-asset:input-asset-links
-						className="<%= MBMessage.class.getName() %>"
-						classPK="<%= (message != null) ? message.getMessageId() : 0 %>"
+							className="<%= MBMessage.class.getName() %>"
+							classPK="<%= (message != null) ? message.getMessageId() : 0 %>"
 					/>
 				</aui:fieldset>
 
 
-<%--				<c:if test="<%= message == null %>">--%>
-<%--					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">--%>
-<%--						<liferay-ui:input-permissions--%>
-<%--							modelName="<%= MBMessage.class.getName() %>"--%>
-<%--						/>--%>
-<%--					</aui:fieldset>--%>
-<%--				</c:if>--%>
+					<%--				<c:if test="<%= message == null %>">--%>
+					<%--					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">--%>
+					<%--						<liferay-ui:input-permissions--%>
+					<%--							modelName="<%= MBMessage.class.getName() %>"--%>
+					<%--						/>--%>
+					<%--					</aui:fieldset>--%>
+					<%--				</c:if>--%>
 
 				<c:if test="<%= (message == null) && captchaConfiguration.messageBoardsEditMessageCaptchaEnabled() %>">
 					<liferay-captcha:captcha />
 				</c:if>
 
 				<%
-				boolean pending = false;
+					boolean pending = false;
 
-				if (message != null) {
-					pending = message.isPending();
-				}
+					if (message != null) {
+						pending = message.isPending();
+					}
 				%>
 
 				<c:if test="<%= pending %>">
@@ -346,17 +346,17 @@ if (portletTitleBasedNavigation) {
 					<div class="btn-group">
 
 						<%
-						String saveButtonLabel = "save";
+							String saveButtonLabel = "save";
 
-						if ((message == null) || message.isDraft() || message.isApproved()) {
-							saveButtonLabel = "save-as-draft";
-						}
+							if ((message == null) || message.isDraft() || message.isApproved()) {
+								saveButtonLabel = "save-as-draft";
+							}
 
-						String publishButtonLabel = "publish";
+							String publishButtonLabel = "publish";
 
-						if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, MBMessage.class.getName())) {
-							publishButtonLabel = "submit-for-workflow";
-						}
+							if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, MBMessage.class.getName())) {
+								publishButtonLabel = "submit-for-workflow";
+							}
 						%>
 
 						<div class="btn-group-item">
@@ -377,14 +377,14 @@ if (portletTitleBasedNavigation) {
 			</div>
 		</div>
 	</aui:form>
-</clay:container-fluid-1280>
+</clay:container-fluid>
 
 <%
-MBEditMessageDisplayContext mbEditMessageDisplayContext = new MBEditMessageDisplayContext(liferayPortletRequest, liferayPortletResponse, message);
+	MBEditMessageDisplayContext mbEditMessageDisplayContext = new MBEditMessageDisplayContext(liferayPortletRequest, liferayPortletResponse, message);
 %>
 
 <liferay-frontend:component
-	context="<%= mbEditMessageDisplayContext.getMBPortletComponentContext() %>"
-	module="message_boards/js/MBPortlet.es"
-	servletContext="<%= application %>"
+		context="<%= mbEditMessageDisplayContext.getMBPortletComponentContext() %>"
+		module="message_boards/js/MBPortlet.es"
+		servletContext="<%= application %>"
 />
