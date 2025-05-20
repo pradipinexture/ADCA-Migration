@@ -6,7 +6,6 @@
 --%>
 
 <%@ include file="/message_boards/init.jsp" %>
-<h1>Hello inside the </h1>
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
@@ -135,65 +134,6 @@ if (portletTitleBasedNavigation) {
 					-->
 				</aui:fieldset>
 
-				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="mailing-list">
-					<aui:model-context bean="<%= mailingList %>" model="<%= MBMailingList.class %>" />
-
-					<aui:input inlineLabel="right" label="active" labelCssClass="simple-toggle-switch" name="mailingListActive" type="toggle-switch" value='<%= ParamUtil.getBoolean(request, "mailingListActive", BeanPropertiesUtil.getBoolean(mailingList, "active")) %>' />
-
-					<aui:input inlineLabel="right" label="allow-anonymous-emails" labelCssClass="simple-toggle-switch" name="allowAnonymous" type="toggle-switch" value='<%= BeanParamUtil.getBoolean(mailingList, request, "allowAnonymous") %>' />
-
-					<div id="<portlet:namespace />mailingListSettings">
-						<aui:input name="emailAddress" />
-
-						<br />
-
-						<aui:fieldset label="incoming">
-
-							<%
-							String protocol = BeanParamUtil.getString(mailingList, request, "inProtocol", "pop3");
-							%>
-
-							<aui:field-wrapper label="protocol">
-								<aui:input checked='<%= protocol.startsWith("pop3") %>' label="pop" name="inProtocol" type="radio" value="pop3" />
-								<aui:input checked='<%= protocol.startsWith("imap") %>' label="imap" name="inProtocol" type="radio" value="imap" />
-							</aui:field-wrapper>
-
-							<aui:input label="server-name" name="inServerName" />
-
-							<aui:input label="server-port" name="inServerPort" value="110" />
-
-							<aui:input label="use-a-secure-network-connection" name="inUseSSL" />
-
-							<aui:input label="user-name" name="inUserName" />
-
-							<aui:input label="password" name="inPassword" />
-
-							<aui:input label="read-interval-minutes" name="inReadInterval" value="5" />
-						</aui:fieldset>
-
-						<aui:fieldset label="outgoing">
-							<aui:input label="email-address" name="outEmailAddress" />
-
-							<aui:input label="use-custom-outgoing-server" name="outCustom" />
-
-							<div id="<portlet:namespace />outCustomSettings">
-								<aui:input label="server-name" name="outServerName" />
-
-								<aui:input label="server-port" name="outServerPort" value="25" />
-
-								<aui:input label="use-a-secure-network-connection" name="outUseSSL" />
-
-								<aui:input label="user-name" name="outUserName" />
-
-								<aui:input label="password" name="outPassword" />
-							</div>
-						</aui:fieldset>
-					</div>
-
-					<c:if test="<%= (category == null) && captchaConfiguration.messageBoardsEditCategoryCaptchaEnabled() %>">
-						<liferay-captcha:captcha />
-					</c:if>
-				</aui:fieldset>
 
 				<liferay-expando:custom-attributes-available
 					className="<%= MBCategory.class.getName() %>"
@@ -208,13 +148,7 @@ if (portletTitleBasedNavigation) {
 					</aui:fieldset>
 				</liferay-expando:custom-attributes-available>
 
-				<c:if test="<%= category == null %>">
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-						<liferay-ui:input-permissions
-							modelName="<%= MBCategory.class.getName() %>"
-						/>
-					</aui:fieldset>
-				</c:if>
+
 
 				<div class="sheet-footer">
 					<aui:button type="submit" />

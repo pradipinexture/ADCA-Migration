@@ -108,7 +108,7 @@ if (portletTitleBasedNavigation) {
 }
 %>
 
-<clay:container-fluid
+<clay:container-fluid-1280
 	cssClass="container-form-lg"
 	id='<%= liferayPortletResponse.getNamespace() + "mbEditPageContainer" %>'
 >
@@ -310,13 +310,13 @@ if (portletTitleBasedNavigation) {
 				</aui:fieldset>
 
 
-				<c:if test="<%= message == null %>">
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-						<liferay-ui:input-permissions
-							modelName="<%= MBMessage.class.getName() %>"
-						/>
-					</aui:fieldset>
-				</c:if>
+<%--				<c:if test="<%= message == null %>">--%>
+<%--					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">--%>
+<%--						<liferay-ui:input-permissions--%>
+<%--							modelName="<%= MBMessage.class.getName() %>"--%>
+<%--						/>--%>
+<%--					</aui:fieldset>--%>
+<%--				</c:if>--%>
 
 				<c:if test="<%= (message == null) && captchaConfiguration.messageBoardsEditMessageCaptchaEnabled() %>">
 					<liferay-captcha:captcha />
@@ -377,7 +377,7 @@ if (portletTitleBasedNavigation) {
 			</div>
 		</div>
 	</aui:form>
-</clay:container-fluid>
+</clay:container-fluid-1280>
 
 <%
 MBEditMessageDisplayContext mbEditMessageDisplayContext = new MBEditMessageDisplayContext(liferayPortletRequest, liferayPortletResponse, message);
