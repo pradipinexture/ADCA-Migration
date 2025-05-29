@@ -111,20 +111,31 @@ public class PollService {
         return result;
     }
 
-    public List<PollAnalyticsDTO> getPollAnalytics(long formId) {
+    public PollDTO getPollAnalytics(long formId) {
         List<PollAnalyticsDTO> results = new ArrayList<>();
-
+        PollDTO pollDTO = new PollDTO();
         try {
             DDMFormInstance formInstance = DDMFormInstanceLocalServiceUtil.getDDMFormInstance(formId);
             DDMForm form = formInstance.getDDMForm();
             Map<String, DDMFormField> fieldMap = form.getDDMFormFieldsMap(true);
+
+            Optional<DDMFormField> firstRadioField = fieldMap.values().stream()
+                    .filter(field -> "radio".equalsIgnoreCase(field.getType()))
+                    .findFirst();
+
+            if (firstRadioField.isPresent()) {
+                String questionLabel = firstRadioField.get().getLabel().getString(locale);
+                pollDTO.setFormInstanceId(formInstance.getFormInstanceId());
+                pollDTO.setName(formInstance.getName(locale));
+                pollDTO.setQuestion(questionLabel);
+            }
 
             Optional<Map.Entry<String, DDMFormField>> radioFieldEntryOpt = fieldMap.entrySet().stream()
                     .filter(entry -> "radio".equalsIgnoreCase(entry.getValue().getType()))
                     .findFirst();
 
             if (!radioFieldEntryOpt.isPresent()) {
-                return results;
+                return null;
             }
 
             String radioFieldName = radioFieldEntryOpt.get().getKey();
@@ -167,10 +178,10 @@ public class PollService {
             }
 
         } catch (Exception e) {
-            return new ArrayList<>();
+            return null;
         }
-
-        return results;
+        pollDTO.setPollAnalyticsDTOS(results);
+        return pollDTO;
     }
 
 }

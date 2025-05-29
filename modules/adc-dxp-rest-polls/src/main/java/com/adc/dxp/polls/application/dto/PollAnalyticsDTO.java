@@ -1,24 +1,24 @@
 package com.adc.dxp.polls.application.dto;
 
 public class PollAnalyticsDTO {
-    private String question;
+    private String optionName;
     private int numberOfVotes;
 
     public PollAnalyticsDTO(String question, int numberOfVotes) {
-        this.question = question;
+        this.optionName = question;
         this.numberOfVotes = numberOfVotes;
     }
 
-    public String getQuestion() {
-        return question;
+    public String getOptionName() {
+        return optionName;
     }
 
     public int getNumberOfVotes() {
         return numberOfVotes;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setOptionName(String optionName) {
+        this.optionName = optionName;
     }
 
     public void setNumberOfVotes(int numberOfVotes) {

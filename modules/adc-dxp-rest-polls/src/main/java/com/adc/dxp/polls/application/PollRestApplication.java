@@ -90,16 +90,16 @@ public class PollRestApplication extends Application {
 	@Path("/{pollId}/analytics")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPollAnalytics(@PathParam("pollId") long pollId) {
-		List<PollAnalyticsDTO> analytics = pollService.getPollAnalytics(pollId);
+		PollDTO pollDTO = pollService.getPollAnalytics(pollId);
 
-		if (analytics.isEmpty()) {
+		if (pollDTO == null) {
 			return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseDTO<>(
 					"error", "No question or no votes submitted.", Collections.emptyList(), 0)
 			).build();
 		}
 
 		return Response.ok(
-				new ResponseDTO<>("success", "Poll analytics generated successfully.", analytics, analytics.size())
+				new ResponseDTO<>("success", "Poll analytics generated successfully.", pollDTO, 0)
 		).build();
 	}
 
