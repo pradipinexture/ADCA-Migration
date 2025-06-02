@@ -110,12 +110,13 @@ public class PollService {
 
         return result;
     }
-
     public PollDTO getPollAnalytics(long formId) {
         List<PollAnalyticsDTO> results = new ArrayList<>();
         PollDTO pollDTO = new PollDTO();
+
         try {
             DDMFormInstance formInstance = DDMFormInstanceLocalServiceUtil.getDDMFormInstance(formId);
+            Locale locale = formInstance.getDDMForm().getDefaultLocale();
             DDMForm form = formInstance.getDDMForm();
             Map<String, DDMFormField> fieldMap = form.getDDMFormFieldsMap(true);
 
@@ -123,26 +124,24 @@ public class PollService {
                     .filter(field -> "radio".equalsIgnoreCase(field.getType()))
                     .findFirst();
 
-            if (firstRadioField.isPresent()) {
-                String questionLabel = firstRadioField.get().getLabel().getString(locale);
-                pollDTO.setFormInstanceId(formInstance.getFormInstanceId());
-                pollDTO.setName(formInstance.getName(locale));
-                pollDTO.setQuestion(questionLabel);
-            }
-
-            Optional<Map.Entry<String, DDMFormField>> radioFieldEntryOpt = fieldMap.entrySet().stream()
-                    .filter(entry -> "radio".equalsIgnoreCase(entry.getValue().getType()))
-                    .findFirst();
-
-            if (!radioFieldEntryOpt.isPresent()) {
+            if (!firstRadioField.isPresent()) {
                 return null;
             }
 
-            String radioFieldName = radioFieldEntryOpt.get().getKey();
-            DDMFormField radioField = radioFieldEntryOpt.get().getValue();
+            DDMFormField radioField = firstRadioField.get();
+            String radioFieldName = fieldMap.entrySet().stream()
+                    .filter(entry -> entry.getValue() == radioField)
+                    .map(Map.Entry::getKey)
+                    .findFirst().orElse(null);
 
+            String questionLabel = radioField.getLabel().getString(locale);
+
+            pollDTO.setFormInstanceId(formInstance.getFormInstanceId());
+            pollDTO.setName(formInstance.getName(locale));
+            pollDTO.setQuestion(questionLabel);
+
+            // Step 1: Count responses
             Map<String, Integer> countMap = new HashMap<>();
-
             List<DDMFormInstanceRecord> records = DDMFormInstanceRecordLocalServiceUtil.getFormInstanceRecords(formId);
 
             for (DDMFormInstanceRecord record : records) {
@@ -154,7 +153,6 @@ public class PollService {
                     for (DDMFormFieldValue fieldValue : formValues.getDDMFormFieldValues()) {
                         if (fieldValue.getName().equals(radioFieldName)) {
                             String rawValue = fieldValue.getValue().getString(locale);
-
                             if (rawValue != null && !rawValue.isEmpty()) {
                                 countMap.put(rawValue, countMap.getOrDefault(rawValue, 0) + 1);
                             }
@@ -162,26 +160,24 @@ public class PollService {
                     }
 
                 } catch (Exception ignored) {
-                    // Skip invalid records
+                    // skip invalid record
                 }
             }
 
-            for (Map.Entry<String, Integer> entry : countMap.entrySet()) {
-                String optionKey = entry.getKey();
-                int count = entry.getValue();
-
-                String label = radioField.getDDMFormFieldOptions()
-                        .getOptionLabels(optionKey)
-                        .getString(locale);
-
+            // Step 2: Build result with ALL options, including 0-vote ones
+            radioField.getDDMFormFieldOptions().getOptionsValues().forEach(optionKey -> {
+                String label = radioField.getDDMFormFieldOptions().getOptionLabels(optionKey).getString(locale);
+                int count = countMap.getOrDefault(optionKey, 0);
                 results.add(new PollAnalyticsDTO(label != null ? label : optionKey, count));
-            }
+            });
 
         } catch (Exception e) {
             return null;
         }
+
         pollDTO.setPollAnalyticsDTOS(results);
         return pollDTO;
     }
+
 
 }

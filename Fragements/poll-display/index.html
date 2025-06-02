@@ -1,0 +1,136 @@
+<div class="polls-display-wrapper">
+    <div class="poll-header">
+        <div class="poll-actions">
+            <a id="select-form-link">
+                <svg aria-hidden="true" class="lexicon-icon lexicon-icon-cog">
+                    <use xlink:href="/o/classic-theme/images/clay/icons.svg#cog" />
+                </svg> Select Poll
+            </a>
+            <a id="add-form-link">
+                <svg aria-hidden="true" class="lexicon-icon lexicon-icon-plus">
+                    <use xlink:href="/o/classic-theme/images/clay/icons.svg#plus" />
+                </svg> Add
+            </a>
+            <a id="edit-form-link">
+                <svg aria-hidden="true" class="lexicon-icon lexicon-icon-pencil">
+                    <use xlink:href="/o/classic-theme/images/clay/icons.svg#pencil" />
+                </svg> Edit Question
+            </a>
+        </div>
+    </div>
+
+    <div class="poll-box">
+        <iframe
+            id="poll-iframe"
+            src="/web/forms/shared/-/form/${configuration.formInstanceId}"
+            width="100%"
+            height="400px"
+            frameborder="0"
+            style="border: none;"
+            allowtransparency="true"
+        ></iframe>
+    </div>
+</div>
+
+<div id="loader" class="loader">
+    <div class="spinner"></div>
+</div>
+
+<div class="survey-container" id="survey-container">
+    <div class="survey-question" id="survey-question">
+        </div>
+    <div class="survey-results">
+        <table id="survey-results-table">
+            <thead>
+                <tr>
+                    <th>%</th>
+                    <th>Votes</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+        <div class="total-votes" id="total-votes">
+            </div>
+    </div>
+</div>
+
+<div id="select-form-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Select a Poll</h2>
+            <span class="close">×</span>
+        </div> 
+                <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search polls...">
+            <svg aria-hidden="true" class="lexicon-icon lexicon-icon-search">
+                <use xlink:href="/o/classic-theme/images/clay/icons.svg#search" />
+            </svg>
+        </div>
+        <div class="poll-list" id="poll-list">
+            <div id="poll-items-container">
+                </div>
+        </div>
+            <div class="pagination">
+                <button class="btn btn-pagination" id="prev-btn" disabled>
+                    <svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-left" >
+                        <use xlink:href="/o/classic-theme/images/clay/icons.svg#angle-left" />
+                    </svg> 
+                </button>
+                <span id="page-info">Page 1 of 1</span>
+                <button class="btn btn-pagination" id="next-btn" disabled>
+                     <svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-right">
+                        <use xlink:href="/o/classic-theme/images/clay/icons.svg#angle-right" />
+                    </svg>
+                </button>
+            </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" id="cancel-btn">Cancel</button>
+            <button class="btn btn-save" id="save-btn">Save</button>
+        </div>
+    </div>
+</div>
+
+<div id="add-form-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add a Poll</h2>
+            <span class="close">×</span>
+        </div>
+        <div class="add-form-content">
+            <iframe
+                id="add-form-iframe"
+                src="group/guest/~/control_panel/manage?p_p_id=com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_v_l_s_g_id=${themeDisplay.getScopeGroupId()}"
+                width="100%"
+                height="500px"
+                frameborder="0"
+                style="border: none;"
+                allowtransparency="true"
+            ></iframe>
+        </div>
+    </div>
+</div>
+
+<div id="edit-form-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Question</h2>
+            <span class="close">×</span>
+        </div>
+        <div class="edit-form-content">
+            <iframe
+                id="edit-form-iframe"
+                width="100%"
+                height="500px"
+                frameborder="0"
+                style="border: none;"
+                allowtransparency="true"
+            ></iframe>
+        </div>
+    </div>
+</div>
+<script> 
+let selectedFormId = localStorage.getItem('selectedPollId') || "${configuration.formInstanceId}";
+</script>

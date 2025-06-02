@@ -200,7 +200,7 @@
 		for (Calendar mang_cal : manageableCalendars) {
 			Long usr_id = mang_cal.getUserId();
 			
-			if(!UserLocalServiceUtil.hasRoleUser(20101, usr_id)){//user who has no Administrator Role (in my case, only administrator is able to add calendars and resources)
+			if(!UserLocalServiceUtil.hasRoleUser(20107, usr_id)){//user who has no Administrator Role (in my case, only administrator is able to add calendars and resources)
 				Long cal_usr_id = mang_cal.getCalendarId();
 
 				ArrayList<Long> cal_grp = new ArrayList<Long>();//[calendarId, groupId1, groupId2, ...]

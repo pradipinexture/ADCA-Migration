@@ -1,0 +1,23 @@
+{
+  "fieldSets": [
+    {
+      "label": "Polls Display Configuration",
+      "fields": [
+        {
+          "name": "groupId",
+          "label": "Group ID",
+          "description": "The group ID for fetching polls",
+          "type": "text",
+          "defaultValue": "20119"
+        },
+        {
+          "name": "formInstanceId",
+          "label": "Default Form Instance ID",
+          "description": "The default form instance ID for the iframe",
+          "type": "text",
+          "defaultValue": "38676"
+        }
+      ]
+    }
+  ]
+}
