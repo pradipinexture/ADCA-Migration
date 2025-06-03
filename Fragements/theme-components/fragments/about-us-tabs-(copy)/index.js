@@ -131,8 +131,8 @@ $(document).ready(function () {
             <i class="icon-chevron-right mr-2 text-secondary"></i>${section}</li>`);}
       }
 
-       if (contact.numbers[0]['']) {
-        for (let number of contact.numbers[0]['']) {
+       if (contact.numbers[0]['ContactNumbers']) {
+        for (let number of contact.numbers[0]['ContactNumbers']) {
           $('.contacts-ul').eq(count).append(`<li  class="py-2 border-bottom-dashed">
             <i class="icon-chevron-right mr-2 text-secondary"></i> <a href="tel:${number}"
               class="mb-0">${number}</a>

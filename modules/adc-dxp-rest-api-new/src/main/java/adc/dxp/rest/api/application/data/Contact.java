@@ -26,8 +26,7 @@ public class Contact extends BaseContent {
 		super(article, Optional.of(languageId == null ? Constants.DEFAULT_VALUE_LANGUAGE : languageId), ContentType.ANNOUNCEMENT);
 		
 		this.setSections(TransformUtils.getLocalizableField(article, languageId, "Sections"));
-		this.setNumbers(TransformUtils.getLocalizableFieldMap(article, languageId, "ContactNumbers", "Number"));
-			
+		this.setNumbers(TransformUtils.getContactNumbers(article, languageId));
 	}
 
 	public List<String> getSections() {

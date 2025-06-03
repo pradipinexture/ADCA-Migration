@@ -271,7 +271,6 @@ public class TransformUtils {
 		List<Map<String,List<String>>> result= new ArrayList<>();
 
 		try {
-
 			Document document = SAXReaderUtil.read(model.getContentByLocale(languageId));
 			List<Node> nodes = document.selectNodes("/root/dynamic-element[@name='"+fieldNameParent+"']");
 			Map<String, List<String>> obj = new HashMap<>();
@@ -284,6 +283,27 @@ public class TransformUtils {
 				}
 				obj.put(mapKey, list);
 			}
+			result.add(obj);
+		} catch (DocumentException e) {
+			_log.error(e.getMessage());
+		}
+		return result;
+	}
+
+	public static List<Map<String,List<String>>> getContactNumbers(JournalArticle model, String languageId) {
+		List<Map<String,List<String>>> result = new ArrayList<>();
+		try {
+			Document document = SAXReaderUtil.read(model.getContentByLocale(languageId));
+			List<Node> numberNodes = document.selectNodes("//dynamic-element[@name='ContactNumbersFieldSetFieldSet']//dynamic-element[@name='Number']/dynamic-content");
+
+			Map<String, List<String>> obj = new HashMap<>();
+			List<String> numbers = new ArrayList<>();
+
+			for (Node node : numberNodes) {
+				numbers.add(node.getText());
+			}
+
+			obj.put("ContactNumbers", numbers); // Use a consistent key
 			result.add(obj);
 		} catch (DocumentException e) {
 			_log.error(e.getMessage());
