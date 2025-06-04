@@ -54,7 +54,6 @@ String randomNamespace = PortalUtil.generateRandomKey(request, "portlet_search_b
 SearchBarPortletDisplayContext searchBarPortletDisplayContext = (SearchBarPortletDisplayContext) java.util.Objects
 		.requireNonNull(request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT));
 %>
-<h2>Hellodddddddd</h2>
 <c:choose>
 	<c:when
 		test="<%=searchBarPortletDisplayContext.isDestinationUnreachable()%>">

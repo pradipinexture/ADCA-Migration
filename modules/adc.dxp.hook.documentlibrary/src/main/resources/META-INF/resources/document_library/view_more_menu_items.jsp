@@ -1,4 +1,3 @@
-Hello form view
 <%--
 /**
  * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com

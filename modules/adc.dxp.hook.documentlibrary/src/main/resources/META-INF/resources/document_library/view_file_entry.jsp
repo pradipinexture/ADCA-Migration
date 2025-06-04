@@ -130,16 +130,6 @@ if (portletTitleBasedNavigation) {
 
 				</c:if>
 
-				<c:if test="<%= dlViewFileEntryDisplayContext.isShowComments() %>">
-					<liferay-comment:discussion
-						className="<%= dlViewFileEntryDisplayContext.getDiscussionClassName() %>"
-						classPK="<%= dlViewFileEntryDisplayContext.getDiscussionClassPK() %>"
-						formName="fm2"
-						ratingsEnabled="<%= dlViewFileEntryDisplayContext.isEnableDiscussionRatings() %>"
-						redirect="<%= currentURL %>"
-						userId="<%= dlViewFileEntryDisplayContext.getDiscussionUserId() %>"
-					/>
-				</c:if>
 			</div>
 		</clay:container-fluid>
 	</div>
