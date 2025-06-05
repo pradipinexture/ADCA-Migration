@@ -26,7 +26,7 @@ import java.util.Set;
         service = Application.class,
         immediate = true,
         configurationPolicy = ConfigurationPolicy.OPTIONAL,
-        configurationPid = "adc.dxp.rest.api.application.AdcDx  pRestApiConfiguration"
+        configurationPid = "adc.dxp.rest.api.application.AdcDxpRestApiConfiguration"
 )
 public class AdcDxpRestApiApplication extends Application {
 

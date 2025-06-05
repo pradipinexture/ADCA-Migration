@@ -14,11 +14,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.adc.dxp.polls.application.dto.FormRecordDTO;
-import com.adc.dxp.polls.application.dto.PollAnalyticsDTO;
 import com.adc.dxp.polls.application.dto.PollDTO;
 import com.adc.dxp.polls.application.dto.ResponseDTO;
 import com.adc.dxp.polls.application.service.PollService;
-import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
@@ -48,14 +48,10 @@ public class PollRestApplication extends Application {
 		List<PollDTO> polls = pollService.getPolls(groupId);
 
 		if (polls.isEmpty()) {
-			return Response.status(Response.Status.BAD_REQUEST).entity(
-					new ResponseDTO<>("error", "Polls not found for the given group ID.", Collections.emptyList(), 0)
-			).build();
+			return buildJsonResponse(new ResponseDTO<>("error", "Polls not found for the given group ID.", Collections.emptyList(), 0));
 		}
 
-		return Response.ok(
-				new ResponseDTO<>("success", "Polls fetched successfully.", polls, polls.size())
-		).build();
+		return buildJsonResponse(new ResponseDTO<>("success", "Polls fetched successfully.", polls, polls.size()));
 	}
 
 	@GET
@@ -68,22 +64,10 @@ public class PollRestApplication extends Application {
 		List<FormRecordDTO> records = pollService.getFormRecords(formId, userId);
 
 		if (records.isEmpty()) {
-			ResponseDTO<List<FormRecordDTO>> response = new ResponseDTO<>(
-					"error",
-					"No records found for this user.",
-					Collections.emptyList(),
-					0
-			);
-			return Response.status(Response.Status.BAD_REQUEST).entity(response).build();
+			return buildJsonResponse(new ResponseDTO<>("error", "No records found for this user.", Collections.emptyList(), 0));
 		}
 
-		ResponseDTO<List<FormRecordDTO>> response = new ResponseDTO<>(
-				"success",
-				"User form records fetched successfully.",
-				records,
-				records.size()
-		);
-		return Response.ok(response).build();
+		return buildJsonResponse(new ResponseDTO<>("success", "User form records fetched successfully.", records, records.size()));
 	}
 
 	@GET
@@ -93,14 +77,32 @@ public class PollRestApplication extends Application {
 		PollDTO pollDTO = pollService.getPollAnalytics(pollId);
 
 		if (pollDTO == null) {
-			return Response.status(Response.Status.BAD_REQUEST).entity(new ResponseDTO<>(
-					"error", "No question or no votes submitted.", Collections.emptyList(), 0)
-			).build();
+			return buildJsonResponse(new ResponseDTO<>("error", "No question or no votes submitted.", Collections.emptyList(), 0));
 		}
 
-		return Response.ok(
-				new ResponseDTO<>("success", "Poll analytics generated successfully.", pollDTO, 0)
-		).build();
+		return buildJsonResponse(new ResponseDTO<>("success", "Poll analytics generated successfully.", pollDTO, 0));
+	}
+
+	private Response buildJsonResponse(ResponseDTO<?> dto) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			String json = mapper.writeValueAsString(dto);
+
+			if ("error".equalsIgnoreCase(dto.getStatus())) {
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(json)
+						.type(MediaType.APPLICATION_JSON)
+						.build();
+			}
+
+			return Response.ok(json, MediaType.APPLICATION_JSON).build();
+		} catch (JsonProcessingException e) {
+			String errorJson = "{\"status\":\"error\",\"message\":\"Failed to process response.\"}";
+			return Response.serverError()
+					.entity(errorJson)
+					.type(MediaType.APPLICATION_JSON)
+					.build();
+		}
 	}
 
 }

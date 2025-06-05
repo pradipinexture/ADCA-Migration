@@ -2,3 +2,5 @@ Bundle-Name: adc-dxp-rest-polls
 Bundle-SymbolicName: com.adc.dxp.polls
 Bundle-Version: 1.0.0
 Liferay-Configuration-Path: /configuration
+Export-Package: com.adc.dxp.polls.application.dto
+Import-Package: *; version="0";resolution:=optional
