@@ -1,4 +1,3 @@
-
 const modal = document.getElementById('select-form-modal');
 const editModal = document.getElementById('edit-form-modal');
 const addModal = document.getElementById('add-form-modal');
@@ -19,7 +18,6 @@ const totalVotes = document.getElementById('total-votes');
 const loader = document.getElementById('loader');
 const editModalCloseBtn = document.querySelector('#edit-form-modal .close');
 
-let selectedFormId = localStorage.getItem('selectedPollId') || "${configuration.formInstanceId}";
 let pollsData = [];
 let filteredPolls = []; // New array to store filtered polls
 let currentPage = 1;
@@ -139,7 +137,7 @@ function filterPolls() {
     const searchTerm = searchInput.value.toLowerCase().trim();
 
     // Filter the entire pollsData array
-    filteredPolls = pollsData.filter(poll => 
+    filteredPolls = pollsData.filter(poll =>
         poll.name.toLowerCase().includes(searchTerm)
     );
 
@@ -175,9 +173,6 @@ editModalCloseBtn.addEventListener('click', () => {
     // Refresh the iframe
     const iframe = document.getElementById('poll-iframe');
     iframe.src = iframe.src; // Refresh the iframe by setting its src to itself
-
-    // Reload the survey container
-    checkPollSelection();
 });
 
 closeBtns.forEach(btn => {
