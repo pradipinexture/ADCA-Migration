@@ -13,11 +13,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import adc.dxp.rest.api.application.data.News;
+import adc.dxp.rest.api.application.data.comparator.JournalArticleTitleComparator;
 import adc.dxp.rest.api.application.utils.JournalArticleUtil;
 import adc.dxp.rest.api.application.utils.PageUtils;
 import adc.dxp.rest.api.application.utils.StructureUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.journal.util.comparator.ArticleDisplayDateComparator;
 import com.liferay.portal.kernel.dao.orm.*;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
@@ -116,7 +118,10 @@ public class NewsResource {
             @Parameter(hidden = true) @QueryParam("search") String search,
             @Parameter(hidden = true) @QueryParam("categoryId") String categoryIdParam,
             @Parameter(hidden = true) @QueryParam("achievement") String achievementParam,
+            @Parameter(hidden = true) @QueryParam("startDate") String startDateParam,
+            @Parameter(hidden = true) @QueryParam("endDate") String endDateParam,
             @QueryParam("pageSize") Integer pageSize,
+
             @Context Pagination pagination,
             @Context HttpServletRequest request) throws PortalException {
 
@@ -146,36 +151,33 @@ public class NewsResource {
         Boolean achievement = achievementParam != null && !achievementParam.isEmpty() && !achievementParam.equalsIgnoreCase("null") ?
                 Boolean.valueOf(achievementParam) : null;
 
-        // Get all articles for the group
-        List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(groupId);
+        // Date parsing
+        Date startDate = null;
+        Date endDate = null;
 
-        // Filter by approved status and structure ID
-        List<JournalArticle> filteredArticles = new ArrayList<>();
-        for (JournalArticle article : allArticles) {
-            if (article.getStatus() == WorkflowConstants.STATUS_APPROVED &&
-                    structureId.equals(article.getDDMStructureKey())) {
-                filteredArticles.add(article);
+        try {
+            if (startDateParam != null && !startDateParam.isEmpty()) {
+                startDate = new SimpleDateFormat("dd-MM-yyyy").parse(startDateParam);
             }
+            if (endDateParam != null && !endDateParam.isEmpty()) {
+                endDate = new SimpleDateFormat("dd-MM-yyyy").parse(endDateParam);
+            }
+        } catch (ParseException e) {
+            _log.error("Error parsing date", e);
         }
 
-        // Filter by search term if provided
-        if (search != null && !search.isEmpty()) {
-            String searchLowerCase = search.toLowerCase();
-            List<JournalArticle> searchFilteredArticles = new ArrayList<>();
-            for (JournalArticle article : filteredArticles) {
-                String title = article.getTitle(languageIdString).toLowerCase();
-                String description = article.getDescription(languageIdString).toLowerCase();
-                if (title.contains(searchLowerCase) || description.contains(searchLowerCase)) {
-                    searchFilteredArticles.add(article);
-                }
-            }
-            filteredArticles = searchFilteredArticles;
-        }
+        // Set up sorting
+        OrderByComparator<JournalArticle> orderByComparator = null;
+
+        DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_NEWS_NAME_EN);
+
+        List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
+
 
         // Process results
         List<News> lastResults = new ArrayList<>();
 
-        for (JournalArticle article : filteredArticles) {
+        for (JournalArticle article : results) {
             try {
                 // Check if this is the latest approved version
                 if (_journalArticleLocalService.isLatestVersion(

@@ -711,70 +711,13 @@ public class EventResource extends BasicResource {
             }
         }
 
-        return PageUtils.createPage(result, pagination, paginationPage);
+        return PageUtils.createPage(result, pagination, result.size());
     }
-
-//    // Helper method for permission checking
-//    private boolean isAllowed(String modelName, Long resourceId, User user, Long companyId) {
-//        try {
-//            // Implementation depends on your permission framework
-//            // This is a placeholder - replace with your actual permission checking logic
-//            return PermissionChecker.hasPermission(user, modelName, resourceId, ActionKeys.VIEW);
-//        } catch (Exception e) {
-//            _log.error("Permission check failed", e);
-//            return false;
-//        }
-//    }
 
     // Helper method to get company ID
      public long getCompanyId(HttpServletRequest request) {
         return PortalUtil.getCompanyId(request);
     }
-
-//    private void addCalendar(
-//            Long calendarBookingId,
-//            List<CalendarResource> calendarResources,
-//            User currentUser,
-//            ServiceContext serviceContext) throws PortalException {
-//
-//        if (calendarResources.isEmpty()) {
-//            return;
-//        }
-//
-//        CalendarBooking calendarBookingClone = _calendarBookingLocalService.fetchCalendarBooking(calendarBookingId);
-//
-//        List<com.liferay.calendar.model.Calendar> calendars = _calendarLocalService.getCalendarResourceCalendars(
-//                calendarResources.get(0).getGroupId(),
-//                calendarResources.get(0).getCalendarResourceId(),
-//                true);
-//
-//        if (calendars.isEmpty()) {
-//            return;
-//        }
-//
-//        calendarBookingClone.setCalendarResourceId(calendarResources.get(0).getCalendarResourceId());
-//        calendarBookingClone.setCalendarBookingId(0L);
-//        calendarBookingClone.setCalendarId(calendars.get(0).getCalendarId());
-//        calendarBookingClone.setUuid(null);
-//
-//        _calendarBookingLocalService.addCalendarBooking(
-//                currentUser.getUserId(),
-//                calendars.get(0).getCalendarId(),
-//                new long[0],
-//                calendarBookingId,
-//                calendarBookingClone.getTitleMap(),
-//                calendarBookingClone.getDescriptionMap(),
-//                calendarBookingClone.getLocation(),
-//                calendarBookingClone.getStartTime(),
-//                calendarBookingClone.getEndTime(),
-//                calendarBookingClone.getAllDay(),
-//                calendarBookingClone.getRecurrence(),
-//                calendarBookingClone.getFirstReminder(),
-//                calendarBookingClone.getFirstReminderType(),
-//                calendarBookingClone.getSecondReminder(),
-//                calendarBookingClone.getSecondReminderType(),
-//                serviceContext);
-//    }
 
     @Override
     public boolean isAllowed(String name, Long primaryKey, User currentUser, Long companyId) throws PortalException {

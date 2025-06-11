@@ -81,7 +81,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 
 /**
  *
@@ -90,6 +92,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author ana.cavadas
  *
  */
+@Component(
+		property = {
+				"osgi.jaxrs.application.select=(osgi.jaxrs.name=ADC.Services)",
+				"osgi.jaxrs.resource=true"
+		},
+		scope = ServiceScope.PROTOTYPE,
+		service = RelatedResource.class
+)
 @Path("/related")
 public class RelatedResource {
 
@@ -408,12 +418,7 @@ public class RelatedResource {
 
 		List<LookupValue> categoryList = new ArrayList<>();
 
-		if (type.equalsIgnoreCase("events")) {
-
-			// TODO: ana.cavadas
-
-		} else {
-
+		if (!type.equalsIgnoreCase("events")) {
 			DynamicQuery dynamicQuery = AssetVocabularyLocalServiceUtil.dynamicQuery();
 
 			Property structureIdProperty = PropertyFactoryUtil.forName("name");

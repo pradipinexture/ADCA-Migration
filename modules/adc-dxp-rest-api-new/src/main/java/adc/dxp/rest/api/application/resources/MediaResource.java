@@ -211,37 +211,6 @@ public class MediaResource {
 			}
 		}
 
-//		// Get all articles for the group
-//		List<JournalArticle> allArticles = _journalArticleLocalService.getArticles(groupId);
-//		_log.debug("Total articles in group: " + allArticles.size());
-//
-//		// Filter by approved status and structure ID
-//		List<JournalArticle> filteredArticles = new ArrayList<>();
-//		for (JournalArticle article : allArticles) {
-//			if (article.getStatus() == WorkflowConstants.STATUS_APPROVED &&
-//					structureId.equals(article.getDDMStructureKey())) {
-//				filteredArticles.add(article);
-//			}
-//		}
-//		_log.debug("Articles matching structure: " + filteredArticles.size());
-//
-//		// Filter by search term if provided
-//		if (search != null && !search.isEmpty()) {
-//			String searchLowerCase = search.toLowerCase();
-//			List<JournalArticle> searchFilteredArticles = new ArrayList<>();
-//			for (JournalArticle article : filteredArticles) {
-//				String title = article.getTitle(languageIdString).toLowerCase();
-//				String description = article.getDescription(languageIdString).toLowerCase();
-//				if (title.contains(searchLowerCase) || description.contains(searchLowerCase)) {
-//					searchFilteredArticles.add(article);
-//				}
-//			}
-//			filteredArticles = searchFilteredArticles;
-//		}
-//
-//		// Process results
-//		List<Media> lastResults = new ArrayList<>();
-
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_MEDIA_NAME_EN);
 
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
