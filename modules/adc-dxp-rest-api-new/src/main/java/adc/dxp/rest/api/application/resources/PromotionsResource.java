@@ -223,6 +223,31 @@ public class PromotionsResource {
 
 		//	List<Promotion> lastResults = new ArrayList<>();
 
+		// Get all articles for the group
+
+		// Filter by approved status and structure ID
+		List<JournalArticle> filteredArticles = new ArrayList<>();
+		for (JournalArticle article : allArticles) {
+			if (article.getStatus() == WorkflowConstants.STATUS_APPROVED &&
+					structureId.equals(article.getDDMStructureKey())) {
+				filteredArticles.add(article);
+			}
+		}
+
+		// Filter by search term if provided
+		if (search != null && !search.isEmpty()) {
+			String searchLowerCase = search.toLowerCase();
+			List<JournalArticle> searchFilteredArticles = new ArrayList<>();
+			for (JournalArticle article : filteredArticles) {
+				String title = article.getTitle(languageIdString).toLowerCase();
+				String description = article.getDescription(languageIdString).toLowerCase();
+				if (title.contains(searchLowerCase) || description.contains(searchLowerCase)) {
+					searchFilteredArticles.add(article);
+				}
+			}
+			filteredArticles = searchFilteredArticles;
+		}
+
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_PROMOTIONS_EN);
 
 		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);

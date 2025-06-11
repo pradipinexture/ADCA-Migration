@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component(
 		property = {
@@ -79,7 +81,6 @@ public class AnnouncementsResource {
 			_log.error("Error loading configuration", e);
 		}
 	}
-
 	@GET
 	@Path("")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -117,7 +118,6 @@ public class AnnouncementsResource {
 			@Context HttpServletRequest request) throws PortalException {
 
 		User currentUser = UserUtil.getCurrentUser(request, null);
-
 		return AnnouncementsFlagLocalServiceUtil.addFlag(
 				currentUser.getUserId(), entryId,
 				com.liferay.announcements.kernel.model.AnnouncementsFlagConstants.HIDDEN
@@ -129,7 +129,6 @@ public class AnnouncementsResource {
 				.add(PropertyFactoryUtil.forName("entryId").eq(entryId))
 				.add(PropertyFactoryUtil.forName("userId").eq(userId))
 				.add(PropertyFactoryUtil.forName("value").eq(com.liferay.announcements.kernel.model.AnnouncementsFlagConstants.HIDDEN));
-
 		return !AnnouncementsFlagLocalServiceUtil.dynamicQuery(dq).isEmpty();
 	}
 
@@ -151,44 +150,67 @@ public class AnnouncementsResource {
 
 		long groupId = GetterUtil.getLong(request.getHeader("groupId"));
 		User currentUser = UserUtil.getCurrentUser(request, null);
+		String languageId = currentUser.getLanguageId();
 
-		DynamicQuery query = JournalArticleLocalServiceUtil.dynamicQuery()
-				.add(PropertyFactoryUtil.forName("groupId").eq(groupId))
-				.add(PropertyFactoryUtil.forName("status").eq(WorkflowConstants.STATUS_APPROVED));
+		List<JournalArticle> allArticles = JournalArticleLocalServiceUtil.getArticles(groupId);
 
-		if (categoryIdParam != null) {
-			long categoryId = GetterUtil.getLong(categoryIdParam);
-			if (categoryId > 0) {
+		List<JournalArticle> filteredArticles = new ArrayList<>();
+
+		for (JournalArticle article : allArticles) {
+			if (article.getStatus() != WorkflowConstants.STATUS_APPROVED) {
+				continue;
+			}
+			if (Validator.isNotNull(categoryIdParam)) {
+				long categoryId = GetterUtil.getLong(categoryIdParam);
 				List<Long> entryIds = getAssetEntryIdsByCategoryId(categoryId);
-				if (!entryIds.isEmpty()) {
-					query.add(PropertyFactoryUtil.forName("resourcePrimKey").in(entryIds));
+				if (!entryIds.contains(article.getResourcePrimKey())) {
+					continue;
 				}
 			}
+			try {
+				Date displayDate = article.getDisplayDate();
+				if (Validator.isNotNull(startDateParam)) {
+					Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateParam);
+					if (displayDate.before(startDate)) continue;
+				}
+				if (Validator.isNotNull(endDateParam)) {
+					Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateParam);
+					if (displayDate.after(endDate)) continue;
+				}
+			} catch (ParseException e) {
+				_log.error("Date parse error", e);
+			}
+
+			filteredArticles.add(article);
 		}
 
-		try {
-			if (startDateParam != null) {
-				Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateParam);
-				query.add(PropertyFactoryUtil.forName("displayDate").ge(startDate));
-			}
-			if (endDateParam != null) {
-				Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateParam);
-				query.add(PropertyFactoryUtil.forName("displayDate").le(endDate));
-			}
-		} catch (ParseException e) {
-			_log.error("Date parse error", e);
+		// Manual search by title/description
+		if (Validator.isNotNull(search)) {
+			String searchLower = search.toLowerCase();
+			filteredArticles = filteredArticles.stream()
+					.filter(article -> {
+						String title = article.getTitle(languageId).toLowerCase();
+						String desc = article.getDescription(languageId).toLowerCase();
+						return title.contains(searchLower) || desc.contains(searchLower);
+					})
+					.collect(Collectors.toList());
 		}
 
-		List<JournalArticle> articles = JournalArticleLocalServiceUtil.dynamicQuery(query, pagination.getStartPosition(), pagination.getEndPosition());
-		long total = JournalArticleLocalServiceUtil.dynamicQueryCount(query);
+		int total = filteredArticles.size();
+
+		// Paginate manually
+		int start = pagination.getStartPosition();
+		int end = Math.min(pagination.getEndPosition(), total);
+		List<JournalArticle> paginatedArticles = filteredArticles.subList(start, end);
 
 		List<Announcements> announcements = new ArrayList<>();
-		for (JournalArticle article : articles) {
-			announcements.add(convertToAnnouncement(article, currentUser.getLanguageId()));
+		for (JournalArticle article : paginatedArticles) {
+			announcements.add(convertToAnnouncement(article, languageId));
 		}
 
 		return PageUtils.createPage(announcements, pagination, total);
 	}
+
 
 	@GET
 	@Path("/web-content/{entryId}")
