@@ -18,6 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import adc.dxp.rest.api.application.AdcDxpRestApiConfiguration;
+import adc.dxp.rest.api.application.data.DirectorMessage;
 import adc.dxp.rest.api.application.utils.JournalArticleUtil;
 import adc.dxp.rest.api.application.utils.PageUtils;
 import com.liferay.asset.kernel.model.AssetCategory;
@@ -164,8 +165,8 @@ public class ContactResource {
 			orderByComparator = new JournalArticleTitleComparator(!sorts[0].isReverse());
 		}
 		DDMStructure structure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_CONTACT_NAME_EN);
-		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(),
-				startDate, endDate, null);
+
+		List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(companyId, groupId, search, structure.getStructureKey(), startDate, endDate, orderByComparator);
 
 		List<Contact> lastResults = new ArrayList<>();
 		for (JournalArticle article: results) {
@@ -218,7 +219,13 @@ public class ContactResource {
 				lastResults.sort((entity1, entity2) -> entity2.getCategory().getName().compareTo(entity1.getCategory().getName()));
 			}
 		}
-		return PageUtils.createPage(lastResults,pagination,lastResults.size());
+
+		int start = (paginationPage - 1) * paginationSize;
+		int end = Math.min(start + paginationSize, lastResults.size());
+		List<Contact> pageResults = start < lastResults.size() ?
+				lastResults.subList(start, end) : Collections.emptyList();
+
+		return Page.of(pageResults, pagination, lastResults.size());
 	}
 
 	/**

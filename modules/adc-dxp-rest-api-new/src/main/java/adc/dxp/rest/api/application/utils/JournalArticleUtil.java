@@ -1,6 +1,5 @@
 package adc.dxp.rest.api.application.utils;
 
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.*;
@@ -13,6 +12,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.xml.*;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 import java.util.*;
 
@@ -28,15 +30,12 @@ public class JournalArticleUtil {
             OrderByComparator<JournalArticle> orderByComparator) {
 
         try {
-            // Create a basic dynamic query
             DynamicQuery dq = JournalArticleLocalServiceUtil.dynamicQuery();
 
-            // Add group and company filters
             dq.add(RestrictionsFactoryUtil.eq("groupId", groupId));
             dq.add(RestrictionsFactoryUtil.eq("companyId", companyId));
             dq.add(RestrictionsFactoryUtil.eq("status", WorkflowConstants.STATUS_APPROVED));
 
-            // Add date filters if specified
             if (startDate != null) {
                 dq.add(RestrictionsFactoryUtil.ge("displayDate", startDate));
             }
@@ -44,29 +43,61 @@ public class JournalArticleUtil {
                 dq.add(RestrictionsFactoryUtil.le("displayDate", endDate));
             }
 
-            // Execute query to get all matching articles
             List<JournalArticle> allArticles = JournalArticleLocalServiceUtil.dynamicQuery(dq);
 
-            // Create a map to store only the latest version of each article
             Map<String, JournalArticle> latestVersions = new HashMap<>();
 
-            // Process articles to find latest versions and apply remaining filters
             for (JournalArticle article : allArticles) {
-                // Skip if doesn't match structure key
                 if (Validator.isNotNull(structureKey) &&
                         !structureKey.equals(article.getDDMStructureKey())) {
                     continue;
                 }
 
-                // Skip if doesn't match search term
+                boolean matchesSearch = true;
+
                 if (Validator.isNotNull(search)) {
-                    String title = article.getTitle();
-                    if (title == null || !StringUtil.containsIgnoreCase(title, search)) {
+                    matchesSearch = false;
+
+                    // 1. Check title
+                    String title = article.getTitleCurrentValue();
+                    if (Validator.isNotNull(title) && StringUtil.containsIgnoreCase(title, search)) {
+                        matchesSearch = true;
+                    }
+
+                    // 2. Check description
+                    if (!matchesSearch) {
+                        String description = article.getDescriptionCurrentValue();
+                        if (Validator.isNotNull(description) && StringUtil.containsIgnoreCase(description, search)) {
+                            matchesSearch = true;
+                        }
+                    }
+
+                    // 3. Check custom fields inside <dynamic-content>
+                    if (!matchesSearch) {
+                        try {
+                            String content = article.getContentByLocale(article.getDefaultLanguageId());
+
+                            Document document = SAXReaderUtil.read(content);
+                            List<Node> nodes = document.selectNodes("//dynamic-content");
+
+                            for (Node node : nodes) {
+                                String fieldValue = node.getText();
+                                if (Validator.isNotNull(fieldValue) &&
+                                        StringUtil.containsIgnoreCase(fieldValue, search)) {
+                                    matchesSearch = true;
+                                    break;
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (!matchesSearch) {
                         continue;
                     }
                 }
 
-                // Keep only the latest version
                 String key = article.getArticleId();
                 if (!latestVersions.containsKey(key) ||
                         article.getVersion() > latestVersions.get(key).getVersion()) {
@@ -74,29 +105,23 @@ public class JournalArticleUtil {
                 }
             }
 
-            // Convert map values to list
             List<JournalArticle> results = new ArrayList<>(latestVersions.values());
 
-            // Sort results
             if (orderByComparator != null) {
-                Collections.sort(results, orderByComparator);
+                results.sort(orderByComparator);
             } else {
-                // Default sort by display date descending
-                Collections.sort(results, new Comparator<JournalArticle>() {
-                    @Override
-                    public int compare(JournalArticle a1, JournalArticle a2) {
-                        return a2.getDisplayDate().compareTo(a1.getDisplayDate());
-                    }
-                });
+                results.sort((a1, a2) -> a2.getDisplayDate().compareTo(a1.getDisplayDate()));
             }
 
             return results;
+
         } catch (Exception e) {
             e.printStackTrace();
-            return java.util.Collections.emptyList();
+            return Collections.emptyList();
         }
     }
-    public static List<Document> searchArticles(long companyId, long groupId, String structureKey, String searchKeyword) throws SearchException, ParseException {
+
+    public static List<com.liferay.portal.kernel.search.Document> searchArticles(long companyId, long groupId, String structureKey, String searchKeyword) throws SearchException, ParseException {
         // Setup Search Context
         SearchContext searchContext = new SearchContext();
         searchContext.setCompanyId(companyId);
@@ -125,7 +150,7 @@ public class JournalArticleUtil {
 
         // Execute search
         Hits hits = indexer.search(searchContext);
-        List<Document> documents = hits.toList();
+        List<com.liferay.portal.kernel.search.Document> documents = hits.toList();
 
         return documents;
     }
