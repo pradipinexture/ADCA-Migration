@@ -152,6 +152,26 @@ background: transparent;
 .breadcrumb-item .active{
 color: #fff;
 }
+#content {
+  padding-bottom: 0px !important;
+}
+
+footer#footer {
+  padding-top: 1.5rem !important;
+  margin-top: 1.5rem !important;
+}
+
+.owl-carousel button.owl-dot{
+  background: #ccc  !important;
+}
+
+.owl-dots button.owl-dot.active{
+  background-color: #c6ac7f !important;
+}
+
+.modal#satisfaction-modal {
+  display: block;
+}
 
 /* SCSS imports */
 @import "custom-datepicker";
