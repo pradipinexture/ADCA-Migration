@@ -13,10 +13,7 @@ import com.liferay.calendar.model.CalendarBooking;
 import com.liferay.calendar.model.CalendarResource;
 import com.liferay.calendar.service.*;
 import com.liferay.calendar.util.comparator.CalendarBookingStartTimeComparator;
-import com.liferay.portal.kernel.dao.orm.Criterion;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.*;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -524,195 +521,80 @@ public class EventResource extends BasicResource {
     }
 
     @GET
-    @Operation(description = "Retrieves the list all of the events. Results can be paginated, filtered, searched, and sorted.")
-    @Parameters({
-            @Parameter(in = ParameterIn.QUERY, name = "search"),
-            @Parameter(in = ParameterIn.QUERY, name = "filter"),
-            @Parameter(in = ParameterIn.QUERY, name = "page"),
-            @Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-            @Parameter(in = ParameterIn.QUERY, name = "sort")
-    })
+    @Path("")
+    @Produces(MediaType.APPLICATION_JSON)
     public Page<CalendarBookingVO> searchV2(
-            @Parameter(hidden = true) @QueryParam("search") String searchValue,
-            @Parameter(hidden = true) @QueryParam("calendarId") Long calendarId,
-            @Parameter(hidden = true) @QueryParam("startDate") String startDateParam,
-            @Parameter(hidden = true) @QueryParam("endDate") String endDateParam,
+            @QueryParam("search") String searchValue,
+            @QueryParam("calendarId") Long calendarId,
+            @QueryParam("startDate") String startDateParam,
+            @QueryParam("endDate") String endDateParam,
             @QueryParam("pageSize") Integer pageSize,
-            @Context Filter filter,
             @Context Pagination pagination,
-            @Context Sort[] sorts,
-            @Context HttpServletRequest request) throws PortalException {
+            @Context HttpServletRequest request
+    ) throws PortalException {
 
         _log.debug("Get all calendar bookings");
 
-        // Configuration and pagination setup
-        int paginationSize = (pageSize == null) ?
-                this._dxpRESTConfiguration.paginationSize() : pageSize;
-        int paginationPage = pagination.getPage();
+        if (calendarId == null || calendarId <= 0) {
+            throw new BadRequestException("calendarId is required and must be > 0");
+        }
 
-        // Date parsing with improved error handling
-        Date startTime = null;
-        Date endTime = null;
+        long startTimeLong = 0L;
+        long endTimeLong = Long.MAX_VALUE;
 
         try {
             if (Validator.isNotNull(startDateParam)) {
-                startTime = new SimpleDateFormat("dd-MM-yyyy").parse(startDateParam);
+                Date startDate = new SimpleDateFormat("dd-MM-yyyy").parse(startDateParam);
+                startTimeLong = startDate.getTime();
             }
             if (Validator.isNotNull(endDateParam)) {
-                endTime = new SimpleDateFormat("dd-MM-yyyy").parse(endDateParam);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(endTime);
-                calendar.add(Calendar.HOUR_OF_DAY, 23);
-                calendar.add(Calendar.MINUTE, 59);
-                calendar.add(Calendar.SECOND, 59);
-                endTime = calendar.getTime();
+                Date endDate = new SimpleDateFormat("dd-MM-yyyy").parse(endDateParam);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(endDate);
+                cal.add(Calendar.HOUR_OF_DAY, 23);
+                cal.add(Calendar.MINUTE, 59);
+                cal.add(Calendar.SECOND, 59);
+                endTimeLong = cal.getTime().getTime();
             }
-        } catch (ParseException e) {
-            _log.error("Error parsing date parameters", e);
+        } catch (Exception e) {
+            _log.error("Invalid date format", e);
             throw new PortalException("Invalid date format. Expected: dd-MM-yyyy", e);
         }
 
-        List<CalendarBookingVO> result = new ArrayList<>();
-        long companyId = PortalUtil.getCompanyId(request);
+        // Build DynamicQuery
+        DynamicQuery bookingQuery = _calendarBookingLocalService.dynamicQuery()
+                .add(PropertyFactoryUtil.forName("calendarId").eq(calendarId))
+                .add(PropertyFactoryUtil.forName("startTime").ge(startTimeLong))
+                .add(PropertyFactoryUtil.forName("endTime").le(endTimeLong));
 
-        // Group ID configuration
-        String defaultGroupId = GetterUtil.getString(
-                PropsUtil.get("default-group-id"), "0");
-        String groupIdString = request.getHeader("groupId");
-        long groupId = GetterUtil.getLong(groupIdString, GetterUtil.getLong(defaultGroupId));
-        long[] groupIds = {groupId};
-
-        // Language configuration
-        String languageIdString = request.getHeader("languageId");
-        String languageIdAcceptLanguage =
-                (request.getHeader("Accept-Language") != null &&
-                        request.getHeader("Accept-Language").equalsIgnoreCase("ar-AE")) ?
-                        "ar_AE" : "en_US";
-        String languageIdRequest =
-                (languageIdString != null) ? languageIdString : languageIdAcceptLanguage;
-        String languageId = (languageIdRequest != null) ? languageIdRequest : "en";
-
-        // TimeZone configuration - NEW for 7.4
-        TimeZone displayTimeZone = null;
-        try {
-            // Get user's timezone or fall back to company/portal timezone
-            User currentUser = UserUtil.getCurrentUser(request, this._app);
-            if (currentUser != null) {
-                displayTimeZone = currentUser.getTimeZone();
-            }
-
-            // Fallback to company timezone if user timezone not available
-            if (displayTimeZone == null) {
-                Company company = CompanyLocalServiceUtil.getCompany(companyId);
-                displayTimeZone = company.getTimeZone();
-            }
-
-            // Final fallback to system default
-            if (displayTimeZone == null) {
-                displayTimeZone = TimeZone.getDefault();
-            }
-        } catch (Exception e) {
-            _log.warn("Could not determine display timezone, using system default", e);
-            displayTimeZone = TimeZone.getDefault();
+        if (Validator.isNotNull(searchValue)) {
+            bookingQuery.add(
+                    RestrictionsFactoryUtil.or(
+                            PropertyFactoryUtil.forName("title").like("%" + searchValue + "%"),
+                            PropertyFactoryUtil.forName("description").like("%" + searchValue + "%")
+                    )
+            );
         }
 
-        // Order by comparator setup
-        OrderByComparator<CalendarBooking> orderByComparator = null;
-        if (sorts != null && sorts.length > 0) {
-            if (sorts[0].getFieldName().equalsIgnoreCase("startTime")) {
-                orderByComparator = new CalendarBookingStartTimeComparator(!sorts[0].isReverse());
-            } else if (sorts[0].getFieldName().equalsIgnoreCase("title")) {
-                orderByComparator = OrderByComparatorFactoryUtil.create(
-                        "CalendarBooking",
-                        new Object[]{"title", Boolean.valueOf(!sorts[0].isReverse())}
-                );
-            }
-        }
+        // ** NO ORDERING **
+        _log.debug("Executing DynamicQuery WITHOUT any ORDER BY");
 
-        // Calendar and resource IDs setup
-        List<Long> resourceIds = new ArrayList<>();
-        List<com.liferay.calendar.model.Calendar> calendars = CalendarLocalServiceUtil.getCalendars(-1, -1);
+        int start = pagination.getStartPosition();
+        int end = pagination.getEndPosition();
 
-        for (com.liferay.calendar.model.Calendar cal : calendars) {
-            resourceIds.add(cal.getCalendarResourceId());
-        }
+        List<CalendarBooking> bookings = _calendarBookingLocalService.dynamicQuery(bookingQuery, start, end);
+        long total = _calendarBookingLocalService.dynamicQueryCount(bookingQuery);
 
-        long[] calendarResourceIds = resourceIds.stream()
-                .mapToLong(Long::longValue)
-                .toArray();
+        String languageId = getLanguageId(request);
 
-        // Calendar IDs configuration
-        long[] calendarIds;
-        if (calendarId != null && calendarId != -1L) {
-            calendarIds = new long[]{calendarId};
-        } else {
-            List<Long> configuredCalendars = new ArrayList<>();
-            try {
-                configuredCalendars = this._dxpRESTConfiguration.calendars();
-                calendarIds = configuredCalendars.stream()
-                        .mapToLong(Long::longValue)
-                        .toArray();
-            } catch (Exception e) {
-                calendarIds = new long[0];
-            }
-        }
+        List<CalendarBookingVO> result = bookings.stream()
+                .map(booking -> new CalendarBookingVO(booking, languageId))
+                .collect(Collectors.toList());
 
-        // Time range setup
-        long startTimeLong = (startTime != null) ? startTime.getTime() : 0L;
-        long endTimeLong = (endTime != null) ? endTime.getTime() : Long.MAX_VALUE;
-
-        // Search parameters
-        boolean recurring = false;
-        int[] statuses = {WorkflowConstants.STATUS_APPROVED};
-
-        // Perform search - Updated for 7.4 with displayTimeZone parameter
-        List<CalendarBooking> bookings = CalendarBookingServiceUtil.search(
-                companyId,
-                groupIds,
-                calendarIds,
-                calendarResourceIds,
-                -1L,  // parentCalendarBookingId
-                searchValue,
-                startTimeLong,
-                endTimeLong,
-                displayTimeZone,  // NEW: displayTimeZone parameter for 7.4
-                recurring,
-                statuses,
-                -1,  // start
-                -1,  // end
-                orderByComparator
-        );
-
-        _log.debug("bookings SIZE: " + bookings.size());
-
-        // Process results with permission checks
-        User currentUser = UserUtil.getCurrentUser(request, this._app);
-        long currentCompanyId = getCompanyId(request);
-
-        for (CalendarBooking booking : bookings) {
-            try {
-                // Get parent calendar booking for permission check
-                CalendarBooking parentBooking =
-                        CalendarBookingLocalServiceUtil.getCalendarBooking(
-                                booking.getParentCalendarBookingId()
-                        );
-
-                // Permission check using the calendar ID
-                if (isAllowed(
-                        "com.liferay.calendar.model.Calendar",
-                        parentBooking.getCalendarId(),
-                        currentUser,
-                        currentCompanyId)) {
-                    result.add(new CalendarBookingVO(booking, languageId));
-                }
-            } catch (Exception e) {
-                _log.warn("Error processing calendar booking: " + booking.getCalendarBookingId(), e);
-                // Continue processing other bookings
-            }
-        }
-
-        return PageUtils.createPage(result, pagination, result.size());
+        return PageUtils.createPage(result, pagination, total);
     }
+
+
 
     // Helper method to get company ID
      public long getCompanyId(HttpServletRequest request) {
