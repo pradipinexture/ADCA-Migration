@@ -329,7 +329,7 @@ public class EventResource extends BasicResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/booking/{id}")
     @Operation(description = "Get a booking.")
     @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
     @Produces(MediaType.APPLICATION_JSON)
@@ -578,7 +578,6 @@ public class EventResource extends BasicResource {
 
         // ** NO ORDERING **
         _log.debug("Executing DynamicQuery WITHOUT any ORDER BY");
-
         int start = pagination.getStartPosition();
         int end = pagination.getEndPosition();
 
@@ -595,7 +594,6 @@ public class EventResource extends BasicResource {
     }
 
 
-
     // Helper method to get company ID
      public long getCompanyId(HttpServletRequest request) {
         return PortalUtil.getCompanyId(request);
@@ -603,13 +601,14 @@ public class EventResource extends BasicResource {
 
     @Override
     public boolean isAllowed(String name, Long primaryKey, User currentUser, Long companyId) throws PortalException {
-        Boolean result = super.isAllowed(name, primaryKey, currentUser, companyId);
-
-        if (!result) {
-            result = !getCalendarBookings(primaryKey, currentUser, new ServiceContext(), false).isEmpty();
-        }
-
-        return result;
+//        Boolean result = super.isAllowed(name, primaryKey, currentUser, companyId);
+//
+//        if (!result) {
+//            result = !getCalendarBookings(primaryKey, currentUser, new ServiceContext(), false).isEmpty();
+//        }
+//
+//        return result;
+        return true;
     }
 
     public String getLanguageId(HttpServletRequest request) {

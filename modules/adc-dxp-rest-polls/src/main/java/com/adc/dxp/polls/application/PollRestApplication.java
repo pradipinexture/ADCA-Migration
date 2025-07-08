@@ -44,37 +44,34 @@ public class PollRestApplication extends Application {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPolls(@QueryParam("groupId") long groupId) {
-		List<PollDTO> polls = pollService.getPolls(groupId);
+	public Response getPolls(@QueryParam("groupId") long groupId, @QueryParam("languageId") String languageId) {
+		List<PollDTO> polls = pollService.getPolls(groupId, languageId);
 
 		if (polls.isEmpty()) {
 			return buildJsonResponse(new ResponseDTO<>("error", "Polls not found for the given group ID.", Collections.emptyList(), 0));
 		}
-
 		return buildJsonResponse(new ResponseDTO<>("success", "Polls fetched successfully.", polls, polls.size()));
 	}
-
 	@GET
 	@Path("/{pollId}/records/by/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getFormRecords(
 			@PathParam("pollId") long formId,
-			@PathParam("userId") long userId) {
+			@PathParam("userId") long userId,
+			@QueryParam("languageId") String languageId) {
 
-		List<FormRecordDTO> records = pollService.getFormRecords(formId, userId);
-
+		List<FormRecordDTO> records = pollService.getFormRecords(formId, userId, languageId);
 		if (records.isEmpty()) {
 			return buildJsonResponse(new ResponseDTO<>("error", "No records found for this user.", Collections.emptyList(), 0));
 		}
-
 		return buildJsonResponse(new ResponseDTO<>("success", "User form records fetched successfully.", records, records.size()));
 	}
 
 	@GET
 	@Path("/{pollId}/analytics")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPollAnalytics(@PathParam("pollId") long pollId) {
-		PollDTO pollDTO = pollService.getPollAnalytics(pollId);
+	public Response getPollAnalytics(@PathParam("pollId") long pollId, @QueryParam("languageId") String languageId) {
+		PollDTO pollDTO = pollService.getPollAnalytics(pollId, languageId);
 
 		if (pollDTO == null) {
 			return buildJsonResponse(new ResponseDTO<>("error", "No question or no votes submitted.", Collections.emptyList(), 0));

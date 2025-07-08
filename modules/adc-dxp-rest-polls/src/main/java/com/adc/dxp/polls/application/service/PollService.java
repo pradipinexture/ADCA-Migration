@@ -20,10 +20,11 @@ import java.util.stream.Collectors;
 @Component(service = PollService.class, immediate = true)
 public class PollService {
 
-    Locale locale = LocaleUtil.getSiteDefault();
+    Locale defaultLocale = LocaleUtil.getSiteDefault();
 
-    public List<PollDTO> getPolls(long groupId) {
+    public List<PollDTO> getPolls(long groupId, String languageId) {
         List<PollDTO> pollDTOList = new ArrayList<>();
+        Locale locale = getLocale(languageId);
 
         try {
             List<DDMFormInstance> forms = DDMFormInstanceLocalServiceUtil.getFormInstances(groupId);
@@ -52,9 +53,9 @@ public class PollService {
         return pollDTOList;
     }
 
-    public List<FormRecordDTO> getFormRecords(long formId, long userId) {
+    public List<FormRecordDTO> getFormRecords(long formId, long userId, String languageId) {
         List<FormRecordDTO> result = new ArrayList<>();
-
+        Locale locale = getLocale(languageId);
         try {
 
             List<DDMFormInstanceRecord> records = DDMFormInstanceRecordLocalServiceUtil.getFormInstanceRecords(
@@ -81,7 +82,9 @@ public class PollService {
                 if (field == null) continue;
 
                 String label = field.getLabel().getString(locale);
-                String rawValue = fieldValue.getValue().getString(locale);
+                //String rawValue = fieldValue.getValue().getString(locale);
+                String rawValue = fieldValue.getValue().getString(null);
+
                 String finalValue = rawValue;
 
                 if (Arrays.asList("radio", "select", "checkbox_multiple").contains(field.getType())) {
@@ -110,13 +113,25 @@ public class PollService {
 
         return result;
     }
-    public PollDTO getPollAnalytics(long formId) {
+
+    private Locale getLocale(String languageId) {
+        if(languageId == null || languageId.isEmpty()) {
+            return Locale.forLanguageTag(defaultLocale.getLanguage());
+        } else {
+            return Locale.forLanguageTag(languageId);
+        }
+    }
+
+
+    public PollDTO getPollAnalytics(long formId, String languageId) {
         List<PollAnalyticsDTO> results = new ArrayList<>();
         PollDTO pollDTO = new PollDTO();
 
+        Locale locale = getLocale(languageId);
+
         try {
             DDMFormInstance formInstance = DDMFormInstanceLocalServiceUtil.getDDMFormInstance(formId);
-            Locale locale = formInstance.getDDMForm().getDefaultLocale();
+            //Locale locale = formInstance.getDDMForm().getDefaultLocale();
             DDMForm form = formInstance.getDDMForm();
             Map<String, DDMFormField> fieldMap = form.getDDMFormFieldsMap(true);
 

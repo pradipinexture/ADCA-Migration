@@ -23,7 +23,7 @@ public interface AdcDxpRestApiConfiguration {
     @Meta.AD(description= "PaginationSize", deflt="6", required=false)
     public Integer paginationSize();
 
-    @Meta.AD(description= "calendars", deflt="", required=false)
+    @Meta.AD(description= "calendars", required=false)
     public List<Long> calendars();
 
 }

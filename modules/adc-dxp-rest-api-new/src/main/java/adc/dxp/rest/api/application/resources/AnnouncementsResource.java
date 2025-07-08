@@ -3,9 +3,8 @@ package adc.dxp.rest.api.application.resources;
 import adc.dxp.rest.api.application.AdcDxpRestApiConfiguration;
 import adc.dxp.rest.api.application.data.Announcements;
 import adc.dxp.rest.api.application.data.Category;
+import adc.dxp.rest.api.application.utils.*;
 import adc.dxp.rest.api.application.utils.Constants;
-import adc.dxp.rest.api.application.utils.PageUtils;
-import adc.dxp.rest.api.application.utils.UserUtil;
 import com.liferay.announcements.kernel.model.AnnouncementsEntry;
 import com.liferay.announcements.kernel.model.AnnouncementsFlag;
 import com.liferay.announcements.kernel.service.AnnouncementsEntryLocalServiceUtil;
@@ -16,6 +15,7 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryServiceUtil;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -28,9 +28,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.*;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -47,10 +45,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component(
@@ -132,6 +127,7 @@ public class AnnouncementsResource {
 		return !AnnouncementsFlagLocalServiceUtil.dynamicQuery(dq).isEmpty();
 	}
 
+/*
 	@GET
 	@Path("/web-content")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -211,6 +207,118 @@ public class AnnouncementsResource {
 		return PageUtils.createPage(announcements, pagination, total);
 	}
 
+*/
+@GET
+@Path("/web-content")
+@Produces(MediaType.APPLICATION_JSON)
+@Operation(description = "Get all announcements from web content.")
+public Page<Announcements> getAllAnnouncementsFromWebContent(
+		@QueryParam("onlyIsNotRead") Boolean onlyIsNotRead,
+		@QueryParam("search") String search,
+		@QueryParam("categoryId") String categoryIdParam,
+		@QueryParam("startDate") String startDateParam,
+		@QueryParam("endDate") String endDateParam,
+		@QueryParam("pageSize") Integer pageSize,
+		@Context Filter filter,
+		@Context Pagination pagination,
+		@Context Sort[] sorts,
+		@Context HttpServletRequest request) throws PortalException {
+
+	// === Context info ===
+	long companyId = _portal.getCompanyId(request);
+	long groupId = GetterUtil.getLong(request.getHeader("groupId"));
+	if (groupId <= 0) {
+		throw new PortalException("Missing or invalid required header: groupId");
+	}
+
+	User currentUser = UserUtil.getCurrentUser(request, null);
+	String languageId = currentUser.getLanguageId();
+
+	// === Date parsing ===
+	Date startDate = null;
+	Date endDate = null;
+	try {
+		if (Validator.isNotNull(startDateParam)) {
+			startDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateParam);
+		}
+		if (Validator.isNotNull(endDateParam)) {
+			endDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateParam);
+		}
+	} catch (ParseException e) {
+		_log.error("Date parse error", e);
+	}
+
+	// === Get announcement structureKey ===
+	DDMStructure announcementStructure = StructureUtil.getStructureByNameEn(Constants.STRUCTURE_ANNOUNCEMENT_NAME_EN);
+	String announcementStructureKey = announcementStructure.getStructureKey();
+
+	// === Do actual search via service ===
+	OrderByComparator<JournalArticle> orderByComparator = null; // You can define your own if needed
+	List<JournalArticle> results = JournalArticleUtil.searchJournalArticles(
+			companyId,
+			groupId,
+			search,
+			announcementStructureKey,
+			startDate,
+			endDate,
+			orderByComparator
+	);
+
+	// === Filter only APPROVED and CATEGORY if given ===
+	List<JournalArticle> filteredArticles = new ArrayList<>();
+	long categoryId = Validator.isNotNull(categoryIdParam) && !categoryIdParam.equalsIgnoreCase("-1")
+			? GetterUtil.getLong(categoryIdParam) : -1;
+
+	for (JournalArticle article : results) {
+		try {
+			if (article.getStatus() != WorkflowConstants.STATUS_APPROVED) {
+				continue;
+			}
+
+			// Optional category filter
+			if (categoryId != -1) {
+				List<AssetCategory> categories = AssetCategoryLocalServiceUtil.getCategories(
+						JournalArticle.class.getName(), article.getResourcePrimKey());
+				boolean matchesCategory = categories.stream()
+						.anyMatch(cat -> cat.getCategoryId() == categoryId);
+				if (!matchesCategory) {
+					continue;
+				}
+			}
+
+			filteredArticles.add(article);
+		} catch (Exception e) {
+			_log.error("Error filtering article ID: " + article.getArticleId(), e);
+		}
+	}
+
+	// === Optional OnlyIsNotRead filter ===
+//	if (Boolean.TRUE.equals(onlyIsNotRead)) {
+//		filteredArticles = filteredArticles.stream()
+//				.filter(article -> isNotReadByUser(article, currentUser))
+//				.collect(Collectors.toList());
+//	}
+
+	// === Manual pagination ===
+	int total = filteredArticles.size();
+	int paginationSizeValue = pageSize == null ? _dxpRESTConfiguration.paginationSize() : pageSize;
+	int paginationPage = pagination.getPage();
+
+	int start = (paginationPage - 1) * paginationSizeValue;
+	int end = Math.min(start + paginationSizeValue, total);
+
+	List<JournalArticle> paginatedArticles = start < total
+			? filteredArticles.subList(start, end)
+			: Collections.emptyList();
+
+	// === Convert to Announcements DTO ===
+	List<Announcements> announcements = new ArrayList<>();
+	for (JournalArticle article : paginatedArticles) {
+		announcements.add(convertToAnnouncement(article, languageId));
+	}
+
+	return Page.of(announcements, pagination, total);
+}
 
 	@GET
 	@Path("/web-content/{entryId}")
