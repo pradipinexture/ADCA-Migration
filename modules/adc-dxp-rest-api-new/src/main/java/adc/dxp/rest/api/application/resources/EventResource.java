@@ -18,15 +18,19 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.service.*;
 import com.liferay.portal.kernel.util.*;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -50,6 +54,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+
 
 @Component(
         property = {
@@ -83,7 +89,14 @@ public class EventResource extends BasicResource {
     @Reference
     private CalendarBookingLocalService _calendarBookingLocalService;
 
+    @Reference
+    private GroupLocalService _groupLocalService;
 
+    @Reference
+    private ClassNameLocalService _classNameLocalService;
+
+    @Reference
+    private ResourcePermissionLocalService _resourcePermissionLocalService;
 
     @Reference
     private ConfigurationProvider _configurationProvider;
@@ -328,6 +341,7 @@ public class EventResource extends BasicResource {
         return Page.of(result, pagination, paginationPage);
     }
 
+
     @GET
     @Path("/booking/{id}")
     @Operation(description = "Get a booking.")
@@ -339,14 +353,18 @@ public class EventResource extends BasicResource {
 
         _log.debug("Get booking by ids " + id);
 
-        User currentUser = UserUtil.getCurrentUser(request,_app);
-        CalendarBooking booking = _calendarBookingLocalService.fetchCalendarBooking(id);
+        long userId = PrincipalThreadLocal.getUserId();
+        if (userId == 0) {
+            throw new PrincipalException("User not authenticated");
+        }
 
-        if (!isAllowed("com.liferay.calendar.model.Calendar",
-                _calendarBookingLocalService.getCalendarBooking(booking.getParentCalendarBookingId()).getCalendarId(),
-                currentUser,
-                getCompanyId(request))) {
-            throw new ForbiddenException();
+        CalendarBooking booking = _calendarBookingLocalService.fetchCalendarBooking(id);
+        if (booking == null) {
+            throw new NotFoundException("Calendar booking not found");
+        }
+
+        if (!isUserAllowedCalendarBooking(booking, userId)) {
+            throw new ForbiddenException("User does not have access to this calendar booking");
         }
 
         String languageIdRequestRequest = request.getHeader("languageId");
@@ -365,27 +383,29 @@ public class EventResource extends BasicResource {
         Criterion parentIdCriterion = RestrictionsFactoryUtil.eq("parentCalendarBookingId", id);
         bookingsDQ.add(parentIdCriterion);
 
-        List<CalendarBooking> bookings = _calendarLocalService.dynamicQuery(bookingsDQ, -1, -1);
+        List<CalendarBooking> bookings = _calendarBookingLocalService.dynamicQuery(bookingsDQ, -1, -1);
 
         for (CalendarBooking b : bookings) {
-            CalendarResource calendarResource = _calendarResourceLocalService.fetchCalendarResource(b.getCalendarResourceId());
-            User user = _userLocalService.fetchUser(calendarResource.getUserId());
+            if (isUserAllowedCalendarBooking(b, userId)) {
+                CalendarResource calendarResource = _calendarResourceLocalService.fetchCalendarResource(b.getCalendarResourceId());
+                User user = _userLocalService.fetchUser(calendarResource.getUserId());
 
-            if (user == null) {
-                _log.warn("User is null");
-            } else {
-                UserVO userVo = new UserVO(user);
-                userVo.complementValues();
-                userVo.setContacts(null);
+                if (user == null) {
+                    _log.warn("User is null");
+                } else {
+                    UserVO userVo = new UserVO(user);
+                    userVo.complementValues();
+                    userVo.setContacts(null);
 
-                CalendarBoobingUserVO calendarBookingUser = new CalendarBoobingUserVO(userVo, b.getStatus());
+                    CalendarBoobingUserVO calendarBookingUser = new CalendarBoobingUserVO(userVo, b.getStatus());
 
-                if (currentUser.getUserId() == calendarBookingUser.getUser().getUserId()) {
-                    result.setCurrentUserStatus(calendarBookingUser.getStatus());
-                }
+                    if (userId == calendarBookingUser.getUser().getUserId()) {
+                        result.setCurrentUserStatus(calendarBookingUser.getStatus());
+                    }
 
-                if (result.getCalendarBoobingUserVO().indexOf(calendarBookingUser) == -1) {
-                    result.getCalendarBoobingUserVO().add(calendarBookingUser);
+                    if (result.getCalendarBoobingUserVO().indexOf(calendarBookingUser) == -1) {
+                        result.getCalendarBoobingUserVO().add(calendarBookingUser);
+                    }
                 }
             }
         }
@@ -393,21 +413,26 @@ public class EventResource extends BasicResource {
         return result;
     }
 
+
     @PATCH
     @Path("/{id}/accept")
-    @Operation(description = "Subscribe in a calendar booking")
+    @Operation(description = "Accept a calendar booking invitation")
     @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
     @Produces(MediaType.APPLICATION_JSON)
     public CalendarBookingVO addCalendarBooking(
             @Parameter(hidden = true) @PathParam("id") long id,
             @Context HttpServletRequest request) throws PortalException {
 
-        _log.debug("Accept calendar booking");
+        _log.debug("Accept calendar booking invitation");
+
+        long userId = PrincipalThreadLocal.getUserId();
+        if (userId == 0) {
+            throw new PrincipalException("User not authenticated");
+        }
 
         String languageId = getLanguageId(request);
-        User currentUser = UserUtil.getCurrentUser(request,_app);
 
-        CalendarBooking booking = setCalendarBookingStatus(id, 0, languageId, currentUser, getCompanyId(request));
+        CalendarBooking booking = updateCalendarBookingStatus(id, 0, userId);
         CalendarBookingVO result = new CalendarBookingVO(booking, languageId);
 
         return result;
@@ -415,19 +440,23 @@ public class EventResource extends BasicResource {
 
     @PATCH
     @Path("/{id}/maybe")
-    @Operation(description = "Think about in a calendar booking")
+    @Operation(description = "Maybe attend a calendar booking")
     @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
     @Produces(MediaType.APPLICATION_JSON)
     public CalendarBookingVO maybeCalendarBooking(
             @Parameter(hidden = true) @PathParam("id") long id,
             @Context HttpServletRequest request) throws PortalException {
 
-        _log.debug("Think about calendar booking");
+        _log.debug("Maybe attend calendar booking");
+
+        long userId = PrincipalThreadLocal.getUserId();
+        if (userId == 0) {
+            throw new PrincipalException("User not authenticated");
+        }
 
         String languageId = getLanguageId(request);
-        User currentUser = UserUtil.getCurrentUser(request,_app);
 
-        CalendarBooking booking = setCalendarBookingStatus(id, 9, languageId, currentUser, getCompanyId(request));
+        CalendarBooking booking = updateCalendarBookingStatus(id, 9, userId);
         CalendarBookingVO result = new CalendarBookingVO(booking, languageId);
 
         return result;
@@ -435,90 +464,253 @@ public class EventResource extends BasicResource {
 
     @PATCH
     @Path("/{id}/decline")
-    @Operation(description = "Decline a calendar booking")
+    @Operation(description = "Decline a calendar booking invitation")
     @Parameters({ @Parameter(in = ParameterIn.PATH, name = "id") })
     @Produces(MediaType.APPLICATION_JSON)
     public CalendarBookingVO declineCalendarBooking(
             @Parameter(hidden = true) @PathParam("id") long id,
             @Context HttpServletRequest request) throws PortalException {
 
-        _log.debug("Decline calendar booking");
+        _log.debug("Decline calendar booking invitation");
+
+        long userId = PrincipalThreadLocal.getUserId();
+        if (userId == 0) {
+            throw new PrincipalException("User not authenticated");
+        }
 
         String languageId = getLanguageId(request);
-        User currentUser = UserUtil.getCurrentUser(request,_app);
 
-        CalendarBooking booking = setCalendarBookingStatus(id, 4, languageId, currentUser, getCompanyId(request));
+        CalendarBooking booking = updateCalendarBookingStatus(id, 4, userId);
         CalendarBookingVO result = new CalendarBookingVO(booking, languageId);
 
         return result;
     }
+    private CalendarBooking updateCalendarBookingStatus(long calendarBookingId, int status, long userId)
+            throws PortalException {
 
-    private CalendarBooking setCalendarBookingStatus(
-            long calendarBookingId,
-            int status,
-            String languageId,
-            User currentUser,
-            Long companyId) throws PortalException {
+        CalendarBooking parentBooking = _calendarBookingLocalService.fetchCalendarBooking(calendarBookingId);
+        if (parentBooking == null) {
+            throw new NotFoundException("Calendar booking not found");
+        }
 
-        if (!isAllowed("com.liferay.calendar.model.Calendar",
-                _calendarBookingLocalService.getCalendarBooking(calendarBookingId).getCalendarId(),
-                currentUser,
-                companyId)) {
-            throw new ForbiddenException();
+        if (!isUserAllowedCalendarBooking(parentBooking, userId)) {
+            throw new ForbiddenException("User does not have access to this calendar booking");
+        }
+
+        CalendarBooking userBooking = findUserCalendarBooking(calendarBookingId, userId);
+
+        if (userBooking == null) {
+            throw new ForbiddenException("User is not invited to this calendar booking");
         }
 
         ServiceContext serviceContext = new ServiceContext();
-        List<CalendarBooking> bookings = getCalendarBookings(calendarBookingId, currentUser, serviceContext, true);
+        serviceContext.setUserId(userId);
 
-        CalendarBooking result = null;
-
-        for (CalendarBooking booking : bookings) {
-            result = _calendarBookingLocalService.updateStatus(
-                    currentUser.getUserId(),
-                    booking.getCalendarBookingId(),
+        try {
+            return _calendarBookingLocalService.updateStatus(
+                    userId,
+                    userBooking.getCalendarBookingId(),
                     status,
-                    serviceContext);
+                    serviceContext
+            );
+        } catch (Exception e) {
+            _log.error("Error updating calendar booking status", e);
+            throw new ForbiddenException("Failed to update calendar booking status");
         }
-
-        return result;
     }
 
-    private List<CalendarBooking> getCalendarBookings(
-            Long calendarBookingId,
-            User currentUser,
-            ServiceContext serviceContext,
-            Boolean createIfMissing) throws PortalException {
+    private CalendarBooking findUserCalendarBooking(long parentCalendarBookingId, long userId) {
+        try {
+            List<CalendarBooking> childBookings = _calendarBookingLocalService.getChildCalendarBookings(parentCalendarBookingId);
 
-        DynamicQuery bookingsDQ = _calendarBookingLocalService.dynamicQuery();
-        Criterion idCriterion = RestrictionsFactoryUtil.ne("calendarBookingId", calendarBookingId);
-        bookingsDQ.add(idCriterion);
+            for (CalendarBooking childBooking : childBookings) {
+                CalendarResource resource = _calendarResourceLocalService.fetchCalendarResource(
+                        childBooking.getCalendarResourceId()
+                );
 
-        Criterion parentIdCriterion = RestrictionsFactoryUtil.eq("parentCalendarBookingId", calendarBookingId);
-        bookingsDQ.add(parentIdCriterion);
+                if (resource != null && resource.getUserId() == userId) {
+                    return childBooking;
+                }
+            }
 
-        DynamicQuery resourceDQ = _calendarResourceLocalService.dynamicQuery();
-        Criterion userIdCriterion = RestrictionsFactoryUtil.eq("userId", currentUser.getUserId());
-        resourceDQ.add(userIdCriterion);
-
-        List<CalendarResource> calendarResources = _calendarResourceLocalService.dynamicQuery(resourceDQ);
-
-        List<Long> ids = new ArrayList<>();
-        for (CalendarResource resource : calendarResources) {
-            ids.add(resource.getCalendarResourceId());
+            return null;
+        } catch (Exception e) {
+            _log.error("Error finding user calendar booking", e);
+            return null;
         }
-
-        Criterion calendarResourceCriterion = RestrictionsFactoryUtil.in("calendarResourceId", ids);
-        bookingsDQ.add(calendarResourceCriterion);
-
-        List<CalendarBooking> bookings = _calendarLocalService.dynamicQuery(bookingsDQ);
-
-        if (createIfMissing && bookings.isEmpty()) {
-            //addCalendar(calendarBookingId, calendarResources, currentUser, serviceContext);
-            bookings = _calendarLocalService.dynamicQuery(bookingsDQ);
-        }
-
-        return bookings;
     }
+
+    private CalendarBooking createUserCalendarBooking(CalendarBooking parentBooking, long userId)
+            throws PortalException {
+
+        List<CalendarResource> userCalendarResources = getUserCalendarResources(userId);
+
+        if (userCalendarResources.isEmpty()) {
+            throw new PortalException("No calendar resource found for user");
+        }
+
+        CalendarResource userCalendarResource = userCalendarResources.get(0);
+
+        List<com.liferay.calendar.model.Calendar> userCalendars = _calendarLocalService.getCalendarResourceCalendars(
+                userCalendarResource.getGroupId(),
+                userCalendarResource.getCalendarResourceId()
+        );
+
+        if (userCalendars.isEmpty()) {
+            throw new PortalException("No calendar found for user calendar resource");
+        }
+
+        com.liferay.calendar.model.Calendar userCalendar = userCalendars.get(0);
+
+        ServiceContext serviceContext = new ServiceContext();
+        serviceContext.setUserId(userId);
+        serviceContext.setScopeGroupId(parentBooking.getGroupId());
+
+        return _calendarBookingLocalService.addCalendarBooking(
+                userId,
+                userCalendar.getCalendarId(),
+                new long[0],
+                parentBooking.getParentCalendarBookingId(),
+                userCalendarResource.getCalendarResourceId(),
+                parentBooking.getTitleMap(),
+                parentBooking.getDescriptionMap(),
+                parentBooking.getLocation(),
+                parentBooking.getStartTime(),
+                parentBooking.getEndTime(),
+                parentBooking.getAllDay(),
+                parentBooking.getRecurrence(),
+                parentBooking.getFirstReminder(),
+                parentBooking.getFirstReminderType(),
+                parentBooking.getSecondReminder(),
+                parentBooking.getSecondReminderType(),
+                serviceContext
+        );
+    }
+
+    private List<CalendarResource> getUserCalendarResources(long userId) {
+        try {
+            DynamicQuery resourceQuery = _calendarResourceLocalService.dynamicQuery();
+            resourceQuery.add(PropertyFactoryUtil.forName("userId").eq(userId));
+            resourceQuery.add(PropertyFactoryUtil.forName("classNameId").eq(
+                    _classNameLocalService.getClassNameId(User.class.getName())
+            ));
+
+            return _calendarResourceLocalService.dynamicQuery(resourceQuery);
+        } catch (Exception e) {
+            _log.error("Error getting user calendar resources", e);
+            return new ArrayList<>();
+        }
+    }
+
+
+
+    private boolean isUserAllowedCalendarBooking(CalendarBooking calendarBooking, long userId) {
+        try {
+            if (calendarBooking.getUserId() == userId) {
+                return true;
+            }
+
+            com.liferay.calendar.model.Calendar calendar = _calendarLocalService.getCalendar(calendarBooking.getCalendarId());
+            if (isUserAllowedCalendar(calendar, userId)) {
+                return true;
+            }
+
+            if (isUserInvitedToBooking(calendarBooking, userId)) {
+                return true;
+            }
+
+            if (hasCalendarResourcePermission(calendarBooking.getCalendarId(), userId, ActionKeys.VIEW)) {
+                return true;
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            _log.error("Error checking calendar booking access for user " + userId + " and booking " +
+                    calendarBooking.getCalendarBookingId(), e);
+            return false;
+        }
+    }
+
+    private boolean isUserAllowedCalendar(com.liferay.calendar.model.Calendar calendar, long userId) {
+        try {
+            if (calendar.getUserId() == userId) {
+                return true;
+            }
+
+            PermissionChecker permissionChecker = PermissionThreadLocal.getPermissionChecker();
+            if (permissionChecker == null) {
+                return false;
+            }
+
+            try {
+                return permissionChecker.hasPermission(
+                        calendar.getGroupId(),
+                        "com.liferay.calendar.model.Calendar",
+                        calendar.getCalendarId(),
+                        ActionKeys.VIEW
+                );
+            } catch (Exception e) {
+                _log.debug("PermissionChecker.hasPermission failed for calendar " + calendar.getCalendarId(), e);
+                return false;
+            }
+
+        } catch (Exception e) {
+            _log.error("Error checking calendar access for user " + userId + " and calendar " +
+                    calendar.getCalendarId(), e);
+            return false;
+        }
+    }
+
+    private boolean isUserInvitedToBooking(CalendarBooking calendarBooking, long userId) {
+        try {
+            List<CalendarBooking> childBookings = _calendarBookingLocalService.getChildCalendarBookings(
+                    calendarBooking.getCalendarBookingId());
+
+            for (CalendarBooking childBooking : childBookings) {
+                CalendarResource resource = _calendarResourceLocalService.fetchCalendarResource(
+                        childBooking.getCalendarResourceId()
+                );
+
+                if (resource != null && resource.getUserId() == userId) {
+                    return true;
+                }
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            _log.error("Error checking booking invitation for user " + userId + " and booking " +
+                    calendarBooking.getCalendarBookingId(), e);
+            return false;
+        }
+    }
+
+    private boolean hasCalendarResourcePermission(long calendarId, long userId, String actionId) {
+        try {
+            com.liferay.calendar.model.Calendar calendar = _calendarLocalService.getCalendar(calendarId);
+
+            return _resourcePermissionLocalService.hasResourcePermission(
+                    calendar.getCompanyId(),
+                    "com.liferay.calendar.model.Calendar",
+                    ResourceConstants.SCOPE_INDIVIDUAL,
+                    String.valueOf(calendarId),
+                    userId,
+                    actionId
+            );
+
+        } catch (Exception e) {
+            _log.error("Error checking resource permission for user " + userId + " and calendar " + calendarId, e);
+            return false;
+        }
+    }
+
+    private List<CalendarBooking> filterBookingsByUserPermission(List<CalendarBooking> bookings, long userId) {
+        return bookings.stream()
+                .filter(booking -> isUserAllowedCalendarBooking(booking, userId))
+                .collect(Collectors.toList());
+    }
+
 
     @GET
     @Path("")
@@ -536,7 +728,17 @@ public class EventResource extends BasicResource {
         _log.debug("Get all calendar bookings");
 
         if (calendarId == null || calendarId <= 0) {
-            throw new BadRequestException("calendarId is required and must be > 0");
+            throw new IllegalArgumentException("calendarId is required and must be > 0");
+        }
+        User currentUser = UserUtil.getCurrentUser(request,_app);
+        long userId = PrincipalThreadLocal.getUserId();
+        if (userId == 0) {
+            throw new PrincipalException("User not authenticated");
+        }
+
+        com.liferay.calendar.model.Calendar calendar = _calendarLocalService.getCalendar(calendarId);
+        if (!isUserAllowedCalendar(calendar, userId)) {
+            throw new PrincipalException("User does not have access to this calendar");
         }
 
         long startTimeLong = 0L;
@@ -561,7 +763,6 @@ public class EventResource extends BasicResource {
             throw new PortalException("Invalid date format. Expected: dd-MM-yyyy", e);
         }
 
-        // Build DynamicQuery
         DynamicQuery bookingQuery = _calendarBookingLocalService.dynamicQuery()
                 .add(PropertyFactoryUtil.forName("calendarId").eq(calendarId))
                 .add(PropertyFactoryUtil.forName("startTime").ge(startTimeLong))
@@ -576,26 +777,27 @@ public class EventResource extends BasicResource {
             );
         }
 
-        // ** NO ORDERING **
-        _log.debug("Executing DynamicQuery WITHOUT any ORDER BY");
-        int start = pagination.getStartPosition();
-        int end = pagination.getEndPosition();
+        List<CalendarBooking> allBookings = _calendarBookingLocalService.dynamicQuery(bookingQuery);
 
-        List<CalendarBooking> bookings = _calendarBookingLocalService.dynamicQuery(bookingQuery, start, end);
-        long total = _calendarBookingLocalService.dynamicQueryCount(bookingQuery);
+        List<CalendarBooking> allowedBookings = filterBookingsByUserPermission(allBookings, userId);
+
+        int start = pagination.getStartPosition();
+        int end = Math.min(pagination.getEndPosition(), allowedBookings.size());
+
+        List<CalendarBooking> paginatedBookings = allowedBookings.subList(start, Math.min(end, allowedBookings.size()));
+        long total = allowedBookings.size();
 
         String languageId = getLanguageId(request);
 
-        List<CalendarBookingVO> result = bookings.stream()
+        List<CalendarBookingVO> result = paginatedBookings.stream()
                 .map(booking -> new CalendarBookingVO(booking, languageId))
                 .collect(Collectors.toList());
 
         return PageUtils.createPage(result, pagination, total);
     }
 
-
     // Helper method to get company ID
-     public long getCompanyId(HttpServletRequest request) {
+    public long getCompanyId(HttpServletRequest request) {
         return PortalUtil.getCompanyId(request);
     }
 
