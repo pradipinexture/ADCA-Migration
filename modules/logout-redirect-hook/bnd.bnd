@@ -1,0 +1,4 @@
+Bundle-Name: logout-redirect-hook
+Bundle-SymbolicName: com.adca.logout.redirect
+Bundle-Version: 1.0.0
+Export-Package: com.ADCA.logout.hook
