@@ -1,0 +1,49 @@
+<div class="modal" id="satisfaction-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-md modal-center">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Satisfaction Survey</h5>
+          <button type="button" class="btn close-modal" data-bs-dismiss="modal" aria-label="Close"><i class="icon-remove"></i></button>
+        </div>
+        <div class="modal-body">
+          <form id="feedbackForm">
+               <div class="mb-3">
+              <label class="form-label">How do feel about the page content?</label>
+              <div class="form-check text-center mt-5">
+                <label class="radio-option">
+                  <input class="form-check-input" type="radio" name="satisfactionRating" value="Happy" checked>
+                  <img src="[resources:happy.png]" alt="Happy" width="70">
+                <p class="small">Happy</p>
+                </label>
+                <label class="radio-option">
+                  <input class="form-check-input" type="radio" name="satisfactionRating" value="Neutral">
+                  <img src="[resources:neutral.png]" alt="Neutral" width="70">
+                  <p class="small">Neutral</p>
+                </label>
+                <label class="radio-option">
+                  <input class="form-check-input" type="radio" name="satisfactionRating" value="Sad">
+                  <img src="[resources:sad.png]" alt="Sad" width="70">
+                  <p class="small">SAD</p>
+                </label>
+              </div>
+            </div>
+            <div class="mb-3" id="messageField" style="display:none;">
+              <label for="messageInput" class="form-label">Feedback</label>
+              <textarea class="form-control" id="messageInput" name="message" rows="4"></textarea>
+            </div>
+           
+          </form>
+         <div id="submitted-message" class="pb-3 d-none">
+            <img src="/documents/2424487/2424489/completed.gif/32cc607a-a807-9a79-5bb9-537f78d6de14?t=1692790588021&amp;download=true" height="100">
+           <h4> Thank you! </h4>
+           <p>Your feedback has been submitted  </p>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-end">
+        
+          <button type="button" class="btn btn-secondary-outline" id="submitBtn">[@liferay.language key='submit'/]</button>
+        </div>
+      </div>
+    </div>
+  </div>

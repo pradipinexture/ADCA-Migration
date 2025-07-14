@@ -1,0 +1,47 @@
+#wrapper .form-control:focus {
+    border: 1px solid var(--primary-hover-color) !important;
+}
+
+.modal{
+      background: #0000004a;
+}
+
+#submitted-message{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Custom styling for radio image options */
+   
+   .radio-option {
+      cursor: pointer;
+      margin-right: 15px;
+    }
+
+    /* Hide radio button and show only the image */
+    .radio-option input[type="radio"] {
+      display: none;
+    }
+
+    /* Add background to selected radio image */
+    .radio-option input[type="radio"]:checked + img {
+       border-radius: 50%;
+    }
+    
+    
+ 
+
+/* Change background color of selected radio images */
+.radio-option:nth-child(1)  input[type="radio"]:checked + img{
+  background-color: #95dc98; /* Color for the first option */
+}
+
+.radio-option:nth-child(2) input[type="radio"]:checked + img {
+  background-color: #ffd24c; /* Color for the second option */
+}
+
+.radio-option:nth-child(3) input[type="radio"]:checked + img {
+  background-color: #ff574b; /* Color for the third option */
+}

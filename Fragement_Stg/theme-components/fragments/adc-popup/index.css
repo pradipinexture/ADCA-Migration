@@ -1,0 +1,50 @@
+.fragment_1161156 {
+}
+
+.chat-popup.dl-popup{
+  
+    right: 90px;
+    bottom: 90px;
+    min-height:450px;
+}
+
+.polls-popup.dl-popup{
+  
+    right: 40px;
+    bottom: 90px;
+}
+
+
+.dl-popup {
+    background: #fff;
+    max-width: 350px;
+    min-width: 350px;
+    min-height: 200px;
+    border-radius: 5px;
+    position: fixed;
+    overflow: hidden;
+ 
+ 
+}
+
+.polls-popup .inline-scroller{
+  
+ max-height:unset;
+  
+}
+
+.polls-popup .card-horizontal{
+  border:none;
+}
+
+.polls-popup  .panel-body .popover-body{
+   padding : 0;
+}
+.dl-popup .progress {
+  height:auto;
+}
+
+
+.dl-popup .progress .progress-bar , .oda-chat-header , .oda-chat-header-button{
+     background-color: #bba78d;
+}

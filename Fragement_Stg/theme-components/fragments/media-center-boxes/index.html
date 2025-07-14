@@ -1,0 +1,49 @@
+<div class="col-md-12 mt-3 wow fadeInUp">
+	[#if locale == 'en_US'] [#assign discover= 'E X P L O R E'/] [#else] [#assign discover= 'تصفح'/][/#if]
+	<div class="row">
+	  <div class=" col-md-6 v-space">
+		<a id="news-container"
+		  class=" media-center-item card-shadowed flex-column justify-content-center  v-space "
+		  href="/group/portal/news" style=" height: 380px;">
+		  <div class="media-text"> <small class="font-t">${discover}</small>
+  
+  
+			<h1 class="mt-3"> [#if locale == 'en_US'] News [#else] الأخبار[/#if] </h1>
+			<h3 id="news-counter"></h3>
+		  </div>
+		</a>
+  
+		<a id="media-container" class="media-center-item card-shadowed flex-column justify-content-center  "
+		  href="/group/portal/media-gallery">
+		  <div class="media-text"> <small class="font-t">${discover}</small>
+			<h1 class="mt-3">[#if locale == 'en_US'] Media Gallery [#else] ألبوم الوسائط[/#if] </h1>
+			<h3 id="media-counter"></h3>
+  
+  
+		  </div>
+		</a>
+	  </div>
+	  <div class=" col-md-6 v-space"> <a id="events-container"
+		  class=" media-center-item card-shadowed flex-column justify-content-center  v-space "
+		  href="/group/portal/events" style="background-image:  url([resources:events.jpg])">
+		  <div class="media-text"> <small class="font-t">${discover}</small>
+			<h1 class="mt-3">[#if locale == 'en_US'] Events [#else] الفعاليات[/#if] </h1>
+			<h3 id="events-counter"></h3>
+  
+		  </div>
+		</a>
+		<a id="botcast-container" class="media-center-item card-shadowed flex-column justify-content-center "
+		  href="/group/portal/adc-botcast" style=" height: 380px;">
+		  <div class="media-text"> <small class="font-t">${discover}</small>
+			<h1 class="mt-3">[#if locale == 'en_US'] Botcast [#else] التعاميم[/#if] </h1>
+			<h3 id="botcast-counter"></h3>
+  
+		  </div>
+		</a>
+	  </div>
+  
+	</div>
+  
+  </div>
+  
+  </div>

@@ -1,0 +1,18 @@
+.fragment_792002 {
+}
+
+.fav-btn{
+  
+    position: absolute;
+    right: 30px;
+    top: -13px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 29px;
+    color: #fff;
+    display:none;
+}

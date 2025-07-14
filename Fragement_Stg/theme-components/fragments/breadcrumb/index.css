@@ -1,0 +1,17 @@
+[dir='rtl'] #wrapper .scheduler-base-icon-prev.btn-default, [dir='rtl']  #wrapper .scheduler-base-icon-next.btn-default {
+    transform: scaleX(-1);
+}
+
+[dir='rtl'] .flip-icon{
+  transform: scaleX(-1);
+}
+
+a.btn.btn-outline-light.rounded-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.breadcrumb a .breadcrumb-text-truncate:hover{
+  text-decoration:none !important;
+}

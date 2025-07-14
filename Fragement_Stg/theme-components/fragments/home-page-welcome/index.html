@@ -1,0 +1,28 @@
+[#assign morning='Good morning']
+                [#assign afternoon='Good Afternoon']
+                    [#assign evening='Good Evening']
+                        [#if locale !='en_US']
+                            [#assign morning='صباح الخير']
+                                [#assign afternoon='مساء الخير']
+                                    [#assign evening='مساء الخير']
+                        [/#if]
+                        [#assign aDateTime=.now]
+                            [#assign aDate=aDateTime?date]
+                                [#assign aTime=aDateTime?time]
+                                    [#assign timeStr=aTime?iso("GMT+04") /]
+                                    [#assign hr=timeStr?split(":")[0]?number /]
+
+                                    [#assign greet=morning /]
+                                       [#assign icon = 'sunrise.png' /]
+                                    [#if (hr>= 12 && hr <= 17)]
+                                            [#assign greet=afternoon /]
+                                               [#assign icon = 'asr.png' /]
+                                            [#elseif (hr > 17 && hr <= 24)]
+                                                    [#assign greet=evening /]
+                                                    [#assign icon = 'Ishaa.png' /]
+                                    [/#if]
+
+
+<h3 class="h3 font-l ml-3 wow fadeIn">
+            <span><img src="[resources:${icon}]" width="30" alt=""></span> [@liferay_ui.message key="${greet}" /], <span class="font-r">${user.getFirstName()} </span>
+          </h3>

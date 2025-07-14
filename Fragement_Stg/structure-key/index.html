@@ -1,0 +1,23 @@
+<script>
+	function getKey()
+	{
+		Liferay.Service(
+  '/ddm.ddmstructure/get-structure',
+  {
+    structureId: $("#s_id").val()
+  },
+  function(obj) {
+    $("#result").text(obj.structureKey)
+  }
+);
+	}
+
+</script>
+<input id="s_id" />
+
+<button onclick="getKey()">
+	get key
+</button>
+<p id="result">
+	
+</p>

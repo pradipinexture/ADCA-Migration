@@ -1,0 +1,26 @@
+.welcome-banner{
+      position: relative;
+    height: 320px;
+ 
+}
+
+.custom-shape-divider-bottom-1663502978 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
+
+.custom-shape-divider-bottom-1663502978 svg {
+    position: relative;
+    display: block;
+    width: calc(131% + 1.3px);
+    height: 151px;
+}
+
+.custom-shape-divider-bottom-1663502978 .shape-fill {
+    fill: #fff;
+}
