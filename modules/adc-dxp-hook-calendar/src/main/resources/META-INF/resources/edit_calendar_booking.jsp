@@ -214,7 +214,8 @@
             <liferay-asset:asset-tags-error />
             <aui:model-context bean="<%= calendarBooking %>" model="<%= CalendarBooking.class %>" />
             <aui:fieldset markupView="lexicon">
-                <aui:input defaultLanguageId="<%= LocaleUtil.toLanguageId(themeDisplay.getSiteDefaultLocale()) %>" name="title" />
+                <aui:input autofocus="true" defaultLanguageId="<%= LocaleUtil.toLanguageId(themeDisplay.getSiteDefaultLocale()) %>" name="title" />
+
                 <div class="<%= allDay ? "allday-class-active" : "" %>" id="<portlet:namespace />startDateContainer">
                     <aui:input ignoreRequestValue="<%= true %>" label="starts" name="startTime" timeFormat="<%= timeFormat %>" value="<%= startTimeJCalendar %>" />
                 </div>
@@ -387,7 +388,7 @@
             <liferay-ui:message arguments="<%= ResourceActionsUtil.getModelResource(locale, CalendarBooking.class.getName()) %>" key="this-x-is-approved.-publishing-these-changes-will-cause-it-to-be-unpublished-and-go-through-the-approval-process-again" translateArguments="<%= false %>" />
         </div>
         <%
-            String publishButtonLabel = "publish";
+            String publishButtonLabel = "submit-for-publication";
             if (hasWorkflowDefinitionLink) {
                 publishButtonLabel = "submit-for-publication";
             }
