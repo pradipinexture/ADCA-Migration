@@ -1,0 +1,177 @@
+@import "./customs.min.css";
+@import "./normalize.css";
+@import "./component.css";
+
+
+.tag {
+	font-weight: bold; margin-right: 1em;
+}
+
+.value {
+	font-family: monospace;
+}
+
+.pre {
+	font-family: monospace; white-space: pre;
+}
+
+.day-month {
+	margin-right: 30 !important;
+}
+
+.btn-primary {
+    color: #FFF;
+    background-color: #a39161;
+    border-color: #a39161;
+    box-shadow: none;
+}
+
+.btn-primary:focus {
+    color: #FFF;
+    background-color: #a39161;
+    border-color: #a39161;
+    box-shadow: none;
+}
+
+.btn-primary:active {
+    color: #FFF;
+    background-color: #a39161;
+    border-color: #a39161;
+    box-shadow: none;
+}
+
+.btn-primarytrue:active {
+	background-color: #ede9e0;
+}
+
+.btn-primary:hover {
+    color: #FFF;
+    background-color: #a39161;
+    border-color: #a39161;
+
+}
+
+.btn-secondary:hover {
+    color: #FFF;
+    background-color: #f6f4ef;
+    border-color: #a39161;
+
+}
+
+.btn {
+    font-size: 1rem;
+    border-color: #a39161;
+}
+
+
+.tab-active-true {
+	background-color: #ede9e0;
+}
+
+
+
+
+.tab-active-false {
+	background-color: #ffffff;
+}
+
+.tab-active-false:hover {
+	background-color: #f6f4ef;
+}
+
+
+nav.navbar {
+    -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .2);
+    -moz-box-shadow: 0 4px 8px 0 rgba(0,0,0,.2);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .2);
+    font-size: 1rem;
+    background-color: #ede9e0;
+    padding: 1rem;
+    height: 120px;
+    justify-content: left;
+}
+ 
+.calendar-portlet-column-parent .btn-primary.calendar-add-event-btn{
+    text-transform: uppercase;
+    font-weight: 400;
+    height: 3.5rem;
+     color: #FFF; 
+    background-color: #a39161;
+    border-color: #a39161;
+    box-shadow: none;
+}
+.btn-default, .btn-secondary{
+  font-size: 1rem;
+    border-color: #a39161 !important;
+    color: #FFF !important;
+    background-color: #6c757d !important;
+}
+.btn-default:hover , .btn-secondary:hover{
+    color: #FFF !important;
+    background-color: #5a6268 !important;
+    border-color: #545b62 !important;
+}
+.calendar-portlet-column-parent .btn {
+    display: inline-block;
+    font-weight: 400;
+    color: #212529;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+ 
+.calendar-portlet-column-parent .scheduler-base-controls{
+      display: inline-flex;
+     align-items: center;
+}
+ 
+.calendar-portlet-column-parent .btn-group>.btn, .btn-group-vertical>.btn {
+    position: relative;
+    flex: 1 1 auto;
+}
+ 
+.calendar-portlet-column-parent .col-5, .col-xs-5 {
+    flex: 0 0 41.66667%;
+    max-width: 41.66667%;
+}
+ 
+.calendar-portlet-column-parent .btn-group, .btn-group-vertical {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+}
+ 
+.calendar-portlet-column-parent .btn-default:not(:disabled):not(.disabled):active, .calendar-portlet-column-parent .btn-default:not(:disabled):not(.disabled).active, .calendar-portlet-column-parent .nav-underline .tab.active a.btn-default:not(:disabled):not(.disabled), .show>.btn-default.dropdown-toggle{
+    color: #FFF !important;
+    background-color: #545b62 !important;
+    border-color: #4e555b !important;
+}
+ 
+.calendar-portlet-column-parent .scheduler-base-hd .scheduler-base-views{
+  align-items: center;
+}
+ 
+.form .btn-sm{
+    color: #a39161 !important;
+    background-color: transparent !important;
+    height: 3.5rem !important;
+    text-transform: uppercase !important;
+    font-weight: 500 !important;
+    margin-bottom: 64px !important;
+    align-items: flex-start !important;
+    display: inline-flex !important;
+}
+.form .btn-sm:hover{
+    color: #84754d !important;
+    border-color: #84754d !important;
+    background-color: transparent !important;
+    border: 1px solid #a39161 !important;
+}
+

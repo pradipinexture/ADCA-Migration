@@ -1,3 +1,4 @@
+
 @import 'liferay-font-awesome/scss/font-awesome';
 @import 'liferay-font-awesome/scss/glyphicons';
 
@@ -73,6 +74,85 @@
   background: #ffffff38;
 }
 
+#banner .navbar-nav{
+  align-items: center;
+}
+
+.attachments-container .form-control.attachment{
+  background: transparent !important;
+}
+
+.scheduler-view-agenda{
+  margin-top: 0px !important;
+}
+
+simple-menu-item:hover{
+  padding: 6px 30px !important;
+}
+
+.calendar-portlet .header-title{
+  margin-top: 0rem !important;
+}
+
+.document-container .lfr-search-container-wrapper a:not(.component-action):not(.btn){
+  color: #000 !important;
+}
+
+.list-group-header{
+  background-color: #f8f9fa !important;
+}
+
+.document-library-breadcrumb .breadcrumb-link{
+   color: #6c757d !important;
+}
+
+.documents-section .sidenav-content h3.text-secondary{
+  color: #555 !important;
+}
+
+.documents-section .sidenav-content .management-bar.navbar{
+  box-shadow: none !important;
+  border-bottom: 1px solid #c8c9ca !important;
+}
+
+.documents-section .subnav-tbar-primary .component-link:hover{
+  cursor: pointer;
+}
+
+.documents-section .card-body .management-bar{
+  margin-bottom: 1.25rem;
+  background-color: #f8f9fa;
+}
+
+#banner .navbar-nav .nav-item{
+  margin-right: 17px !important;
+}
+
+.status.approved{
+  text-transform: uppercase !important;
+}
+
+.signed-out .portlet-login .portlet-content{
+  padding-left: 130px !important;
+  padding-right: 130px !important;
+  padding-top: 100px !important;
+}
+
+.signed-out .portlet-navigation ul.navbar-nav{
+  gap: 12px !important;
+}
+
+.signed-out .portlet-navigation ul.navbar-nav .text-truncate {
+  overflow: visible !important;
+  text-overflow: inherit !important;
+  white-space: nowrap;
+}
+
+.management-bar-light .navbar-overlay{
+  background-color: #f8f9fa !important;
+}
+
+
 [dir="rtl"] {
   .page-title nav .breadcrumb .breadcrumb-item+.breadcrumb-item::before {
     transform: scaleX(-1);
@@ -121,6 +201,39 @@ span.badge.badge-danger.panel-notifications-count {
   background: linear-gradient(158.76deg, #dad6d6 2.55%, rgba(0, 65, 102, 0.01) 23.57%, #8aa39917 45.57%, rgba(190, 186, 180, 0.270833) 70.99%, rgba(217, 217, 217, 0) 96.41%);
 }
 
+.middle-content{
+  min-height: 100vh;
+}
+
+.advance-search.news .input-group-prepend .input-group-text{
+  border-top-left-radius: 20px !important;
+  border-bottom-left-radius: 20px !important;
+
+}
+
+.advance-search.news .search-input-append .input-group-text{
+
+  border-top-right-radius: 20px !important;
+
+  border-bottom-right-radius: 20px !important;
+
+  border-top-left-radius: 0px !important;
+
+  border-bottom-left-radius: 0px !important;
+}
+
+.yui3-g [class *= "yui3-u"]{
+  font-family: "HelveticaNeue-LT", "HelveticaNeue-AR-LT";
+}
+
+.events-filter label{
+  border-radius: 16px !important;
+}
+
+.media-gallery .icon-calendar.mr-2{
+  margin-right: 11.8px !important;
+}
+
 div#wrapper.viewerAccess {
   margin-top: 0;
 }
@@ -143,14 +256,14 @@ div#wrapper.loggedIn {
 }
 
 .portlet-decorate .portlet-content{
-padding: 0;
-border: none;
-border-radius: 10px;
-background: transparent;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
 }
 
 .breadcrumb-item .active{
-color: #fff;
+  color: #fff;
 }
 #content {
   padding-bottom: 0px !important;
@@ -173,6 +286,540 @@ footer#footer {
   display: block;
 }
 
+ul.tabs-primary-outline li a.active {
+  background-color: transparent !important;
+  color: #000 !important;
+}
+
+//#wrapper .search-input{
+//  background: transparent !important;
+//}
+//.main-sidebar .sidebar-btn{
+//  padding: 8px 20px 8px 19.5px !important;
+//  margin: 0px 0px 16px -2px !important;
+//}
+.portlet-user-personal-bar .personal-menu-dropdown .sticker-lg .lexicon-icon{
+  margin-top: 4px !important;
+  height: 20px;
+  width: 20px;
+}
+//.btn-group-vertical>.btn{
+//  padding: 13px !important;
+//}
+.card-page.card-page-equal-height .card{
+  border-radius: 10px;
+}
+.calendar-portlet-column-parent .btn-primary.calendar-add-event-btn{
+  z-index: 1;
+}
+.calendar-portlet .popover.scheduler-event-recorder-popover .popover-content .close{
+  display: flex;
+}
+.calendar-portlet-column-parent{
+  padding-top: 20px;
+}
+.component-action[aria-expanded=true], .component-action.show{
+  background-color: transparent !important;
+  color: #fff;
+}
+.list-group-notification .list-group-item {
+  border-width: 1px;
+  //border-radius: 7px 7px 0px 0px;
+  margin-top: -3px;
+}
+.sheet{
+  border-color: #000000;
+  margin-bottom: 15px;
+}
+.lfr-asset-column-details .lfr-asset-actions{
+  right: 20px;
+}
+/* 16/06 */
+.sheet .panel-group .panel-body {
+  margin-bottom: 1.5rem !important;
+}
+
+.taglib-empty-result-message{
+  background-color: #FFF;
+  border-color: #dee2e6;
+  border-style: solid;
+  border-width: .0625rem;
+  border-radius: .25rem;
+  padding-bottom: .0625rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.taglib-empty-result-message .text-secondary{
+  margin-bottom: 1.5rem;
+}
+
+.advance-search .input-group-prepend{
+  display: flex;
+  border-radius: 0px!important
+}
+
+.advance-search input.search-input , .input-group-prepend a.search-input{
+  background-color: #ededed !important;
+  border-radius: 0px !important;
+}
+
+.advance-search input.search-input.no-filter {
+  border-top-right-radius: 20px !important;
+  border-bottom-right-radius: 20px !important;
+}
+
+.input-group-text{
+  border-radius: 0px !important;
+}
+
+//footer#footer{
+//  position: fixed !important;
+//  bottom: 0;
+//  left: 0;
+//  width: 100%;
+//  z-index: 1;
+//}
+
+.form-control.poster , .form-control.attachment{
+  border-style: none !important;
+}
+
+nav.subnav-tbar{
+  padding-left: 75px !important;
+  padding-right: 75px !important;
+}
+
+.calendar-portlet .c-inner .lexicon-icon{
+  height:4em !important;
+}
+
+.portlet-message-boards .component-action:hover{
+  background-color: transparent !important;
+  color: #6c757d !important;
+}
+.portlet-message-boards .component-action[aria-expanded=true]{
+  color: #6c757d;
+}
+.portlet-message-boards .main-content-body{
+  padding-bottom: 50px;
+}
+
+.pagination-items-per-page > a, .pagination-items-per-page > button{
+  color: #212529 !important;
+}
+
+.lfr-search-container-wrapper a:not(.component-action):not(.btn){
+  text-decoration: none !important;
+}
+
+//nav.navbar {
+//
+//  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .2);
+//
+//  -moz-box-shadow: 0 4px 8px 0 rgba(0,0,0,.2);
+//
+//  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .2);
+//
+//  font-size: 1rem;
+//
+//  background-color: #ede9e0;
+//
+//  padding: 1rem;
+//
+//  height: 120px;
+//
+//  justify-content: left;
+//
+//}
+
+.calendar-portlet-column-parent .btn-primary.calendar-add-event-btn{
+
+  text-transform: uppercase;
+
+  font-weight: 400;
+
+  height: 3.5rem;
+
+  color: #FFF;
+
+  background-color: #a39161;
+
+  border-color: #a39161;
+
+  box-shadow: none;
+
+}
+.btn-secondary-outline:hover {
+  color: #fff;
+  background-color: #3D4742 !important;
+}
+
+
+.btn-default, .btn-secondary{
+
+  font-size: 1rem;
+
+  border-color: #a39161 !important;
+
+  color: #FFF !important;
+
+  background-color: #6c757d !important;
+
+}
+
+.btn-default:hover , .btn-secondary:hover{
+  color: #FFF !important;
+  background-color: #5a6268 !important;
+  border-color: #545b62 !important;
+}
+
+.calendar-portlet nav.navbar{
+  box-shadow: 0 4px 4px rgba(0,0,0,0.14);
+  height: 120px;
+  padding: 1rem;
+  background-color: #ede9e0;
+}
+
+.calendar-portlet nav.navbar ul li a{
+  text-transform: uppercase;
+}
+
+.calendar-portlet-column-parent .btn {
+
+  display: inline-block;
+  font-weight: 400;
+  color: #212529;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.calendar-portlet-column-parent .scheduler-base-controls{
+  display: inline-flex;
+  align-items: center;
+}
+
+.calendar-portlet-column-parent .btn-group>.btn, .btn-group-vertical>.btn {
+
+  position: relative;
+
+  flex: 1 1 auto;
+
+}
+
+.calendar-portlet-column-parent .col-5, .col-xs-5 {
+
+  flex: 0 0 41.66667%;
+
+  max-width: 41.66667%;
+
+}
+
+.calendar-portlet-column-parent .btn-group, .btn-group-vertical {
+
+  position: relative;
+
+  display: inline-flex;
+
+  vertical-align: middle;
+
+}
+
+.calendar-portlet-column-parent .btn-default:not(:disabled):not(.disabled):active, .calendar-portlet-column-parent .btn-default:not(:disabled):not(.disabled).active, .calendar-portlet-column-parent .nav-underline .tab.active a.btn-default:not(:disabled):not(.disabled), .show>.btn-default.dropdown-toggle{
+
+  color: #FFF !important;
+
+  background-color: #545b62 !important;
+
+  border-color: #4e555b !important;
+
+}
+
+.calendar-portlet-column-parent .scheduler-base-hd .scheduler-base-views{
+
+  align-items: center;
+
+}
+
+.form .btn-sm{
+
+  color: #a39161 !important;
+
+  background-color: transparent !important;
+
+  height: 3.5rem !important;
+
+  text-transform: uppercase !important;
+
+  font-weight: 500 !important;
+
+  margin-bottom: 64px !important;
+
+  align-items: flex-start !important;
+
+  display: inline-flex !important;
+
+}
+
+.form .btn-sm:hover{
+
+  color: #84754d !important;
+
+  border-color: #84754d !important;
+
+  background-color: transparent !important;
+
+  border: 1px solid #a39161 !important;
+
+}
+
+.portlet-message-boards .container-fluid {
+  margin-right: 110px;
+  margin-left: 110px;
+}
+
+.calendar-booking-reminders .calendar-portlet-reminder-section .reminder-duration{
+  margin-bottom: 0 !important;
+  padding: 3px !important;
+  margin-left: 5px !important;
+}
+
+.calendar-booking-reminders .calendar-portlet-reminder-section .reminder-type{
+  margin: 0 6px 0 0 !important;
+}
+
+.calendar-portlet-reminder-section{
+   padding-bottom: 10px !important;
+}
+
+.scheduler-view-table-data-event {
+  padding: 0 3px;
+  z-index: 1 !important;
+}
+
+.event-acceptance-card .day-month .month{
+  height: 17px;
+}
+
+.ui-datepicker-rtl {
+  direction: rtl !important;
+}
+.ui-datepicker-rtl .ui-datepicker-prev {
+  left: auto !important;
+  right: 3px !important;
+}
+.ui-datepicker-rtl .ui-datepicker-next {
+  right: auto !important;
+  left: 3px !important;
+}
+
+.ui-datepicker-rtl .ui-datepicker-next span{
+  rotate: 180deg;
+}
+
+.ui-datepicker-rtl .ui-datepicker-prev span{
+  rotate: 180deg;
+}
+
+.ui-datepicker-rtl .ui-datepicker-prev:hover {
+  right: 1px;
+  left: auto;
+}
+.ui-datepicker-rtl .ui-datepicker-next:hover {
+  left: auto;
+  right: auto;
+}
+
+
+@media (max-width: 991px){
+  .calendar-portlet-column-parent .btn-group{
+    flex-wrap: nowrap;
+  }
+
+  .calendar-portlet-column-parent .btn-primary.calendar-add-event-btn{
+    width: 130px;
+  }
+}
+
+@media (max-width: 768px){
+
+  .event-acceptance-card .card-body .col-md-6{
+    padding-left: 15px !important;
+  }
+
+  .event-acceptance-card .card-body .col-md-6 .reject-btn{
+    margin-top: 8px;
+  }
+}
+
+//.portlet-message-boards {
+//  font-family: 'Roboto', sans-serif;
+//}
+//
+//.portlet-message-boards  .input-group .input-group-item .input-group-inset-after.form-control{
+//  display: block;
+//  height: 2.5rem;
+//  padding: .4375rem 1rem;
+//  font-size: 1rem;
+//  font-weight: 400;
+//  line-height: 1.5;
+//  color: #272833;
+//  background-color: #f1f2f5;
+//  background-clip: padding-box;
+//  border: .0625rem solid #e7e7ed;
+//  border-radius: .25rem;
+//  box-shadow: 0 0 rgba(0,0,0,0);
+//  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+//}
+//
+//.portlet-message-boards  .input-group .input-group-inset-item-after{
+//  border: 0;
+//  background: transparent;
+//}
+//
+//.portlet-message-boards  .navigation-bar-light .navbar-nav .nav-link.active{
+//  color: #454545 !important;
+//}
+//
+//.portlet-message-boards  .navigation-bar-light .navbar-nav .nav-link{
+//  color: #6b6c7e;
+//  font-weight: 600;
+//  font-family: 'Roboto',sans-serif;
+//  font-size: 14px;
+//}
+//
+//.portlet-message-boards .navbar-underline.navbar-expand-md .navbar-nav .nav-link.active:after{
+//  background-color: #9a2730 !important;
+//}
+//
+//.portlet-message-boards .navigation-bar-light{
+//  background-color: transparent;
+//  box-shadow: none;
+//}
+//
+//.portlet-message-boards .breadcrumb{
+//  background-color: transparent;
+//}
+//
+//.portlet-message-boards .btn-group-item .btn-secondary{
+//  color: #a39161 !important;
+//  background-color: transparent !important;
+//  text-transform: uppercase;
+//  border-color: #a39161 !important;
+//  height: 2.5rem;
+//  min-width: 7rem;
+//  font-weight: 400;
+//  border-radius: .25rem 0 0 .25rem;
+//  line-height: 1.6rem;
+//  font-size: 14px;
+//  font-family: 'Roboto', sans-serif;
+//  align-items: center;
+//  justify-content: center;
+//  display: flex;
+//}
+//
+//.portlet-message-boards .btn-group-item .btn-secondary:hover{
+//  background-color: #84754d !important;
+//  color: #84754d !important;
+//  border-color: #84754d !important;
+//  background-color: transparent !important;
+//  border: 1px solid #a39161 !important;
+//}
+//
+//.portlet-message-boards .btn-group-item .btn-primary{
+//  color: white;
+//  background-color: #a39161;
+//  border-color: #a39161;
+//  box-shadow: 0 0 transparent;
+//  text-transform: uppercase;
+//  font-weight: 400;
+//  height: 2.5rem;
+//  line-height: 1.6rem;
+//  font-size: 14px;
+//  font-family: 'Roboto', sans-serif;
+//  align-items: center;
+//  justify-content: center;
+//  display: flex;
+//}
+//
+//.portlet-message-boards .btn-group-item .btn-primary:hover{
+//  background-color: #84754d !important;
+//}
+//.portlet-message-boards .list-group-header {
+//  align-items: center;
+//  background-color: #f7f8f9;
+//  border: 1px solid #e7e7ed;
+//  display: flex;
+//  justify-content: space-between;
+//  margin-bottom: -1px;
+//  padding: .5rem 1rem;
+//  color: #6b6c7e;
+//  font-size: .875rem;
+//}
+//
+//.portlet-message-boards .list-group-header-title {
+//  font-size: .75rem;
+//  font-weight: 700;
+//  line-height: 1.2;
+//  margin-bottom: 0;
+//  color: #6b6c7e;
+//  text-transform: uppercase;
+//}
+//
+//.portlet-message-boards .list-group-item {
+//  position: relative;
+//  padding: 1rem 1rem;
+//  color: #6b6c7e;
+//  background-color: #fff;
+//  border: 1px solid #e7e7ed;
+//}
+//
+//.portlet-message-boards .autofit-col-expand a{
+//  font-size: .875rem;
+//  line-height: 1.5;
+//  font-weight:700 !important;
+//  color: #212529 !important;
+//  text-decoration : none !important;
+//  font-family: 'Roboto', sans-serif;
+//}
+//
+//.portlet-message-boards .autofit-col-expand .h6{
+//  font-weight: 500 !important;
+//  font-family: 'Roboto', sans-serif;
+//}
+//
+//.portlet-message-boards .taglib-empty-result-message{
+//  background-color: transparent;
+//  border-color: #e7e7ed;
+//  border-style: solid;
+//  border-width: .0625rem;
+//  border-radius: .25rem;
+//  padding-bottom: .0625rem;
+//  padding-left: 1.5rem;
+//  padding-right: 1.5rem;
+//  padding-top: 1.5rem;
+//}
+//
+//.portlet-message-boards .taglib-empty-result-message .text-secondary {
+//  color: #6b6c7e;
+//  margin-bottom: 1.5rem;
+//  word-wrap: break-word;
+//}
+//
+//.portlet-message-boards .main-content-body h3{
+//  font-size: 1.1875rem;
+//}
+
+
 /* SCSS imports */
 @import "custom-datepicker";
 @import "adcMain";
@@ -183,4 +830,3 @@ footer#footer {
 @import "custom-tooltips";
 @import "media-center";
 @import "popups";
-

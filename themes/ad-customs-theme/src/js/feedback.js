@@ -78,7 +78,7 @@ function postForm(formValues) {
 
     // Headers for the request
     const headers = new Headers();
-    headers.append("Authorization", "Bearer " + Liferay.authToken);
+    headers.append("x-csrf-token", Liferay.authToken);
     headers.append("languageId", Liferay.ThemeDisplay.getLanguageId());
     headers.append("groupId", Liferay.ThemeDisplay.getSiteGroupId());
     headers.append("Content-Type", "application/json"); // Add this line to specify the content type
